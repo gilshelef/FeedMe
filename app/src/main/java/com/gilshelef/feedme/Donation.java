@@ -1,18 +1,14 @@
 package com.gilshelef.feedme;
 
-import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by gilshe on 2/21/17.
  */
 class Donation implements Parcelable {
-
-    public void setSelected(boolean val) {
-
-        selected = val;
-    }
 
     enum State {AVAILABLE, SAVED}
 
@@ -26,7 +22,7 @@ class Donation implements Parcelable {
     int defaultImage;
     private String id; // donation id
     private State state;
-    Location location;
+    LatLng location;
     private boolean selected;
 
     Donation(){
@@ -65,7 +61,7 @@ class Donation implements Parcelable {
         this.state = state;
     }
 
-    Location getLocation() {
+    LatLng getLocation() {
         return location;
     }
 
@@ -76,10 +72,6 @@ class Donation implements Parcelable {
     boolean isSaved() {
         return state.equals(State.SAVED);
     }
-
-//    boolean isSelected() {
-//        return state.equals(State.SELECTED);
-//    }
 
     boolean isSelected(){
         return selected;
@@ -103,6 +95,9 @@ class Donation implements Parcelable {
         return id.hashCode();
     }
 
+    void setSelected(boolean val) {
+        selected = val;
+    }
 
     public static final Parcelable.Creator<Donation> CREATOR = new Creator<Donation>() {
         public Donation createFromParcel(Parcel source) {

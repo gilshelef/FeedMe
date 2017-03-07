@@ -5,21 +5,24 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 
+import com.google.android.gms.maps.model.LatLng;
+
 /**
  * Created by gilshe on 2/25/17.
  */
 class Association {
 
     private static Association instance;
-    private static String uuid;
-    private static Location baseLocation;
-
+    private static String UUID;
+    private static LatLng location;
+    private static String name;
     private static final int KILOMETER = 1000;
 
 
-    private Association(String id, Location location){
-        uuid = id;
-        baseLocation = location;
+    private Association(String id, LatLng location, String name){
+        Association.UUID = id;
+        Association.location = location;
+        Association.name = name;
     }
 
     static Association get(Activity activity) {
@@ -36,25 +39,35 @@ class Association {
 
         SharedPreferences sharedPref = activity.getPreferences(Context.MODE_PRIVATE);
         String uuid = sharedPref.getString("key_uuid", "1"); // TODO change to null after registering
-        double latitude = sharedPref.getFloat("key_latitude", 31);
-        double longitude = sharedPref.getFloat("key_longitude", 34);
+        String name = sharedPref.getString("key_name", "לשובע"); // TODO change to null after registering
+        float latitude = sharedPref.getFloat("key_latitude", 31.252973f);
+        float longitude = sharedPref.getFloat("key_longitude", 34.791462f);
 
-        Location baseLocation = new Location("base_location");
-        baseLocation.setLatitude(latitude);
-        baseLocation.setLongitude(longitude);
-
-        instance = new Association(uuid, baseLocation);
+        LatLng base= new LatLng(latitude, longitude);
+        instance = new Association(uuid, base, name);
         return instance;
 
 
     }
 
-    static float calcDistance(Location location) {
-        return (location.distanceTo(baseLocation))/ KILOMETER;
+    static float calcDistance(LatLng location) {
+        float[] result = new float[1];
+        Location.distanceBetween(location.latitude, location.longitude, Association.location.latitude, Association.location.longitude, result);
+
+        if(result.length == 0)
+            return Integer.MAX_VALUE;
+        return (result[0] / KILOMETER);
     }
 
     public static String getId() {
-        return uuid;
+        return UUID;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    LatLng getBaseLocation() {
+        return location;
+    }
 }

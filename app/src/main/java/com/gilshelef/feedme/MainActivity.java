@@ -37,15 +37,16 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //initialize app's data
         Association.get(this);
         DataManager.get(this);
         mSelectedHandler = new SelectedDonationHandler();
 
         // set toolbar
         mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mToolBar.setTitle(getTitle(0));
         setSupportActionBar(mToolBar);
-        mToolBar.setNavigationIcon(R.drawable.donate_icon);
+        getSupportActionBar().setTitle(getTitle(0));
 
         // set tabs
         mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
                 mViewPager.setCurrentItem(tab.getPosition());
                 int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.lightPrimaryColor);
                 tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
-                mToolBar.setTitle(getTitle(tab.getPosition()));
+                getSupportActionBar().setTitle(getTitle(tab.getPosition()));
             }
 
             @Override
@@ -154,6 +155,9 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
         snackbar.show();
     }
 
+    /*
+    * class handles view events when donations are selected
+    * */
     private class SelectedDonationHandler {
 
         private int count;
@@ -162,7 +166,6 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
         SelectedDonationHandler(){
             count = 0;
             selected = new HashSet<>();
-
         }
 
         void selectedEvent(String donationId) {
@@ -171,7 +174,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
 
             count++;
             selected.add(donationId);
-            mToolBar.setTitle(getCount());
+            getSupportActionBar().setTitle(getCount());
 
         }
 
@@ -181,7 +184,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
 
             count--;
             selected.remove(donationId);
-            mToolBar.setTitle(getCount());
+            getSupportActionBar().setTitle(getCount());
 
             if(isEmpty())
                 mSelectedHandler.end();
@@ -216,7 +219,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
             mFAB.startAnimation(hideFAB); // hide fab
             mTabLayout.setVisibility(View.VISIBLE);
             mMenu.findItem(R.id.filter).setEnabled(true).setVisible(true); // show filter
-            mToolBar.setTitle(getTitle(mTabLayout.getSelectedTabPosition()));
+            getSupportActionBar().setTitle(getTitle(mTabLayout.getSelectedTabPosition()));
             clear();
             AdapterManager.get().clearSelectedViewAll();
         }
@@ -232,4 +235,5 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
         }
 
     }
+
 }

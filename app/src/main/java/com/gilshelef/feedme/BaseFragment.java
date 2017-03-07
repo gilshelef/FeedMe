@@ -55,12 +55,13 @@ abstract class BaseFragment extends Fragment implements RecycledBaseAdapter.OnAc
     }
 
     @Override
-    public void onSelectEvent(String id, boolean selected) {
-        ((OnSelectedEvent)getActivity()).onSelectedEvent(id, selected);
+    public void onSelectEvent(Donation donation){
+        DataManager.get(getActivity()).selectEvent(donation.getId());
+        ((OnSelectedEvent)getActivity()).onSelectedEvent(donation.getId(), donation.isSelected());
     }
 
     @Override
-    public void onClickEvent(View v, Donation donation){
+    public void onZoomEvent(View v, Donation donation){
         Intent intent = new Intent(getActivity(), PopupActivity.class);
         Bundle mBundle = new Bundle();
         mBundle.putParcelable(PopupActivity.EXTRA_DONATION, donation);
@@ -72,6 +73,7 @@ abstract class BaseFragment extends Fragment implements RecycledBaseAdapter.OnAc
     interface OnSelectedEvent{
         void onSelectedEvent(String id, boolean selected);
     }
+
 
 
 }

@@ -1,8 +1,9 @@
 package com.gilshelef.feedme;
 
 import android.content.Context;
-import android.location.Location;
 import android.os.AsyncTask;
+
+import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +18,7 @@ import java.util.Set;
 
 /**
  * Created by gilshe on 2/25/17.
+ * class handles all data related issues
  */
  class DataManager {
 
@@ -72,10 +74,8 @@ import java.util.Set;
                     donation.setState(Donation.State.AVAILABLE);
                 else donation.setState(Donation.State.SAVED);
 
-                Location l = new Location("donation's location");
-                l.setLatitude(obj.getDouble("latitude"));
-                l.setLongitude(obj.getDouble("longitude"));
-                donation.location = l;
+                LatLng location = new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude"));
+                donation.location = location;
                 donation.defaultImage = getImageByType(donation.type);
                 String id = donation.getId();
                 DataManager.donations.put(id, donation);
@@ -165,6 +165,15 @@ import java.util.Set;
         AdapterManager.get().updateDataSourceAll();
     }
 
+    void selectEvent(String id) {
+        Donation d = donations.get(id);
+        if (!d.isSelected())
+            d.setSelected(true);
+        else d.setSelected(false);
+
+        AdapterManager.get().updateDataSourceAll();
+    }
+
     void removeAll(Set<String> items) {
         donations.keySet().removeAll(items);
         AdapterManager.get().updateDataSourceAll();
@@ -176,7 +185,6 @@ import java.util.Set;
         AdapterManager.get().updateDataSourceAll();
 
     }
-
 
     private static class FetchDataTask extends AsyncTask<String, Void, Integer> {
         private final Context mContext;

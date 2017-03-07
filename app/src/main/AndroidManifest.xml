@@ -2,6 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.gilshelef.feedme">
 
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
@@ -20,6 +22,10 @@
         <activity android:name=".PopupActivity"
             android:theme="@style/MyTheme.Popup">
         </activity>
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyBPAHMrXH-TVe09QLxbC4w44nBcxNYZexs"/>
     </application>
 
 </manifest>

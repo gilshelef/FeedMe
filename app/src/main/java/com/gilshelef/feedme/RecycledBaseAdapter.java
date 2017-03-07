@@ -132,11 +132,7 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
         @Override
         public boolean onLongClick(View v) {
             selectedView = true;
-            if (!mDonation.isSelected())
-                mDonation.setSelected(true);
-            else mDonation.setSelected(false);
-            loadSelected();
-            mListener.onSelectEvent(mDonation.getId(), mDonation.isSelected());
+            mListener.onSelectEvent(mDonation);
             return true;
         }
 
@@ -145,7 +141,7 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
             if (selectedView)
                 onLongClick(v);
             else
-                mListener.onClickEvent(v.findViewById(R.id.list_thumbnail), mDonation);
+                mListener.onZoomEvent(v.findViewById(R.id.list_thumbnail), mDonation);
         }
 
         private void setUnselected() {
@@ -178,11 +174,8 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
     interface OnActionEvent {
         void onSaveEvent(Donation donation);
         void onCallEvent(String phone);
-        void onSelectEvent(String donationId, boolean selected);
-        void onClickEvent(View v, Donation donation);
+        void onSelectEvent(Donation donation);
+        void onZoomEvent(View v, Donation donation);
     }
-
-
-
 
 }
