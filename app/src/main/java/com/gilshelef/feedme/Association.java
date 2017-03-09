@@ -14,14 +14,14 @@ class Association {
 
     private static Association instance;
     private static String UUID;
-    private static LatLng location;
+    private static LatLng position;
     private static String name;
     private static final int KILOMETER = 1000;
 
 
     private Association(String id, LatLng location, String name){
         Association.UUID = id;
-        Association.location = location;
+        Association.position = location;
         Association.name = name;
     }
 
@@ -52,7 +52,7 @@ class Association {
 
     static float calcDistance(LatLng location) {
         float[] result = new float[1];
-        Location.distanceBetween(location.latitude, location.longitude, Association.location.latitude, Association.location.longitude, result);
+        Location.distanceBetween(location.latitude, location.longitude, Association.position.latitude, Association.position.longitude, result);
 
         if(result.length == 0)
             return Integer.MAX_VALUE;
@@ -67,7 +67,7 @@ class Association {
         return name;
     }
 
-    LatLng getBaseLocation() {
-        return location;
+    LatLng getBasePosition() {
+        return position;
     }
 }

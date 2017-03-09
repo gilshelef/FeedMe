@@ -60,7 +60,7 @@ import java.util.Set;
             for(int i = 0; i < donations.length(); i++){
                 JSONObject obj = donations.getJSONObject(i);
                 Donation donation = new Donation();
-                donation.type = obj.getString("type");
+                donation.setType(obj.getString("type"));
                 donation.description = obj.getString("description");
                 donation.phone = obj.getString("phone");
                 donation.firstName = obj.getString("firstName");
@@ -76,15 +76,15 @@ import java.util.Set;
 
                 LatLng location = new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude"));
                 donation.location = location;
-                donation.defaultImage = getImageByType(donation.type);
                 String id = donation.getId();
                 DataManager.donations.put(id, donation);
-
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
+
+
 
     private static String loadJsonFromAsset(String filename, Context context) {
         String json;
@@ -103,19 +103,6 @@ import java.util.Set;
         }
 
         return json;
-    }
-
-    private static int getImageByType(String type) {
-        switch (type){
-            case "ירקות":
-                return R.drawable.ic_vegetable;
-            case "מאפים":
-                return R.drawable.ic_cake;
-            case "בגדים":
-                return R.drawable.ic_clothes;
-            default:
-                return R.drawable.placeholder;
-        }
     }
 
     List<Donation> getSaved(Context context) {

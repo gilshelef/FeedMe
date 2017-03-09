@@ -35,8 +35,7 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
 
     @Override
     public RecycledBaseAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
-        int layout = getListItemLayout();
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(layout, null);
+        View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);
         return new ViewHolder(view);
     }
 
@@ -54,7 +53,6 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
     void clearSelectedView(){
         selectedView = false;
     }
-    abstract int getListItemLayout();
     abstract void updateDataSource();
 
     class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
@@ -97,12 +95,12 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
             loadSelected();
 
             //Setting text views
-            type.setText(donation.getType());
+            type.setText(donation.getType().hebrew());
             description.setText(donation.getDescription());
             contact.setText(donation.getContactInfo());
 
             //distance
-            double distance = Association.calcDistance(mDonation.getLocation());
+            double distance = Association.calcDistance(mDonation.getPosition());
             String text = String.format(mContext.getString(R.string.distance), distance);
             this.distance.setText(text);
 

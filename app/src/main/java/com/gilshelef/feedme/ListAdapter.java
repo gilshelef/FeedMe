@@ -16,11 +16,6 @@ class ListAdapter extends RecycledBaseAdapter {
     }
 
     @Override
-    int getListItemLayout() {
-        return R.layout.list_row;
-    }
-
-    @Override
     void updateDataSource() {
         mDataSource.clear();
         mDataSource.addAll(DataManager.get(mContext).getAll(mContext));

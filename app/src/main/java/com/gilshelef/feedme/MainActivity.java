@@ -86,6 +86,8 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
         mFAB = (FloatingActionButton) findViewById(R.id.fab);
         mCoordinator = (CoordinatorLayout) findViewById(R.id.coordinator);
         mFAB.setOnClickListener(this);
+        mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount());
+
     }
 
 

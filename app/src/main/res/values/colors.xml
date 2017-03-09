@@ -5,6 +5,7 @@
     <color name="colorAccent">#FF4081</color>
     <color name="lightPrimaryColor">#F5F5F5</color>
     <color name="lightTextColor">#e0b7b7b7</color>
+    <color name="selected">#e0cfcbcb</color>
     <color name="iconsUnselected">#212121</color>
     <color name="iconsSelected">#f2f2f2</color>
 

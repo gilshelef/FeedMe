@@ -2,6 +2,7 @@ package com.gilshelef.feedme;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -24,9 +25,14 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -35,24 +41,27 @@ import static android.app.Activity.RESULT_OK;
  * Created by gilshe on 2/23/17.
  */
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     private GoogleMap mMap;
     private MapView mMapView;
     private static final String TAG = MapFragment.class.getSimpleName();
     private static final int PERMISSIONS_REQUEST_LOCATION = 1;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
-
+    private List<Donation> mDataSource;
 
     public MapFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState){
+        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -65,6 +74,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
 
         mMapView.getMapAsync(this);
+        mDataSource = DataManager.get(getActivity()).getAll(getActivity());
         return rootView;
     }
 
@@ -83,7 +93,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         }
         return super.onOptionsItemSelected(item);
     }
-
 
     @Override
     public void onResume() {
@@ -121,8 +130,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     }
 
     private void setUpMap() {
+        Log.d(TAG, "setUpMap");
+        mMap.setOnMarkerClickListener(this);
         Association association = Association.get(getActivity());
-        displayMark(association.getBaseLocation(), association.getName());
+        displayMark(association.getBasePosition(), association.getName());
+
         if (ActivityCompat.checkSelfPermission(getActivity(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                 ActivityCompat.checkSelfPermission(getActivity(),
@@ -138,9 +150,34 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
             Log.i(TAG, "no permission for my location enable");
             return;
         }
-        mMap.setMyLocationEnabled(true);
+        //TODO why not showing?
+        new DrawDonationTask().execute();
     }
 
+//    private void displayDonations() {
+//
+//        List<Donation> donationList = DataManager.get(getActivity()).getAll(getActivity());
+//        List<Marker> markersList = new ArrayList<>();
+//
+//        for(Donation d: donationList) {
+//            MarkerOptions options = new MarkerOptions();
+//            options.position(d.getPosition());
+//            options.title(d.getType().hebrew());
+//            options.snippet(d.getDescription());
+//            options.icon(BitmapDescriptorFactory.defaultMarker(d.getType().getColor()));
+//            Marker m = mMap.addMarker(options);
+//            m.setTag(d);
+//            markersList.add(m);
+//        }
+//
+//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//        for (Marker m : markersList)
+//            builder.include(m.getPosition());
+//
+//        LatLngBounds bounds = builder.build();
+//        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 50);
+//        mMap.animateCamera(cu);
+//    }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
@@ -187,6 +224,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title(title);
+        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_circle_black_48dp));
         Marker marker = mMap.addMarker(markerOptions);
         marker.showInfoWindow();
 
@@ -194,6 +232,43 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mMap.moveCamera(center);
         CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
         mMap.animateCamera(zoom);
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Log.d(TAG, "onMarkerClick");
+        Donation d = (Donation) marker.getTag();
+        return false;
+
+    }
+
+    private class DrawDonationTask extends AsyncTask<Void, Void, Void> {
+
+        Map<MarkerOptions, Donation> optionToTag;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            optionToTag = new HashMap<>();
+            for (Donation d : mDataSource) {
+                MarkerOptions options = new MarkerOptions();
+                options.position(d.getPosition());
+                options.title(d.getType().hebrew());
+                options.snippet(d.getDescription());
+                options.icon(BitmapDescriptorFactory.defaultMarker(d.getType().getColor()));
+                optionToTag.put(options, d);
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            Log.d(TAG, "drawing markers");
+            for (Map.Entry<MarkerOptions, Donation> entry : optionToTag.entrySet()) {
+                Marker m = mMap.addMarker(entry.getKey());
+                m.setTag(entry.getValue());
+            }
+        }
     }
 }
 

@@ -44,7 +44,7 @@ public class PopupActivity extends AppCompatActivity {
                     .load(donation.getDefaultImage())
                     .fit()
                     .into(im);
-        tv.setText(donation.getType());
+        tv.setText(donation.getType().hebrew());
     }
 
 
