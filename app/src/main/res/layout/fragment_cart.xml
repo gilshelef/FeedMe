@@ -8,7 +8,7 @@
     android:padding="12dp"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.gilshelef.feedme.MainActivity">
+    tools:context="com.gilshelef.feedme.activities.MainActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"

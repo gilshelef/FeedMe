@@ -1,9 +1,12 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.fragments;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,6 +17,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.data.Association;
+import com.gilshelef.feedme.data.DataManager;
+import com.gilshelef.feedme.data.Donation;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
@@ -49,8 +56,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private static final int PERMISSIONS_REQUEST_LOCATION = 1;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
     private List<Donation> mDataSource;
-
-    public MapFragment() {}
+    private BottomSheetBehavior mBottomSheetBehavior;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -75,6 +81,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         mMapView.getMapAsync(this);
         mDataSource = DataManager.get(getActivity()).getAll(getActivity());
+
+        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinator);
+        View bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View bottomSheet, int newState) {
+                // React to state change
+            }
+            @Override
+            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
+            }
+        });
         return rootView;
     }
 
@@ -154,31 +173,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         new DrawDonationTask().execute();
     }
 
-//    private void displayDonations() {
-//
-//        List<Donation> donationList = DataManager.get(getActivity()).getAll(getActivity());
-//        List<Marker> markersList = new ArrayList<>();
-//
-//        for(Donation d: donationList) {
-//            MarkerOptions options = new MarkerOptions();
-//            options.position(d.getPosition());
-//            options.title(d.getType().hebrew());
-//            options.snippet(d.getDescription());
-//            options.icon(BitmapDescriptorFactory.defaultMarker(d.getType().getColor()));
-//            Marker m = mMap.addMarker(options);
-//            m.setTag(d);
-//            markersList.add(m);
-//        }
-//
-//        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//        for (Marker m : markersList)
-//            builder.include(m.getPosition());
-//
-//        LatLngBounds bounds = builder.build();
-//        CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, 50);
-//        mMap.animateCamera(cu);
-//    }
-
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         if(requestCode == PERMISSIONS_REQUEST_LOCATION){
@@ -238,6 +232,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     public boolean onMarkerClick(Marker marker) {
         Log.d(TAG, "onMarkerClick");
         Donation d = (Donation) marker.getTag();
+        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
         return false;
 
     }
@@ -254,7 +249,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 options.position(d.getPosition());
                 options.title(d.getType().hebrew());
                 options.snippet(d.getDescription());
-                options.icon(BitmapDescriptorFactory.defaultMarker(d.getType().getColor()));
+                options.icon(BitmapDescriptorFactory.defaultMarker(d.getType().color()));
                 optionToTag.put(options, d);
 
             }

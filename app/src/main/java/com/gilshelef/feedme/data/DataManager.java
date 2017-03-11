@@ -1,9 +1,9 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
 
-import com.google.android.gms.maps.model.LatLng;
+import com.gilshelef.feedme.adapters.AdapterManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,7 +20,8 @@ import java.util.Set;
  * Created by gilshe on 2/25/17.
  * class handles all data related issues
  */
- class DataManager {
+
+public class DataManager {
 
     private static Map<String, Donation> donations; // holding only available and saved items
     private static DataManager instance;
@@ -32,7 +33,7 @@ import java.util.Set;
         initialized = false;
     }
 
-    static DataManager get(Context context) {
+    public static DataManager get(Context context) {
         if (instance == null) {
             synchronized (DataManager.class) {
                 if (instance == null)
@@ -59,23 +60,14 @@ import java.util.Set;
             // Get Donation objects from data
             for(int i = 0; i < donations.length(); i++){
                 JSONObject obj = donations.getJSONObject(i);
-                Donation donation = new Donation();
-                donation.setType(obj.getString("type"));
-                donation.description = obj.getString("description");
-                donation.phone = obj.getString("phone");
-                donation.firstName = obj.getString("firstName");
-                donation.lastName = obj.getString("lastName");
-                donation.imageUrl = obj.getString("imageUrl");
-                donation.date = obj.getString("date");
-                donation.setId(obj.getString("id"));
+                Donation donation = new Donation(obj);
 
+                //TODO assuming donations from data base arrive as available/owned, saved donations locally
                 String state = obj.getString("state");
                 if(state.equals(AVAILABLE))
                     donation.setState(Donation.State.AVAILABLE);
                 else donation.setState(Donation.State.SAVED);
 
-                LatLng location = new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude"));
-                donation.location = location;
                 String id = donation.getId();
                 DataManager.donations.put(id, donation);
             }
@@ -105,7 +97,7 @@ import java.util.Set;
         return json;
     }
 
-    List<Donation> getSaved(Context context) {
+    public List<Donation> getSaved(Context context) {
         final List<Donation> saved = new ArrayList<>();
 
         OnResult callback = new OnResult(){
@@ -125,7 +117,7 @@ import java.util.Set;
 
     }
 
-    List<Donation> getAll(Context context) {
+    public List<Donation> getAll(Context context) {
         final List<Donation> all = new ArrayList<>();
 
         OnResult callback = new OnResult(){
@@ -142,7 +134,7 @@ import java.util.Set;
         return all;
     }
 
-    void saveEvent(String id) {
+    public void saveEvent(String id) {
         Donation d = donations.get(id);
         if(d.isAvailable())  // available => saved
             d.setState(Donation.State.SAVED);
@@ -152,7 +144,7 @@ import java.util.Set;
         AdapterManager.get().updateDataSourceAll();
     }
 
-    void selectEvent(String id) {
+    public void selectEvent(String id) {
         Donation d = donations.get(id);
         if (!d.isSelected())
             d.setSelected(true);
@@ -161,16 +153,20 @@ import java.util.Set;
         AdapterManager.get().updateDataSourceAll();
     }
 
-    void removeAll(Set<String> items) {
+    public void removeAll(Set<String> items) {
         donations.keySet().removeAll(items);
         AdapterManager.get().updateDataSourceAll();
     }
 
-    void returnAll(Set<String> selected) {
+    public void returnAll(Set<String> selected) {
         for(String id: selected)
             donations.get(id).setSelected(false);
         AdapterManager.get().updateDataSourceAll();
 
+    }
+
+    public static void applyFilter(Filter filter) {
+        // TODO
     }
 
     private static class FetchDataTask extends AsyncTask<String, Void, Integer> {

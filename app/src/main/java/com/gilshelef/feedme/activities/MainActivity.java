@@ -1,5 +1,6 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.activities;
 
+import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -17,11 +18,24 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Toast;
 
+import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.adapters.AdapterManager;
+import com.gilshelef.feedme.adapters.PagerAdapter;
+import com.gilshelef.feedme.data.Association;
+import com.gilshelef.feedme.data.DataManager;
+import com.gilshelef.feedme.data.Filter;
+import com.gilshelef.feedme.data.types.TypeManager;
+import com.gilshelef.feedme.fragments.BaseFragment;
+import com.gilshelef.feedme.fragments.CustomViewPager;
+import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+
 import java.util.HashSet;
 import java.util.Set;
 
 public class MainActivity extends AppCompatActivity  implements BaseFragment.OnSelectedEvent, View.OnClickListener {
     private static final String TAG = MainActivity.class.getSimpleName();
+    private static final int FILTER_REQUEST_CODE = 3;
+    private static final String FILTER_DATA = "applyFilter";
     private final int[] TABS_TITLES = {R.string.map_tab, R.string.list_tab, R.string.saved_tab, R.string.account_tab};
 
     private Toolbar mToolBar;
@@ -41,6 +55,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
         //initialize app's data
         Association.get(this);
         DataManager.get(this);
+        TypeManager.get();
         mSelectedHandler = new SelectedDonationHandler();
 
         // set toolbar
@@ -108,7 +123,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.filter:
-                Toast.makeText(getApplicationContext(), "Filter Selected", Toast.LENGTH_LONG).show();
+                filterEvent();
                 return true;
             case R.id.item:
                 Toast.makeText(getApplicationContext(), "Item Selected", Toast.LENGTH_LONG).show();
@@ -117,6 +132,27 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
                 return super.onOptionsItemSelected(item);
         }
     }
+
+    private void filterEvent() {
+        Intent intent = new Intent(this, FilterActivity.class);
+        startActivityForResult(intent, FILTER_REQUEST_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == FILTER_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Filter filter = data.getParcelableExtra(FILTER_DATA);
+                DataManager.applyFilter(filter);
+            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
+                // TODO: Handle the error.
+
+            } else if (resultCode == RESULT_CANCELED) {
+                // The user canceled the operation.
+            }
+        }
+    }
+
 
     @Override
     public void onSelectedEvent(String donationId, boolean selected) {
@@ -212,7 +248,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
             mFAB.setVisibility(View.VISIBLE);
             mTabLayout.setVisibility(View.GONE); // hide tabs
             mViewPager.setClickable(false);
-            mMenu.findItem(R.id.filter).setEnabled(false).setVisible(false); // hide filter
+            mMenu.findItem(R.id.filter).setEnabled(false).setVisible(false); // hide applyFilter
         }
 
         void end() {
@@ -220,7 +256,7 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
             Animation hideFAB = AnimationUtils.loadAnimation(getApplication(), R.anim.hide_fab);
             mFAB.startAnimation(hideFAB); // hide fab
             mTabLayout.setVisibility(View.VISIBLE);
-            mMenu.findItem(R.id.filter).setEnabled(true).setVisible(true); // show filter
+            mMenu.findItem(R.id.filter).setEnabled(true).setVisible(true); // show applyFilter
             getSupportActionBar().setTitle(getTitle(mTabLayout.getSelectedTabPosition()));
             clear();
             AdapterManager.get().clearSelectedViewAll();

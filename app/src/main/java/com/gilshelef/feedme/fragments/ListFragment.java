@@ -1,8 +1,14 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.fragments;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.adapters.ListAdapter;
+import com.gilshelef.feedme.adapters.RecycledBaseAdapter;
+import com.gilshelef.feedme.data.DataManager;
+import com.gilshelef.feedme.data.Donation;
 
 import java.util.List;
 

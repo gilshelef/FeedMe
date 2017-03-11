@@ -1,6 +1,9 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.adapters;
 
 import android.content.Context;
+
+import com.gilshelef.feedme.data.DataManager;
+import com.gilshelef.feedme.data.Donation;
 
 import java.util.List;
 
@@ -8,11 +11,11 @@ import java.util.List;
  * Created by gilshe on 2/26/17.
  */
 
-class CartAdapter extends RecycledBaseAdapter {
+public class CartAdapter extends RecycledBaseAdapter {
 
     static final String TAG = CartAdapter.class.getSimpleName();
 
-    CartAdapter(Context context, List<Donation> dataSource, OnActionEvent listener) {
+    public CartAdapter(Context context, List<Donation> dataSource, OnActionEvent listener) {
         super(context, dataSource, listener);
     }
 

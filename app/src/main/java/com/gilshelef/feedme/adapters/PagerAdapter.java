@@ -1,20 +1,26 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.adapters;
 
 import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
+import com.gilshelef.feedme.fragments.ListFragment;
+import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.fragments.AccountFragment;
+import com.gilshelef.feedme.fragments.CartFragment;
+import com.gilshelef.feedme.fragments.MapFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
-class PagerAdapter extends FragmentPagerAdapter {
+public class PagerAdapter extends FragmentPagerAdapter {
     private static final int NUM_PAGES = 4;
     private final int[] TABS_TITLES = {R.string.map_tab, R.string.list_tab, R.string.saved_tab, R.string.account_tab};
     private Context mContext;
     private List<Fragment> myPages;
 
-    PagerAdapter(FragmentManager fm, Context context) {
+    public PagerAdapter(FragmentManager fm, Context context) {
         super(fm);
         this.mContext = context;
         myPages = new ArrayList<>();

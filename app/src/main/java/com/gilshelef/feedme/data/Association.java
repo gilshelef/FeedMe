@@ -1,4 +1,4 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.data;
 
 import android.app.Activity;
 import android.content.Context;
@@ -10,7 +10,7 @@ import com.google.android.gms.maps.model.LatLng;
 /**
  * Created by gilshe on 2/25/17.
  */
-class Association {
+public class Association {
 
     private static Association instance;
     private static String UUID;
@@ -25,7 +25,7 @@ class Association {
         Association.name = name;
     }
 
-    static Association get(Activity activity) {
+    public static Association get(Activity activity) {
         if (instance == null) {
             synchronized (Association.class) {
                 if (instance == null)
@@ -50,7 +50,7 @@ class Association {
 
     }
 
-    static float calcDistance(LatLng location) {
+    public static float calcDistance(LatLng location) {
         float[] result = new float[1];
         Location.distanceBetween(location.latitude, location.longitude, Association.position.latitude, Association.position.longitude, result);
 
@@ -67,7 +67,7 @@ class Association {
         return name;
     }
 
-    LatLng getBasePosition() {
+    public LatLng getBasePosition() {
         return position;
     }
 }

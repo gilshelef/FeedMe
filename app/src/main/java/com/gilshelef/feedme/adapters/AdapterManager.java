@@ -1,4 +1,4 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.adapters;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * Created by gilshe on 2/26/17.
  */
-class AdapterManager {
+public class AdapterManager {
     private Map<String, RecycledBaseAdapter> adapters;
     private static AdapterManager instance;
 
@@ -14,7 +14,7 @@ class AdapterManager {
         adapters = new HashMap<>();
     }
 
-    static AdapterManager get() {
+    public static AdapterManager get() {
         if (instance == null) {
             synchronized (AdapterManager.class) {
                 if (instance == null)
@@ -29,18 +29,18 @@ class AdapterManager {
         return instance;
     }
 
-    void updateDataSourceAll() {
+    public void updateDataSourceAll() {
         for(RecycledBaseAdapter a: adapters.values()) {
             a.updateDataSource();
             a.notifyDataSetChanged();
         }
     }
 
-    void setAdapter(String name, RecycledBaseAdapter adapter) {
+    public void setAdapter(String name, RecycledBaseAdapter adapter) {
         adapters.put(name, adapter);
     }
 
-    void clearSelectedViewAll() {
+    public void clearSelectedViewAll() {
         for(RecycledBaseAdapter a: adapters.values()) {
             a.clearSelectedView();
         }

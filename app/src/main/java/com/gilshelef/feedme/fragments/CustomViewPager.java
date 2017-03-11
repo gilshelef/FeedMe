@@ -1,4 +1,4 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.fragments;
 
 import android.content.Context;
 import android.support.v4.view.ViewPager;
@@ -24,7 +24,6 @@ public class CustomViewPager extends ViewPager {
         if(enabled) {
            return super.onInterceptTouchEvent(event);
         }
-
         return false;
     }
 

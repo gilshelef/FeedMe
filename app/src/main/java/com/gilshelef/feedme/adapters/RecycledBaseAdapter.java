@@ -1,4 +1,4 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.adapters;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,6 +10,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gilshelef.feedme.data.Association;
+import com.gilshelef.feedme.data.Donation;
+import com.gilshelef.feedme.R;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
 
@@ -19,7 +22,7 @@ import java.util.List;
  * Created by gilshe on 2/27/17.
  */
 
-abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAdapter.ViewHolder>  {
+public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAdapter.ViewHolder>  {
     private final String TAG = this.getClass().getSimpleName();
     List<Donation> mDataSource;
     Context mContext;
@@ -148,9 +151,9 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
                     .load(mDonation.getImageUrl())
                     .fit()
                     .transform(mTransformation)
-                    .error(mDonation.getDefaultImage())
+                    .error(mDonation.getType().defaultThumbnail())
                     .into(image);
-            else image.setImageResource(mDonation.getDefaultImage());
+            else image.setImageResource(mDonation.getType().defaultThumbnail());
             cardView.setCardBackgroundColor(Color.WHITE);
             cardSeparator.setVisibility(View.VISIBLE);
         }
@@ -169,7 +172,7 @@ abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAda
 
     }
 
-    interface OnActionEvent {
+    public interface OnActionEvent {
         void onSaveEvent(Donation donation);
         void onCallEvent(String phone);
         void onSelectEvent(Donation donation);

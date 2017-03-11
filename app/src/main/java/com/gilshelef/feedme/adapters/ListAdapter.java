@@ -1,17 +1,20 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.adapters;
 
 import android.content.Context;
+
+import com.gilshelef.feedme.data.DataManager;
+import com.gilshelef.feedme.data.Donation;
 
 import java.util.List;
 
 /**
  * Created by gilshe on 2/21/17.
  */
-class ListAdapter extends RecycledBaseAdapter {
+public class ListAdapter extends RecycledBaseAdapter {
 
     static final String TAG = ListAdapter.class.getSimpleName();
 
-    ListAdapter(Context context, List<Donation> dataSource, OnActionEvent listener) {
+    public ListAdapter(Context context, List<Donation> dataSource, OnActionEvent listener) {
         super(context, dataSource, listener);
     }
 

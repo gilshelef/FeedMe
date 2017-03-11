@@ -1,4 +1,4 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.fragments;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -11,12 +11,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gilshelef.feedme.activities.PopupActivity;
+import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.adapters.AdapterManager;
+import com.gilshelef.feedme.adapters.RecycledBaseAdapter;
+import com.gilshelef.feedme.data.DataManager;
+import com.gilshelef.feedme.data.Donation;
+
 import java.util.List;
 
 /**
  * Created by gilshe on 2/27/17.
  */
-abstract class BaseFragment extends Fragment implements RecycledBaseAdapter.OnActionEvent {
+public abstract class BaseFragment extends Fragment implements RecycledBaseAdapter.OnActionEvent {
     public final String TAG = this.getClass().getSimpleName();
 
     protected List<Donation> mDataSource;
@@ -70,7 +77,7 @@ abstract class BaseFragment extends Fragment implements RecycledBaseAdapter.OnAc
         startActivity(intent, options.toBundle());
     }
 
-    interface OnSelectedEvent{
+    public interface OnSelectedEvent{
         void onSelectedEvent(String id, boolean selected);
     }
 

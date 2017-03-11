@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:animateLayoutChanges="true"
-    tools:context="com.gilshelef.feedme.MainActivity">
+    tools:context="com.gilshelef.feedme.activities.MainActivity">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
@@ -32,7 +32,7 @@
         android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:animateLayoutChanges="true"/>
 
-    <com.gilshelef.feedme.CustomViewPager
+    <com.gilshelef.feedme.fragments.CustomViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"

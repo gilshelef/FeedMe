@@ -1,4 +1,4 @@
-package com.gilshelef.feedme;
+package com.gilshelef.feedme.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -6,6 +6,8 @@ import android.util.DisplayMetrics;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.data.Donation;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -36,12 +38,12 @@ public class PopupActivity extends AppCompatActivity {
             Picasso.with(getApplicationContext())
                     .load(donation.getImageUrl())
                     .fit()
-                    .error(donation.getDefaultImage())
+                    .error(donation.getType().defaultThumbnail())
                     .into(im);
 
         else
             Picasso.with(getApplicationContext())
-                    .load(donation.getDefaultImage())
+                    .load(donation.getType().defaultThumbnail())
                     .fit()
                     .into(im);
         tv.setText(donation.getType().hebrew());

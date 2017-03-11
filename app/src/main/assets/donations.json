@@ -12,7 +12,8 @@
       "id":"1",
       "state":"0",
       "latitude": 31.259158,
-      "longitude":34.794655
+      "longitude":34.794655,
+      "businessName":"ירקן"
 
     },
     {
@@ -26,7 +27,9 @@
       "id":"2",
       "state":"0",
       "latitude": 31.262218,
-      "longitude":34.801461
+      "longitude":34.801461,
+      "businessName":"מאפייה"
+
 
     },
 
@@ -41,7 +44,9 @@
       "id":"3",
       "state":"2",
       "latitude": 31.253308,
-      "longitude":34.785730
+      "longitude":34.785730,
+      "businessName":"ירקן"
+
 
     },
 
@@ -56,7 +61,9 @@
       "id":"4",
       "state":"0",
       "latitude": 31.241013,
-      "longitude":34.787383
+      "longitude":34.787383,
+      "businessName":"ירקן"
+
 
     },
 
@@ -71,7 +78,9 @@
       "id":"5",
       "state":"1",
       "latitude": 31.256941,
-      "longitude":34.795332
+      "longitude":34.795332,
+      "businessName":"מאפייה"
+
     },
 
     {
@@ -85,8 +94,8 @@
       "id":"6",
       "state":"0",
       "latitude": 31.262370,
-      "longitude":34.844770
-
+      "longitude":34.844770,
+      "businessName":"ירקן"
     },
 
     {
@@ -100,7 +109,9 @@
       "id":"7",
       "state":"0",
       "latitude": 31.278677,
-      "longitude":34.801211
+      "longitude":34.801211,
+      "businessName":"ירקן"
+
 
     },
 
@@ -115,7 +126,9 @@
       "id":"8",
       "state":"2",
       "latitude": 31.248974,
-      "longitude":34.789131
+      "longitude":34.789131,
+      "businessName":"מאפייה"
+
 
     },
 
@@ -130,7 +143,9 @@
       "id":"9",
       "state":"0",
       "latitude": 31.251329,
-      "longitude":34.780703
+      "longitude":34.780703,
+      "businessName":"זארה"
+
 
     },
 
@@ -145,7 +160,9 @@
       "id":"10",
       "state":"0",
       "latitude": 31.245745,
-      "longitude":34.771707
+      "longitude":34.771707,
+      "businessName":"ירקן"
+
 
 
     },
@@ -160,7 +177,9 @@
       "id":"11",
       "state":"1",
       "latitude": 31.236268,
-      "longitude":34.768167
+      "longitude":34.768167,
+      "businessName":"מאפייה"
+
 
 
     },
@@ -176,7 +195,9 @@
       "id":"12",
       "state":"0",
       "latitude":31.226360,
-      "longitude":34.810739
+      "longitude":34.810739,
+      "businessName":"זארה"
+
 
     },
     {
@@ -190,7 +211,9 @@
       "id":"13",
       "state":"1",
       "latitude": 31.242956,
-      "longitude":34.806855
+      "longitude":34.806855,
+      "businessName":"מאפייה"
+
 
     },
 
@@ -205,7 +228,9 @@
       "id":"14",
       "state":"0",
       "latitude": 31.253230,
-      "longitude":34.797542
+      "longitude":34.797542,
+      "businessName":"זארה"
+
 
     }
   ]
