@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="fill_parent"
+    android:clickable="true"
+    style="@android:style/Widget.ActionButton">
+
+    <!-- Shopping Cart Item Image -->
+    <ImageView
+        android:id="@+id/shopping_cart_image"
+        android:src="@drawable/ic_shopping_cart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="0dp"
+        android:paddingEnd="0dp"/>
+
+    <!-- Badge Count -->
+    <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/shopping_cart_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/badge_circle"
+        android:padding="4dp"
+        android:textColor="#000"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:layout_marginStart="0dp"
+        android:layout_alignTop="@id/shopping_cart_image"
+        android:layout_toEndOf="@+id/shopping_cart_image" />
+
+</RelativeLayout>

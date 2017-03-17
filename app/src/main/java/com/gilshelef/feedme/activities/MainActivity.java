@@ -1,51 +1,46 @@
 package com.gilshelef.feedme.activities;
 
-import android.content.Intent;
-import android.graphics.PorterDuff;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.design.widget.TabLayout;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
+import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.adapters.AdapterManager;
-import com.gilshelef.feedme.adapters.PagerAdapter;
 import com.gilshelef.feedme.data.Association;
 import com.gilshelef.feedme.data.DataManager;
-import com.gilshelef.feedme.data.Filter;
 import com.gilshelef.feedme.data.types.TypeManager;
 import com.gilshelef.feedme.fragments.BaseFragment;
-import com.gilshelef.feedme.fragments.CustomViewPager;
-import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.gilshelef.feedme.fragments.CartFragment;
+import com.gilshelef.feedme.fragments.ListFragment;
+import com.gilshelef.feedme.fragments.MapFragment;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
-public class MainActivity extends AppCompatActivity  implements BaseFragment.OnSelectedEvent, View.OnClickListener {
+import static android.widget.Toast.LENGTH_SHORT;
+
+/**
+ * Created by gilshe on 3/13/17.
+ */
+
+public class MainActivity extends AppCompatActivity implements BaseFragment.OnCartEvent {
+
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final int FILTER_REQUEST_CODE = 3;
-    private static final String FILTER_DATA = "applyFilter";
-    private final int[] TABS_TITLES = {R.string.map_tab, R.string.list_tab, R.string.saved_tab, R.string.account_tab};
+    private Toolbar mAppToolBar;
+    private Button mMapBtn;
+    private Button mListBtn;
+    private int shoppingCartNumber = 0;
+    private TextView shoppingCartUI = null;
+    private Map<String, Fragment> mFragments;
 
-    private Toolbar mToolBar;
-    private TabLayout mTabLayout;
-    private CustomViewPager mViewPager;
-    private PagerAdapter mPagerAdapter;
-    private Menu mMenu;
-    private FloatingActionButton mFAB;
-    private SelectedDonationHandler mSelectedHandler;
-    private CoordinatorLayout mCoordinator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,222 +51,121 @@ public class MainActivity extends AppCompatActivity  implements BaseFragment.OnS
         Association.get(this);
         DataManager.get(this);
         TypeManager.get();
-        mSelectedHandler = new SelectedDonationHandler();
 
         // set toolbar
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(mToolBar);
-        getSupportActionBar().setTitle(getTitle(0));
+        mAppToolBar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mAppToolBar);
+        getSupportActionBar().setTitle(R.string.app_name);
 
-        // set tabs
-        mTabLayout = (TabLayout) findViewById(R.id.tab_layout);
-        mTabLayout.addTab(mTabLayout.newTab().setIcon(R.drawable.map_icon));
-        mTabLayout.addTab(mTabLayout.newTab().setIcon(R.drawable.list_icon));
-        mTabLayout.addTab(mTabLayout.newTab().setIcon(R.drawable.heart_icon));
-        mTabLayout.addTab(mTabLayout.newTab().setIcon(R.drawable.account_icon));
-        mTabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        //create fragments
+        mFragments = new HashMap<>();
+        mFragments.put(MapFragment.TAG, new MapFragment());
+        mFragments.put(ListFragment.TAG, new ListFragment());
+        mFragments.put(CartFragment.TAG, new CartFragment());
+        //TODO add filter fragment
 
-        // set viewPager and pageAdapter
-        mViewPager = (CustomViewPager) findViewById(R.id.pager);
-        mPagerAdapter = new PagerAdapter(getSupportFragmentManager(),this);
-        mViewPager.setAdapter(mPagerAdapter);
-        mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mTabLayout));
-        mTabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        //set first fragment - map
+        setFragment(MapFragment.TAG);
+
+        //set buttons
+        mMapBtn = (Button) findViewById(R.id.map_fragment_btn);
+        mListBtn = (Button) findViewById(R.id.list_fragment_btn);
+        mMapBtn.setSelected(true);
+        mMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                mViewPager.setCurrentItem(tab.getPosition());
-                int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.lightPrimaryColor);
-                tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
-                getSupportActionBar().setTitle(getTitle(tab.getPosition()));
+            public void onClick(View v) {
+                setFragment(MapFragment.TAG);
+                setButtonStyle(mMapBtn, mListBtn);
             }
-
+        });
+        mListBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                int tabIconColor = ContextCompat.getColor(getApplicationContext(), R.color.iconsUnselected);
-                tab.getIcon().setColorFilter(tabIconColor, PorterDuff.Mode.SRC_IN);
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
+            public void onClick(View v) {
+                setFragment(ListFragment.TAG);
+                setButtonStyle(mListBtn, mMapBtn);
             }
         });
 
-        //FAB
-        mFAB = (FloatingActionButton) findViewById(R.id.fab);
-        mCoordinator = (CoordinatorLayout) findViewById(R.id.coordinator);
-        mFAB.setOnClickListener(this);
-        mViewPager.setOffscreenPageLimit(mPagerAdapter.getCount());
-
     }
 
+    private void setButtonStyle(Button selected, Button unselected) {
+        selected.setSelected(true);
+        unselected.setSelected(false);
+    }
 
-    private int getTitle(int position) {
-        if(position < TABS_TITLES.length)
-            return TABS_TITLES[position];
-        else return R.string.app_name;
+    public void setFragment(String fragmentName) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.fragment_container, mFragments.get(fragmentName));
+        fragmentTransaction.commit();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.association_menu, menu);
-        this.mMenu = menu;
-        return true;
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        final View menuShoppingCart = menu.findItem(R.id.menu_shopping_cart).getActionView();
+        shoppingCartUI = (TextView) menuShoppingCart.findViewById(R.id.shopping_cart_text);
+        updateShoppingCartNumber(shoppingCartNumber);
+
+        menuShoppingCart.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                moveToShoppingCart();
+                //TODO change to set fragment
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void updateShoppingCartNumber(final int newCartNumber) {
+        shoppingCartNumber = newCartNumber;
+        if (shoppingCartUI == null) return;
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                if(shoppingCartNumber < 0)
+                    Log.e(TAG, "ERROR!! number of items in bag is = " + shoppingCartNumber);
+                if (shoppingCartNumber <= 0)
+                    shoppingCartUI.setVisibility(View.INVISIBLE);
+                else {
+                    shoppingCartUI.setVisibility(View.VISIBLE);
+                    shoppingCartUI.setText(Integer.toString(shoppingCartNumber));
+                }
+            }
+        });
+
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.filter:
-                filterEvent();
-                return true;
-            case R.id.item:
-                Toast.makeText(getApplicationContext(), "Item Selected", Toast.LENGTH_LONG).show();
+            case R.id.menu_filter:
+                moveToFilters(); // TODO change to filter fragment
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void filterEvent() {
-        Intent intent = new Intent(this, FilterActivity.class);
-        startActivityForResult(intent, FILTER_REQUEST_CODE);
+    private void moveToFilters() {
+        Toast.makeText(getApplicationContext(), "Filters fragment", LENGTH_SHORT).show();
+    }
+
+    private void moveToShoppingCart() {
+        //TODO move to shopping cart fragment
+        Toast.makeText(getApplicationContext(), "Shopping cart fragment", LENGTH_SHORT).show();
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == FILTER_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                Filter filter = data.getParcelableExtra(FILTER_DATA);
-                DataManager.applyFilter(filter);
-            } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
-                // TODO: Handle the error.
-
-            } else if (resultCode == RESULT_CANCELED) {
-                // The user canceled the operation.
-            }
-        }
-    }
-
-
-    @Override
-    public void onSelectedEvent(String donationId, boolean selected) {
-        if(selected)
-            mSelectedHandler.selectedEvent(donationId);
-        else mSelectedHandler.unSelectEvent(donationId);
-
+    public void addToCartEvent(String donationId) {
+        boolean added = DataManager.get(this).addToCartEvent(donationId);
+        if(added)
+            updateShoppingCartNumber(shoppingCartNumber+1);
     }
 
     @Override
-    public void onClick(View v) { // fab click
-
-        Snackbar snackbar = Snackbar
-                .make(mCoordinator, "Donation taken :)", Snackbar.LENGTH_LONG)
-                .setAction("UNDO", new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        mSelectedHandler.unSelectEventAll();
-                        Snackbar returned = Snackbar.make(mCoordinator, "Donations returned!", Snackbar.LENGTH_SHORT);
-                        returned.show();
-                    }});
-
-        snackbar.setCallback(new Snackbar.Callback() {
-            @Override
-            public void onDismissed(Snackbar snackbar, int event) {
-                if(event != DISMISS_EVENT_ACTION) { // take action!
-                    if (!mSelectedHandler.isEmpty()) {
-                        // TODO notify data base!
-                        // TODO add to profile
-                        // TODO add to service for timeout check
-                        DataManager.get(getApplicationContext()).removeAll(mSelectedHandler.getSelected());
-                    }
-                }
-                mSelectedHandler.end();
-            }
-
-        });
-        snackbar.show();
+    public void removeFromCartEvent(String donationId) {
+        boolean removed = DataManager.get(this).removeFromCartEvent(donationId);
+        if(removed)
+            updateShoppingCartNumber(shoppingCartNumber-1);
     }
-
-    /*
-    * class handles view events when donations are selected
-    * */
-    private class SelectedDonationHandler {
-
-        private int count;
-        private Set<String> selected;
-
-        SelectedDonationHandler(){
-            count = 0;
-            selected = new HashSet<>();
-        }
-
-        void selectedEvent(String donationId) {
-            if(isEmpty()) // first event
-                start();
-
-            count++;
-            selected.add(donationId);
-            getSupportActionBar().setTitle(getCount());
-
-        }
-
-        void unSelectEvent(String donationId) {
-            if(isEmpty()) //unselected when there are no selected item!
-                Log.e(TAG, "unselected event when there are no selected item!");
-
-            count--;
-            selected.remove(donationId);
-            getSupportActionBar().setTitle(getCount());
-
-            if(isEmpty())
-                mSelectedHandler.end();
-
-        }
-
-        String getCount() {
-            return count+"";
-        }
-
-        boolean isEmpty() {
-            return count <= 0; // should always be >=0
-        }
-
-        Set<String> getSelected() {
-            return selected;
-        }
-
-        void start() {
-            mViewPager.setPagingEnabled(false);
-            Animation showFAB = AnimationUtils.loadAnimation(getApplication(), R.anim.show_fab);
-            mFAB.startAnimation(showFAB); // display fab
-            mFAB.setVisibility(View.VISIBLE);
-            mTabLayout.setVisibility(View.GONE); // hide tabs
-            mViewPager.setClickable(false);
-            mMenu.findItem(R.id.filter).setEnabled(false).setVisible(false); // hide applyFilter
-        }
-
-        void end() {
-            mViewPager.setPagingEnabled(true);
-            Animation hideFAB = AnimationUtils.loadAnimation(getApplication(), R.anim.hide_fab);
-            mFAB.startAnimation(hideFAB); // hide fab
-            mTabLayout.setVisibility(View.VISIBLE);
-            mMenu.findItem(R.id.filter).setEnabled(true).setVisible(true); // show applyFilter
-            getSupportActionBar().setTitle(getTitle(mTabLayout.getSelectedTabPosition()));
-            clear();
-            AdapterManager.get().clearSelectedViewAll();
-        }
-
-        void clear() {
-            count = 0;
-            selected.clear();
-        }
-
-        void unSelectEventAll() {
-            DataManager.get(getApplicationContext()).returnAll(getSelected());
-            clear();
-        }
-
-    }
-
 }
