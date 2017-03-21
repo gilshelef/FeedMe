@@ -11,13 +11,13 @@
     <com.makeramen.roundedimageview.RoundedImageView
         android:background="@color/cardview_light_background"
         android:id="@+id/list_thumbnail"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
+        android:layout_centerInParent="true"
         android:transitionName="profile"
-        android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="6dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
         android:layout_marginStart="6dp"
         android:layout_marginEnd="10dp"
         android:contentDescription="@string/thumbnail" />

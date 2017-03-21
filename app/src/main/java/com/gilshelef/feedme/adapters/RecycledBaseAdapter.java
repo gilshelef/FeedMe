@@ -1,20 +1,15 @@
 package com.gilshelef.feedme.adapters;
 
-import android.content.Context;
-import android.graphics.Color;
-import android.support.v7.widget.CardView;
+import android.app.Activity;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
-import com.gilshelef.feedme.data.Association;
-import com.gilshelef.feedme.data.Donation;
 import com.gilshelef.feedme.R;
-import com.makeramen.roundedimageview.RoundedTransformationBuilder;
-import com.squareup.picasso.Picasso;
+import com.gilshelef.feedme.data.Donation;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 
 import java.util.List;
 
@@ -22,161 +17,66 @@ import java.util.List;
  * Created by gilshe on 2/27/17.
  */
 
-public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<RecycledBaseAdapter.ViewHolder>  {
-    private final String TAG = this.getClass().getSimpleName();
-    List<Donation> mDataSource;
-    Context mContext;
-    private OnActionEvent mListener;
-    private boolean selectedView = false;
+public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<ViewHolder> implements Adaptable {
+    public final String TAG = this.getClass().getSimpleName();
+    protected List<Donation> mDataSource;
+    protected Activity mActivity;
+    protected OnActionEvent mListener;
 
-
-    RecycledBaseAdapter(Context context, List<Donation> dataSource, OnActionEvent listener) {
+    RecycledBaseAdapter(Activity activity, List<Donation> dataSource, OnActionEvent listener) {
         this.mDataSource = dataSource;
-        this.mContext = context;
+        this.mActivity = activity;
         this.mListener = listener;
     }
 
     @Override
-    public RecycledBaseAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
+    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final RecycledBaseAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(final ViewHolder holder, final int position) {
         final Donation donation = mDataSource.get(position);
-        holder.bind(donation);
+        holder.bind(mActivity,donation);
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.onClickEvent(v.findViewById(R.id.list_thumbnail), donation);
+            }
+        });
+        holder.save.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                mListener.onSaveEvent(donation);
+                AdapterManager.get().updateDataSourceAll(TAG);
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                mListener.onUnSaveEvent(donation);
+                AdapterManager.get().updateDataSourceAll(TAG);
+            }
+        });
+        styleSelectedItem(holder, donation);
     }
 
+    protected abstract void styleSelectedItem(ViewHolder itemView, Donation donation);
 
     @Override
     public int getItemCount() {
         return (null != mDataSource ? mDataSource.size() : 0);
     }
-    void clearSelectedView(){
-        selectedView = false;
-    }
-    abstract void updateDataSource();
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnLongClickListener, View.OnClickListener {
-
-        private final com.squareup.picasso.Transformation mTransformation;
-        private Donation mDonation;
-        private ImageView image;
-        private TextView type;
-        private TextView description;
-        private TextView contact;
-        private ImageView save;
-        private ImageView call;
-        private TextView distance;
-        private CardView cardView;
-        private View cardSeparator;
-
-        ViewHolder(View view) {
-            super(view);
-
-            mTransformation = new RoundedTransformationBuilder()
-                    .cornerRadiusDp(4)
-                    .oval(false)
-                    .build();
-
-            this.image = (ImageView) view.findViewById(R.id.list_thumbnail);
-            this.type = (TextView) view.findViewById(R.id.list_type);
-            this.description = (TextView) view.findViewById(R.id.list_description);
-            this.distance = (TextView) view.findViewById(R.id.list_distance);
-            this.call = (ImageView) view.findViewById(R.id.list_call_thumbnail);
-            this.contact = (TextView) view.findViewById(R.id.list_contact);
-            this.save = (ImageView) view.findViewById(R.id.list_save_thumbnail);
-            this.cardView = (CardView) view.findViewById(R.id.list_card_view);
-            this.cardSeparator = view.findViewById(R.id.list_line);
-
-        }
-
-        void bind(Donation donation) {
-            mDonation = donation;
-            loadSave();
-            loadSelected();
-
-            //Setting text views
-            type.setText(donation.getType().hebrew());
-            description.setText(donation.getDescription());
-            contact.setText(donation.getContactInfo());
-
-            //distance
-            double distance = Association.calcDistance(mDonation.getPosition());
-            String text = String.format(mContext.getString(R.string.distance), distance);
-            this.distance.setText(text);
-
-            save.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {mListener.onSaveEvent(mDonation);
-                }
-            });
-            call.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {mListener.onCallEvent(mDonation.getPhone());
-                }
-            });
-            itemView.setOnLongClickListener(this);
-            itemView.setOnClickListener(this);
-        }
-
-        private void loadSave() {
-            int resource = R.drawable.take_unavailable;
-            if (mDonation.isAvailable())
-                resource = R.drawable.not_saved;
-            else if (mDonation.isSaved())
-                resource = R.drawable.saved;
-            save.setImageResource(resource);
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            selectedView = true;
-            mListener.onSelectEvent(mDonation);
-            return true;
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (selectedView)
-                onLongClick(v);
-            else
-                mListener.onZoomEvent(v.findViewById(R.id.list_thumbnail), mDonation);
-        }
-
-        private void setUnselected() {
-            if(!mDonation.getImageUrl().isEmpty())
-                Picasso.with(mContext)
-                    .load(mDonation.getImageUrl())
-                    .fit()
-                    .transform(mTransformation)
-                    .error(mDonation.getType().defaultThumbnail())
-                    .into(image);
-            else image.setImageResource(mDonation.getType().defaultThumbnail());
-            cardView.setCardBackgroundColor(Color.WHITE);
-            cardSeparator.setVisibility(View.VISIBLE);
-        }
-
-        private void setSelected() {
-            image.setImageResource(R.drawable.checked);
-            cardView.setCardBackgroundColor(Color.LTGRAY);
-            cardSeparator.setVisibility(View.GONE);
-        }
-
-        private void loadSelected() {
-            if (mDonation.isSelected())
-                setSelected();
-            else setUnselected();
-        }
-
+    @Override
+    public String getName() {
+        return TAG;
     }
 
     public interface OnActionEvent {
         void onSaveEvent(Donation donation);
-        void onCallEvent(String phone);
-        void onSelectEvent(Donation donation);
-        void onZoomEvent(View v, Donation donation);
+        void onUnSaveEvent(Donation donation);
+        void onClickEvent(View v, Donation donation);
     }
 
 }

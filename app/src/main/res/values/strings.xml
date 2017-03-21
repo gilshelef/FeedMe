@@ -3,13 +3,22 @@
     <string name="thumbnail">thumbnail</string>
     <string name="call">Call</string>
     <string name="menu_filter">Filter</string>
-    <string name="list_tab">Donations</string>
+    <string name="list_tab">List</string>
     <string name="map_tab">Map</string>
     <string name="saved_tab">Saved</string>
     <string name="account_tab">Account</string>
     <string name="distance" formatted="false">%.2f km</string>
     <string name="empty" />
-    <string name="save">save</string>
+    <string name="save">Save</string>
     <string name="search">Search</string>
+    <string name="menu_shopping_cart">Cart</string>
+    <string name="remove_from_cart">הוצא מהסל</string>
+    <string name="add_to_cart">הוסף לסל</string>
+    <string name="checkout">Checkout</string>
+    <string name="transition_cart">TransitionCart</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="association">לשובע</string>
+    <string name="email_placeholder">feedme.placeholder@gmail.com</string>
 
 </resources>

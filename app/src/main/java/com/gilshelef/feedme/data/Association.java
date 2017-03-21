@@ -13,16 +13,19 @@ import com.google.android.gms.maps.model.LatLng;
 public class Association {
 
     private static Association instance;
-    private static String UUID;
-    private static LatLng position;
-    private static String name;
     private static final int KILOMETER = 1000;
+    private String UUID;
+    private LatLng position;
+    private String name;
+    private String email;
 
 
-    private Association(String id, LatLng location, String name){
-        Association.UUID = id;
-        Association.position = location;
-        Association.name = name;
+    private Association(String uuid, LatLng position, String name, String email){
+        this.UUID = uuid;
+        this.position = position;
+        this.name = name;
+        this.email = email;
+
     }
 
     public static Association get(Activity activity) {
@@ -42,24 +45,24 @@ public class Association {
         String name = sharedPref.getString("key_name", "לשובע"); // TODO change to null after registering
         float latitude = sharedPref.getFloat("key_latitude", 31.252973f);
         float longitude = sharedPref.getFloat("key_longitude", 34.791462f);
-
+        String email = sharedPref.getString("key_email", activity.getResources().getString(com.gilshelef.feedme.R.string.email_placeholder));
         LatLng base= new LatLng(latitude, longitude);
-        instance = new Association(uuid, base, name);
+        instance = new Association(uuid, base, name, email);
         return instance;
 
 
     }
 
-    public static float calcDistance(LatLng location) {
+    public float calcDistance(LatLng location) {
         float[] result = new float[1];
-        Location.distanceBetween(location.latitude, location.longitude, Association.position.latitude, Association.position.longitude, result);
+        Location.distanceBetween(location.latitude, location.longitude, position.latitude, position.longitude, result);
 
         if(result.length == 0)
             return Integer.MAX_VALUE;
         return (result[0] / KILOMETER);
     }
 
-    public static String getId() {
+    public String getId() {
         return UUID;
     }
 
@@ -69,5 +72,9 @@ public class Association {
 
     public LatLng getBasePosition() {
         return position;
+    }
+
+    public String getEmail() {
+        return email;
     }
 }

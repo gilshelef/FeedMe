@@ -16,7 +16,7 @@ import org.json.JSONObject;
 public class Donation implements Parcelable{
 
     private static final String TAG = Donation.class.getSimpleName();
-    enum State {AVAILABLE, SAVED, OWNED}
+    public enum State {AVAILABLE, SAVED, OWNED}
 
     // minimum qualification for donation
     private Type type;
@@ -30,14 +30,21 @@ public class Donation implements Parcelable{
     private String description;
     private String imageUrl;
     private State state;
-    private boolean selected;
+    private boolean inCart;
 
     private Donation(){
     }
 
+    public boolean inCart() {
+        return inCart;
+    }
+    public State getState() {
+        return state;
+    }
+
     //TODO add time to take donation
     public Donation(JSONObject obj) {
-        selected = false;
+        inCart = false;
         try {
             phone = obj.getString("phone");
             firstName = obj.getString("firstName");
@@ -51,6 +58,10 @@ public class Donation implements Parcelable{
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    public String getBusinessName() {
+        return businessName;
     }
 
     public Type getType() {
@@ -77,7 +88,7 @@ public class Donation implements Parcelable{
         this.id = id;
     }
 
-    void setState(State state) {
+    public void setState(State state) {
         this.state = state;
     }
 
@@ -93,12 +104,16 @@ public class Donation implements Parcelable{
         return state.equals(State.SAVED);
     }
 
-    public boolean isSelected(){
-        return selected;
+    public boolean isInCart(){
+        return inCart;
     }
 
     public String getId() {
         return id;
+    }
+
+    public String getTime() {
+        return "חמישי 14:00 - 16:00"; // TODO
     }
 
     @Override
@@ -115,8 +130,8 @@ public class Donation implements Parcelable{
         return id.hashCode();
     }
 
-    public void setSelected(boolean val) {
-        selected = val;
+    public void setInCart(boolean val) {
+        inCart = val;
     }
 
     public static final Parcelable.Creator<Donation> CREATOR = new Creator<Donation>() {
@@ -132,6 +147,9 @@ public class Donation implements Parcelable{
             donation.businessName = source.readString();
             donation.description = source.readString();
             donation.imageUrl = source.readString();
+            donation.state = State.valueOf(source.readString());
+            donation.id = source.readString();
+            donation.inCart = Boolean.valueOf(source.readString());
             return donation;
         }
         public Donation[] newArray(int size) {
@@ -152,5 +170,8 @@ public class Donation implements Parcelable{
         parcel.writeString(businessName);
         parcel.writeString(description);
         parcel.writeString(imageUrl);
+        parcel.writeString(state.name());
+        parcel.writeString(id);
+        parcel.writeString(inCart+"");
     }
 }

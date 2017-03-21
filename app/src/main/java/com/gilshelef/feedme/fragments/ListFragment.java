@@ -17,6 +17,8 @@ import java.util.List;
  * Created by gilshe on 2/22/17.
  */
 public class ListFragment extends BaseFragment {
+    public static final String TAG = ListFragment.class.getSimpleName();
+
 
     @Override
     protected RecycledBaseAdapter getAdapter() {

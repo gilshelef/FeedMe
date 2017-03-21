@@ -76,8 +76,6 @@ public class DataManager {
         }
     }
 
-
-
     private static String loadJsonFromAsset(String filename, Context context) {
         String json;
 
@@ -134,21 +132,30 @@ public class DataManager {
         return all;
     }
 
+//    public void saveEvent(String id) {
+//        Donation d = donations.get(id);
+//        if(d.isAvailable())  // available => saved
+//            d.setState(Donation.State.SAVED);
+//        else if(d.isSaved())  // saved => available
+//            d.setState(Donation.State.AVAILABLE);
+//
+//        AdapterManager.get().updateDataSourceAll();
+//    }
+
     public void saveEvent(String id) {
         Donation d = donations.get(id);
-        if(d.isAvailable())  // available => saved
-            d.setState(Donation.State.SAVED);
-        else if(d.isSaved())  // saved => available
-            d.setState(Donation.State.AVAILABLE);
-
-        AdapterManager.get().updateDataSourceAll();
+        d.setState(Donation.State.SAVED);
     }
+
+    public void unSaveEvent(String id) {
+        Donation d = donations.get(id);
+        d.setState(Donation.State.AVAILABLE);}
 
     public void selectEvent(String id) {
         Donation d = donations.get(id);
-        if (!d.isSelected())
-            d.setSelected(true);
-        else d.setSelected(false);
+        if (!d.isInCart())
+            d.setInCart(true);
+        else d.setInCart(false);
 
         AdapterManager.get().updateDataSourceAll();
     }
@@ -160,13 +167,39 @@ public class DataManager {
 
     public void returnAll(Set<String> selected) {
         for(String id: selected)
-            donations.get(id).setSelected(false);
+            donations.get(id).setInCart(false);
         AdapterManager.get().updateDataSourceAll();
 
     }
 
     public static void applyFilter(Filter filter) {
         // TODO
+    }
+
+    public List<Donation> getInCart() {
+        final List<Donation> inCart = new ArrayList<>();
+        for(Donation d: donations.values())
+            if(d.inCart())
+                inCart.add(d);
+        return inCart;
+    }
+
+    public Donation getDonation(String donationId) {
+        return donations.get(donationId);
+    }
+
+    public int addToCartEvent(String donationId) {
+        Donation donation = donations.get(donationId);
+        int added = donation.inCart() ? 0: 1;
+        donation.setInCart(true);
+        return added;
+    }
+
+    public int removeFromCartEvent(String donationId) {
+        Donation donation = donations.get(donationId);
+        int removed = donation.inCart() ? -1 : 0;
+        donation.setInCart(false);
+        return removed;
     }
 
     private static class FetchDataTask extends AsyncTask<String, Void, Integer> {

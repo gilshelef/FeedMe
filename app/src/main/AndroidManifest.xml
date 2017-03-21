@@ -12,6 +12,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/MyTheme">
+
         <activity android:name=".activities.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -19,12 +20,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.PopupActivity"
-            android:theme="@style/MyTheme.Popup">
-        </activity>
 
-        <activity android:name=".activities.FilterActivity"
-            android:theme="@style/MyTheme">
+        <activity android:name=".activities.DetailsActivity"
+            android:theme="@style/MyTheme.Popup">
         </activity>
 
         <meta-data

@@ -1,7 +1,8 @@
 package com.gilshelef.feedme.adapters;
 
-import android.content.Context;
+import android.app.Activity;
 
+import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.data.DataManager;
 import com.gilshelef.feedme.data.Donation;
 
@@ -14,13 +15,26 @@ public class ListAdapter extends RecycledBaseAdapter {
 
     static final String TAG = ListAdapter.class.getSimpleName();
 
-    public ListAdapter(Context context, List<Donation> dataSource, OnActionEvent listener) {
-        super(context, dataSource, listener);
+    public ListAdapter(Activity activity, List<Donation> dataSource, OnActionEvent listener) {
+        super(activity, dataSource, listener);
     }
 
     @Override
-    void updateDataSource() {
-        mDataSource.clear();
-        mDataSource.addAll(DataManager.get(mContext).getAll(mContext));
+    protected void styleSelectedItem(ViewHolder holder, Donation donation) {
+        if(donation.inCart()) {
+            holder.itemView.setBackground(mActivity.getDrawable(R.color.selected));
+            holder.image.setBackground(mActivity.getDrawable(R.color.selected));
+        }
+        else {
+            holder.itemView.setBackground(mActivity.getDrawable(R.color.lightPrimaryColor));
+            holder.image.setBackground(mActivity.getDrawable(R.color.lightPrimaryColor));
+        }
     }
+
+    @Override
+    public void updateDataSource() {
+        mDataSource.clear();
+        mDataSource.addAll(DataManager.get(mActivity).getAll(mActivity));
+    }
+
 }

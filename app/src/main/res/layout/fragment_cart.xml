@@ -1,20 +1,113 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/fragment_cart"
     android:background="@color/lightPrimaryColor"
-    android:layout_width="match_parent"
-    android:padding="12dp"
-    android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.gilshelef.feedme.activities.MainActivity">
+    android:id="@+id/cart_container"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list"
+    <!--header-->
+    <RelativeLayout
+        android:id="@+id/cart_header"
+        style="?attr/toolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:background="@color/colorPrimary"
+        android:elevation="@dimen/cardview_default_elevation"
+        android:minHeight="?attr/actionBarSize">
+
+        <ImageButton
+            android:id="@+id/cart_exit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/colorPrimary"
+            android:clickable="true"
+            android:paddingStart="10dp"
+            android:src="@drawable/ic_close_white_24dp" />
+
+        <TextView
+            android:id="@+id/cart_header_text"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="@string/menu_shopping_cart"
+            android:textSize="20sp"
+            android:textColor="@android:color/white"
+            android:layout_toEndOf="@id/cart_exit_btn"
+            android:background="@color/colorPrimary" />
+
+        <TextView
+            android:transitionName="@string/transition_cart"
+            android:id="@+id/item_count"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/badge_circle_big"
+            android:gravity="center"
+            android:padding="8dp"
+            android:textColor="@android:color/black"
+            android:textSize="20sp" />
+
+    </RelativeLayout>
+
+
+    <android.support.design.widget.CoordinatorLayout
+        android:id="@+id/coordinator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"/>
+        android:layout_below="@id/cart_header">
+
+
+        <!--list-->
+        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:id="@+id/list_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="false"
+            android:layout_below="@+id/cart_header"
+            android:layout_margin="0dp"
+            android:background="@color/lightPrimaryColor"
+            android:orientation="vertical"
+            android:paddingBottom="12dp"
+            android:paddingEnd="12dp"
+            android:paddingStart="12dp"
+            android:paddingTop="0dp"
+            tools:context="com.gilshelef.feedme.activities.MainActivity">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="12dp"
+                android:clickable="true" />
+
+        </RelativeLayout>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/cart_checkout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="16dp"
+            android:src="@drawable/ic_checkout_white_24dp"
+            android:background="@color/colorAccent"
+            android:visibility="visible"
+            app:layout_behavior="com.gilshelef.feedme.ScrollAwareFABBehavior"
+            app:elevation="6dp"
+            app:fabSize="normal" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </RelativeLayout>
-

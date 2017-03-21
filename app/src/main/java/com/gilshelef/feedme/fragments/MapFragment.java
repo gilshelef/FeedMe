@@ -4,9 +4,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.design.widget.BottomSheetBehavior;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -17,12 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gilshelef.feedme.Constants;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.data.Association;
 import com.gilshelef.feedme.data.DataManager;
 import com.gilshelef.feedme.data.Donation;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -50,24 +46,21 @@ import static android.app.Activity.RESULT_OK;
 
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
+    private static final Object CURRENT_POSITION = "position";
+    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
     private GoogleMap mMap;
     private MapView mMapView;
-    private static final String TAG = MapFragment.class.getSimpleName();
-    private static final int PERMISSIONS_REQUEST_LOCATION = 1;
-    private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
+    public static final String TAG = MapFragment.class.getSimpleName();
     private List<Donation> mDataSource;
-    private BottomSheetBehavior mBottomSheetBehavior;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
-        Log.d(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
         View rootView = inflater.inflate(R.layout.fragment_map, container, false);
         mMapView = (MapView) rootView.findViewById(R.id.mapView);
         mMapView.onCreate(savedInstanceState);
@@ -81,34 +74,19 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         mMapView.getMapAsync(this);
         mDataSource = DataManager.get(getActivity()).getAll(getActivity());
-
-        CoordinatorLayout coordinatorLayout = (CoordinatorLayout) rootView.findViewById(R.id.coordinator);
-        View bottomSheet = coordinatorLayout.findViewById(R.id.bottom_sheet);
-        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
-        mBottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
-            @Override
-            public void onStateChanged(@NonNull View bottomSheet, int newState) {
-                // React to state change
-            }
-            @Override
-            public void onSlide(@NonNull View bottomSheet, float slideOffset) {
-            }
-        });
         return rootView;
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.map_menu, menu);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-
         switch (item.getItemId()) {
             case R.id.search:
-                searchEvent();
+                ((OnSearchListener)getActivity()).onSearch();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -165,7 +143,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 //
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
-                    PERMISSIONS_REQUEST_LOCATION);
+                    Constants.PERMISSIONS_REQUEST_LOCATION);
             Log.i(TAG, "no permission for my location enable");
             return;
         }
@@ -175,24 +153,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if(requestCode == PERMISSIONS_REQUEST_LOCATION){
+        if(requestCode == Constants.PERMISSIONS_REQUEST_LOCATION){
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 mMap.setMyLocationEnabled(true);
             }
 
-        }
-    }
-
-    private void searchEvent() {
-        try {
-            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY)
-                    .build(getActivity());
-            startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-        } catch (GooglePlayServicesRepairableException e) {
-            // TODO: Handle the error.
-        } catch (GooglePlayServicesNotAvailableException e) {
-            // TODO: Handle the error.
         }
     }
 
@@ -218,8 +184,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title(title);
-        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_circle_black_48dp));
+
+
+        markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_person));
         Marker marker = mMap.addMarker(markerOptions);
+        marker.setTag(CURRENT_POSITION);
         marker.showInfoWindow();
 
         CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
@@ -231,10 +200,18 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public boolean onMarkerClick(Marker marker) {
         Log.d(TAG, "onMarkerClick");
-        Donation d = (Donation) marker.getTag();
-        mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
-        return false;
+        if(!(marker.getTag() instanceof Donation))
+            marker.showInfoWindow();
 
+        else {
+            Donation donation = (Donation) marker.getTag();
+            ((BaseFragment.OnDetailsListener) getActivity()).onDetails(null, donation);
+        }
+        return false;
+    }
+
+    public interface OnSearchListener {
+        void onSearch();
     }
 
     private class DrawDonationTask extends AsyncTask<Void, Void, Void> {
@@ -251,14 +228,12 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
                 options.snippet(d.getDescription());
                 options.icon(BitmapDescriptorFactory.defaultMarker(d.getType().color()));
                 optionToTag.put(options, d);
-
             }
             return null;
         }
 
         @Override
         protected void onPostExecute(Void result) {
-            Log.d(TAG, "drawing markers");
             for (Map.Entry<MarkerOptions, Donation> entry : optionToTag.entrySet()) {
                 Marker m = mMap.addMarker(entry.getKey());
                 m.setTag(entry.getValue());

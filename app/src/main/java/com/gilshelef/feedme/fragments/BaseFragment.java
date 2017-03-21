@@ -1,17 +1,15 @@
 package com.gilshelef.feedme.fragments;
 
-import android.content.Intent;
-import android.net.Uri;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.gilshelef.feedme.activities.PopupActivity;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.adapters.AdapterManager;
 import com.gilshelef.feedme.adapters.RecycledBaseAdapter;
@@ -30,8 +28,6 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
     protected RecyclerView mRecyclerView;
     protected RecycledBaseAdapter mAdapter;
 
-//    protected ProgressBar progressBar;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflate(inflater, container);
@@ -39,15 +35,20 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mDataSource = getDataSource();
         mAdapter = getAdapter();
-        AdapterManager.get().setAdapter(TAG, mAdapter);
         mRecyclerView.setAdapter(mAdapter);
+
+        //set adapter in manager
+        AdapterManager.get().setAdapter(mAdapter);
+
+        //draw divider line between list items
+        Drawable dividerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.divider);
+        RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
+        mRecyclerView.addItemDecoration(dividerItemDecoration);
         return rootView;
     }
 
     protected abstract RecycledBaseAdapter getAdapter();
-
     protected abstract List<Donation> getDataSource();
-
     protected abstract View inflate(LayoutInflater inflater, ViewGroup container);
 
     @Override
@@ -56,31 +57,19 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
     }
 
     @Override
-    public void onCallEvent(String phone) {
-        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(phone));
-        getActivity().startActivity(intent);
+    public void onUnSaveEvent(Donation donation) {
+        DataManager.get(getActivity()).unSaveEvent(donation.getId());
     }
 
     @Override
-    public void onSelectEvent(Donation donation){
-        DataManager.get(getActivity()).selectEvent(donation.getId());
-        ((OnSelectedEvent)getActivity()).onSelectedEvent(donation.getId(), donation.isSelected());
+    public void onClickEvent(View v, Donation donation){
+        ((OnDetailsListener)getActivity()).onDetails(v, donation);
     }
 
-    @Override
-    public void onZoomEvent(View v, Donation donation){
-        Intent intent = new Intent(getActivity(), PopupActivity.class);
-        Bundle mBundle = new Bundle();
-        mBundle.putParcelable(PopupActivity.EXTRA_DONATION, donation);
-        intent.putExtras(mBundle);
-        ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(getActivity(), v, "profile");
-        startActivity(intent, options.toBundle());
-    }
 
-    public interface OnSelectedEvent{
-        void onSelectedEvent(String id, boolean selected);
+    public interface OnDetailsListener {
+        void onDetails(View v, Donation donation);
     }
-
 
 
 }

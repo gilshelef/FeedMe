@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@android:color/white"
+    android:orientation="vertical"
+    android:id="@+id/details_container"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <!--header-->
+    <RelativeLayout
+        android:id="@+id/details_header"
+        style="?attr/toolbarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/lightPrimaryColor"
+        android:elevation="@dimen/cardview_default_elevation"
+        android:layout_weight="0.01"
+        android:minHeight="?attr/actionBarSize">
+
+        <ImageButton
+            android:id="@+id/details_exit_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentTop="true"
+            android:background="@color/lightPrimaryColor"
+            android:clickable="true"
+            android:paddingStart="10dp"
+            android:src="@drawable/ic_close_black_24dp" />
+
+        <com.like.LikeButton
+            android:id="@+id/details_save_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:background="@color/lightPrimaryColor"
+            android:contentDescription="@string/save"
+            app:icon_size="25dp"
+            app:icon_type="heart" />
+
+    </RelativeLayout>
+
+    <!--image and text-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="8dp"
+        android:layout_weight="0.50">
+
+        <!--image-->
+        <ImageView
+            android:id="@+id/details_image"
+            android:layout_width="180dp"
+            android:layout_height="200dp"
+            android:contentDescription="@string/thumbnail"
+            android:src="@drawable/placeholder"
+            android:transitionName="profile"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true" />
+
+        <!--text-->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_toStartOf="@id/details_image"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="4dp">
+
+            <!--business name-->
+            <TextView
+                android:id="@+id/details_business_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textStyle="bold"
+                android:text="בית עסק"
+                android:textSize="20sp"
+                android:gravity="center"
+                android:paddingTop="10dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+            <!--description-->
+            <TextView
+                android:text="מלא דברים שרוצים לתרום בלה"
+                android:textSize="14sp"
+                android:id="@+id/details_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingTop="8dp"
+                android:layout_centerInParent="true"
+                android:layout_below="@id/details_business_name"
+                android:layout_centerVertical="true"
+                android:layout_centerHorizontal="true" />
+        </RelativeLayout>
+    </RelativeLayout>
+
+    <!--contact-->
+    <RelativeLayout
+        android:layout_weight="0.146"
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/details_contact"
+        android:clickable="true">
+
+        <ImageView
+            android:id="@+id/details_call_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="4dp"
+            android:contentDescription="@string/call"
+            android:padding="4dp"
+            android:layout_centerInParent="true"
+            android:paddingEnd="10dp"
+            android:src="@drawable/ic_call_black_24dp" />
+
+        <TextView
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="גיל שלף"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/details_contact_info"
+            android:textSize="16sp"
+            android:textColor="@color/lightTextColor"
+            android:layout_toStartOf="@id/details_call_image"
+            android:layout_marginEnd="4dp"
+            android:paddingEnd="4dp" />
+    </RelativeLayout>
+
+    <!--divider-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        />
+
+    <!--time-->
+    <RelativeLayout
+        android:layout_weight="0.146"
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/details_time"
+        android:clickable="true">
+
+        <ImageView
+            android:id="@+id/details_time_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="4dp"
+            android:contentDescription="@string/call"
+            android:padding="4dp"
+            android:layout_centerInParent="true"
+            android:paddingEnd="10dp"
+            android:src="@drawable/ic_access_time_black_24dp" />
+
+        <TextView
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="בשעה 16"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/details_time_info"
+            android:textSize="16sp"
+            android:textColor="@color/lightTextColor"
+            android:layout_toStartOf="@id/details_time_image"
+            android:layout_marginEnd="4dp"
+            android:paddingEnd="4dp" />
+    </RelativeLayout>
+
+    <!--divider-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        />
+
+    <!--address-->
+    <RelativeLayout
+        android:layout_weight="0.146"
+        android:background="@android:color/white"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/details_address"
+        android:clickable="true">
+
+        <ImageView
+            android:id="@+id/details_address_image"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_margin="4dp"
+            android:contentDescription="@string/call"
+            android:padding="4dp"
+            android:layout_centerInParent="true"
+            android:paddingEnd="10dp"
+            android:src="@drawable/ic_room_black_24dp" />
+
+        <TextView
+            android:layout_centerInParent="true"
+            android:gravity="center"
+            android:text="אשור 32 כרמיאל"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/details_address_info"
+            android:textSize="16sp"
+            android:textColor="@color/lightTextColor"
+            android:layout_toStartOf="@id/details_address_image"
+            android:layout_marginEnd="4dp"
+            android:paddingEnd="4dp" />
+    </RelativeLayout>
+
+    <!--divider-->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider"
+        />
+
+    <Button
+        android:id="@+id/details_add_to_cart"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_margin="16dp"
+        android:layout_weight="0.05"
+        android:clickable="true"
+        android:gravity="center"
+        android:padding="4dp"
+        android:textColor="@color/cardview_light_background"
+        android:textSize="25sp" />
+
+</LinearLayout>
