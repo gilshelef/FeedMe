@@ -6,7 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.adapters.SaveAdapter;
+import com.gilshelef.feedme.adapters.OwnedAdapter;
 import com.gilshelef.feedme.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.data.DataManager;
 import com.gilshelef.feedme.data.Donation;
@@ -14,34 +14,32 @@ import com.gilshelef.feedme.data.Donation;
 import java.util.List;
 
 /**
- * Created by gilshe on 2/23/17.
+ * Created by gilshe on 3/21/17.
  */
 
-public class SaveFragment extends BaseFragment{
-
-    public static final String TAG = SaveFragment.class.getSimpleName();
+public class OwnedFragment extends BaseFragment {
+    public static final String TAG = OwnedFragment.class.getSimpleName();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
-        ((ToggleHomeBar)getActivity()).drawHomeBar(false);
+        ((ToggleHomeBar) getActivity()).drawHomeBar(false);
         return rootView;
     }
 
-
-        @Override
+    @Override
     protected RecycledBaseAdapter getAdapter() {
-        return new SaveAdapter(getActivity(), mDataSource, this);
+        return new OwnedAdapter(getActivity(), mDataSource, this);
     }
 
     @Override
     protected List<Donation> getDataSource() {
-        return DataManager.get(getActivity()).getSaved(getActivity());
+        return DataManager.get(getActivity()).getOwned();
     }
 
     @Override
     protected View inflate(LayoutInflater inflater, ViewGroup container) {
-        return inflater.inflate(R.layout.fragment_save, container, false);
+        return inflater.inflate(R.layout.fragment_owned, container, false);
     }
 
     @Override
@@ -49,5 +47,4 @@ public class SaveFragment extends BaseFragment{
         super.onDestroyView();
         ((ToggleHomeBar) getActivity()).drawHomeBar(true);
     }
-
 }

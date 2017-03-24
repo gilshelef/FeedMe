@@ -188,37 +188,54 @@
 
     <!--address-->
     <RelativeLayout
-        android:layout_weight="0.146"
-        android:background="@android:color/white"
+        android:id="@+id/details_address"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/details_address"
-        android:clickable="true">
+        android:layout_weight="0.146"
+        android:background="@android:color/white"
+        android:clickable="true"
+        android:paddingRight="0dp"
+        android:paddingStart="0dp"
+        android:paddingTop="0dp">
 
         <ImageView
             android:id="@+id/details_address_image"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
+            android:layout_centerInParent="true"
             android:layout_margin="4dp"
             android:contentDescription="@string/call"
             android:padding="4dp"
-            android:layout_centerInParent="true"
             android:paddingEnd="10dp"
             android:src="@drawable/ic_room_black_24dp" />
 
         <TextView
-            android:layout_centerInParent="true"
-            android:gravity="center"
-            android:text="אשור 32 כרמיאל"
+            android:id="@+id/details_address_info"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/details_address_info"
-            android:textSize="16sp"
-            android:textColor="@color/lightTextColor"
-            android:layout_toStartOf="@id/details_address_image"
+            android:layout_centerInParent="true"
             android:layout_marginEnd="4dp"
-            android:paddingEnd="4dp" />
+            android:layout_toStartOf="@id/details_address_image"
+            android:gravity="center"
+            android:paddingEnd="4dp"
+            android:text="אשור 32 כרמיאל"
+            android:textColor="@color/lightTextColor"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/navigate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/details_address_info"
+            android:layout_below="@+id/details_address_image"
+            android:layout_gravity="center_horizontal"
+            android:clickable="false"
+            android:paddingEnd="4dp"
+            android:text="נווט עם וויז"
+            android:textColor="@color/lightTextColor"
+            android:textSize="14sp" />
+
     </RelativeLayout>
 
     <!--divider-->

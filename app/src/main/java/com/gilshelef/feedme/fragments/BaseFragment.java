@@ -6,13 +6,16 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.gilshelef.feedme.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.adapters.AdapterManager;
 import com.gilshelef.feedme.adapters.RecycledBaseAdapter;
+import com.gilshelef.feedme.adapters.SimpleItemTouchHelperCallback;
 import com.gilshelef.feedme.data.DataManager;
 import com.gilshelef.feedme.data.Donation;
 
@@ -44,7 +47,18 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
         Drawable dividerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.divider);
         RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
+
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        ItemTouchHelper.Callback callback =
+                new SimpleItemTouchHelperCallback(mAdapter);
+        ItemTouchHelper touchHelper = new ItemTouchHelper(callback);
+        touchHelper.attachToRecyclerView(mRecyclerView);
     }
 
     protected abstract RecycledBaseAdapter getAdapter();
@@ -54,15 +68,17 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
     @Override
     public void onSaveEvent(Donation donation) {
         DataManager.get(getActivity()).saveEvent(donation.getId());
+        ((OnCounterChangeListener)getActivity()).updateViewCounters();
     }
 
     @Override
     public void onUnSaveEvent(Donation donation) {
         DataManager.get(getActivity()).unSaveEvent(donation.getId());
+        ((OnCounterChangeListener)getActivity()).updateViewCounters();
     }
 
     @Override
-    public void onClickEvent(View v, Donation donation){
+    public void onDetailsEvent(View v, Donation donation){
         ((OnDetailsListener)getActivity()).onDetails(v, donation);
     }
 

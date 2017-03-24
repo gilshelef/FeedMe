@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/MyTheme">
 
-        <activity android:name=".activities.MainActivity">
+        <activity android:name="launcher.RegistrationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,9 +21,23 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="launcher.RegistrationDonorActivity"
+            android:theme="@style/MyTheme">
+        </activity>
+
+        <activity android:name="launcher.RegistrationNonProfitActivity"
+            android:theme="@style/MyTheme">
+        </activity>
+
+
+        <activity android:name=".activities.NonProfitMainActivity"
+            android:theme="@style/MyTheme">
+        </activity>
+
         <activity android:name=".activities.DetailsActivity"
             android:theme="@style/MyTheme.Popup">
         </activity>
+
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

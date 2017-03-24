@@ -2,6 +2,7 @@ package com.gilshelef.feedme.adapters;
 
 import android.app.Activity;
 
+import com.gilshelef.feedme.OnCounterChangeListener;
 import com.gilshelef.feedme.data.DataManager;
 import com.gilshelef.feedme.data.Donation;
 
@@ -28,7 +29,15 @@ public class CartAdapter extends RecycledBaseAdapter {
     }
 
     @Override
-    protected void styleSelectedItem(ViewHolder itemView, Donation donation) {
+    protected void styleListItem(ItemViewHolder itemView, Donation donation) {
+
+    }
+
+    @Override
+    protected void onItemDismiss(Donation donation) {
+        DataManager.get(mActivity).removeFromCartEvent(donation.getId());
+        ((OnUpdateCount) mListener).updateItemsCount();
+        ((OnCounterChangeListener) mActivity).updateViewCounters();
 
     }
 

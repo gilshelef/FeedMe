@@ -1,5 +1,6 @@
 package com.gilshelef.feedme.fragments;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,9 @@ public class ListFragment extends BaseFragment {
     protected RecycledBaseAdapter getAdapter() {
         return new ListAdapter(getActivity(), mDataSource, this);
     }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {}
 
     @Override
     protected List<Donation> getDataSource() {

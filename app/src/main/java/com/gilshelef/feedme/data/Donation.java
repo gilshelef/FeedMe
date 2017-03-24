@@ -16,6 +16,7 @@ import org.json.JSONObject;
 public class Donation implements Parcelable{
 
     private static final String TAG = Donation.class.getSimpleName();
+
     public enum State {AVAILABLE, SAVED, OWNED}
 
     // minimum qualification for donation
@@ -35,6 +36,7 @@ public class Donation implements Parcelable{
     private Donation(){
     }
 
+    public boolean isOwned() {return state == State.OWNED;}
     public boolean inCart() {
         return inCart;
     }

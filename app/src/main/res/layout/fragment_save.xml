@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@color/lightPrimaryColor"
     android:padding="12dp"
-    tools:context="com.gilshelef.feedme.activities.MainActivity">
+    tools:context="com.gilshelef.feedme.activities.NonProfitMainActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/list"

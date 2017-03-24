@@ -100,7 +100,14 @@ public class DetailsActivity extends AppCompatActivity {
         //contact
         contactInfo.setText(donation.getContactInfo());
         timeInfo.setText(donation.getTime());
+
         styleCartBtn();
+
+        if(donation.isOwned()) {
+            save.setVisibility(View.GONE);
+            addToCartBtn.setVisibility(View.GONE);
+        }
+
         new ListenerTask().execute();
     }
 
@@ -195,13 +202,26 @@ public class DetailsActivity extends AppCompatActivity {
                 //TODO
             }
 
-
+            addressBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    launchNavigationApp();
+                }
+            });
             return addressDetails;
         }
 
         protected void onPostExecute(String addressDetails){
             addressInfo.setText(addressDetails);
         }
+    }
+
+    private void launchNavigationApp() {
+        LatLng latLng = donation.getPosition();
+        String format = "waze://?ll="+latLng.latitude+", " +latLng.longitude + "&navigate=yes";
+        Uri uri = Uri.parse(format);
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        startActivity(intent);
     }
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {

@@ -94,28 +94,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "onResume");
         mMapView.onResume();
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Log.d(TAG, "onPause");
         mMapView.onPause();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy");
         mMapView.onDestroy();
     }
 
     @Override
     public void onLowMemory() {
         super.onLowMemory();
-        Log.d(TAG, "onLowMemory");
         mMapView.onLowMemory();
     }
 
@@ -184,7 +180,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title(title);
-
 
         markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_person));
         Marker marker = mMap.addMarker(markerOptions);

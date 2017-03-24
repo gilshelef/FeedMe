@@ -17,7 +17,7 @@ import com.squareup.picasso.Picasso;
  * Created by gilshe on 3/17/17.
  */
 
-public class ViewHolder extends RecyclerView.ViewHolder {
+public class ItemViewHolder extends RecyclerView.ViewHolder {
 
     private final com.squareup.picasso.Transformation mTransformation;
     private Donation mDonation;
@@ -27,7 +27,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
     public LikeButton save;
     private TextView distance;
 
-    ViewHolder(View view) {
+    ItemViewHolder(View view) {
         super(view);
 
         mTransformation = new RoundedTransformationBuilder()
@@ -53,6 +53,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
                     .fit()
                     .transform(mTransformation)
                     .error(mDonation.getType().defaultThumbnail())
+                    .placeholder(R.drawable.placeholder)
                     .into(image);
         else image.setImageResource(mDonation.getType().defaultThumbnail());
 
@@ -64,7 +65,6 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         double distance = Association.get(activity).calcDistance(mDonation.getPosition());
         String text = String.format(activity.getResources().getString(R.string.distance), distance);
         this.distance.setText(text);
-
     }
 
     private void loadSave() {
@@ -73,6 +73,7 @@ public class ViewHolder extends RecyclerView.ViewHolder {
         else if (mDonation.isSaved())
             save.setLiked(true);
     }
+
 
 }
 

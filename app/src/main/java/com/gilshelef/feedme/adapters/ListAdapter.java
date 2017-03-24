@@ -2,7 +2,6 @@ package com.gilshelef.feedme.adapters;
 
 import android.app.Activity;
 
-import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.data.DataManager;
 import com.gilshelef.feedme.data.Donation;
 
@@ -20,15 +19,20 @@ public class ListAdapter extends RecycledBaseAdapter {
     }
 
     @Override
-    protected void styleSelectedItem(ViewHolder holder, Donation donation) {
-        if(donation.inCart()) {
-            holder.itemView.setBackground(mActivity.getDrawable(R.color.selected));
-            holder.image.setBackground(mActivity.getDrawable(R.color.selected));
-        }
-        else {
-            holder.itemView.setBackground(mActivity.getDrawable(R.color.lightPrimaryColor));
-            holder.image.setBackground(mActivity.getDrawable(R.color.lightPrimaryColor));
-        }
+    protected void styleListItem(ItemViewHolder holder, Donation donation) {
+        if(donation.inCart())
+            super.setSelected(holder);
+        else
+            super.setUnSelected(holder);
+    }
+
+    //cant remove items from home
+    @Override
+    public void onItemDismiss(int position) {
+    }
+
+    @Override
+    protected void onItemDismiss(Donation donation) {
     }
 
     @Override

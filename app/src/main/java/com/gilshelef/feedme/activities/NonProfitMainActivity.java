@@ -1,7 +1,9 @@
 package com.gilshelef.feedme.activities;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.Fragment;
@@ -20,6 +22,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.Constants;
+import com.gilshelef.feedme.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.adapters.AdapterManager;
 import com.gilshelef.feedme.data.Association;
@@ -31,6 +34,7 @@ import com.gilshelef.feedme.fragments.BaseFragment;
 import com.gilshelef.feedme.fragments.CartFragment;
 import com.gilshelef.feedme.fragments.ListFragment;
 import com.gilshelef.feedme.fragments.MapFragment;
+import com.gilshelef.feedme.fragments.OwnedFragment;
 import com.gilshelef.feedme.fragments.SaveFragment;
 import com.gilshelef.feedme.fragments.ToggleHomeBar;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -46,10 +50,10 @@ import static android.widget.Toast.LENGTH_SHORT;
  * Created by gilshe on 3/13/17.
  */
 
-public class MainActivity extends AppCompatActivity implements
-        BaseFragment.OnDetailsListener, ToggleHomeBar, NavigationView.OnNavigationItemSelectedListener, MapFragment.OnSearchListener {
+public class NonProfitMainActivity extends AppCompatActivity implements
+        BaseFragment.OnDetailsListener, ToggleHomeBar, NavigationView.OnNavigationItemSelectedListener, MapFragment.OnSearchListener, OnCounterChangeListener {
 
-    private static final String TAG = MainActivity.class.getSimpleName();
+    private static final String TAG = NonProfitMainActivity.class.getSimpleName();
     private Toolbar mAppToolBar;
     private Button mMapBtn;
     private Button mListBtn;
@@ -57,12 +61,13 @@ public class MainActivity extends AppCompatActivity implements
     private TextView shoppingCartUI = null;
     private Map<String, Fragment> mFragments;
     View mapAndList;
+    NavigationView navigationView;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.association_activity_main);
 
         View main = findViewById(R.id.main);
 
@@ -74,8 +79,6 @@ public class MainActivity extends AppCompatActivity implements
         // set toolbar
         mAppToolBar = (Toolbar) main.findViewById(R.id.toolbar);
         setSupportActionBar(mAppToolBar);
-        getSupportActionBar().setTitle(R.string.app_name);
-
 
         //drawer
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -83,14 +86,15 @@ public class MainActivity extends AppCompatActivity implements
                 this, drawer, mAppToolBar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //drawer header
         View header = navigationView.getHeaderView(0);
         TextView associationName = (TextView)  header.findViewById(R.id.association_name);
         associationName.setText(Association.get(this).getName());
-
-        TextView associationEmail = (TextView) header.findViewById(R.id.association_email);
-        associationEmail.setText(Association.get(this).getEmail());
+        TextView nonProfitContactName = (TextView) header.findViewById(R.id.non_profit_contact_name);
+        nonProfitContactName.setText(Association.get(this).getContact());
 
 
         //create fragments
@@ -99,11 +103,10 @@ public class MainActivity extends AppCompatActivity implements
         mFragments.put(ListFragment.TAG, new ListFragment());
         mFragments.put(CartFragment.TAG, new CartFragment());
         mFragments.put(SaveFragment.TAG, new SaveFragment());
+        mFragments.put(OwnedFragment.TAG, new OwnedFragment());
         mFragments.put(AccountFragment.TAG, new AccountFragment());
         //TODO add filter fragment
 
-        //set first fragment - map
-        setFragment(MapFragment.TAG);
 
         //set buttons
         mMapBtn = (Button) main.findViewById(R.id.map_fragment_btn);
@@ -126,7 +129,14 @@ public class MainActivity extends AppCompatActivity implements
 
         mapAndList = main.findViewById(R.id.views_toolbar);
 
+        //set first fragment - map
+        onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_home));
+        new NavigationViewCounterTask().execute();
+
+        String welcomeText = getString(R.string.Hello) + " " + Association.get(this).getName();
+        Toast.makeText(getApplicationContext(), welcomeText, Toast.LENGTH_LONG).show();
     }
+
 
     private void setButtonStyle(Button selected, Button unselected) {
         selected.setSelected(true);
@@ -169,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void updateShoppingCartNumber(final int newCartNumber) {
+    public void updateShoppingCartNumber(final int newCartNumber) {
         shoppingCartNumber = newCartNumber;
         if (shoppingCartUI == null) return;
         runOnUiThread(new Runnable() {
@@ -219,12 +229,11 @@ public class MainActivity extends AppCompatActivity implements
                     DataManager.get(this).unSaveEvent(donationId);
 
                 //update cart events
-                int delta;
                 if (inCart)
-                    delta = DataManager.get(this).addToCartEvent(donationId);
-                else delta = DataManager.get(this).removeFromCartEvent(donationId);
-                updateShoppingCartNumber(shoppingCartNumber + delta);
+                   DataManager.get(this).addToCartEvent(donationId);
+                else DataManager.get(this).removeFromCartEvent(donationId);
 
+                updateViewCounters();
                 AdapterManager.get().updateDataSourceAll();
             }
         }
@@ -270,15 +279,21 @@ public class MainActivity extends AppCompatActivity implements
 
         switch (item.getItemId()){
             case R.id.nav_home:
+                getSupportActionBar().setTitle(R.string.home);
                 setFragment(MapFragment.TAG);
+                setButtonStyle(mMapBtn, mListBtn);
                 break;
             case R.id.nav_saved:
                 setFragment(SaveFragment.TAG);
+                getSupportActionBar().setTitle(R.string.saved);
                 break;
             case R.id.nav_my_donations:
+                setFragment(OwnedFragment.TAG);
+                getSupportActionBar().setTitle(R.string.my_donations);
                 break;
             case R.id.nav_account:
                 setFragment(AccountFragment.TAG);
+                getSupportActionBar().setTitle(R.string.account);
                 break;
         }
 
@@ -297,6 +312,41 @@ public class MainActivity extends AppCompatActivity implements
             // TODO: Handle the error.
         } catch (GooglePlayServicesNotAvailableException e) {
             // TODO: Handle the error.
+        }
+    }
+
+    @Override
+    public void updateViewCounters(){
+        new NavigationViewCounterTask().execute();
+    }
+
+    private class NavigationViewCounterTask extends AsyncTask<Void, Void, Void>{
+
+        private int countHome;
+        private int countSaved;
+        private int countMyDonations;
+        private int countCart;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            DataManager instance = DataManager.get(getApplicationContext());
+            countHome = instance.getAll(getApplicationContext()).size();
+            countSaved = instance.getSaved(getApplicationContext()).size();
+            countMyDonations = instance.getOwned().size();
+            countCart = instance.getInCart().size();
+            return null;
+        }
+        @Override
+        protected void onPostExecute(Void result) {
+            setMenuCounter(R.id.nav_home, countHome);
+            setMenuCounter(R.id.nav_saved, countSaved);
+            setMenuCounter(R.id.nav_my_donations, countMyDonations);
+            updateShoppingCartNumber(countCart);
+        }
+
+        private void setMenuCounter(@IdRes int itemId, int count) {
+            TextView view = (TextView) navigationView.getMenu().findItem(itemId).getActionView();
+            view.setText(count > 0 ? String.valueOf(count) : null);
         }
     }
 }

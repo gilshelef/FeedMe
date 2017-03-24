@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="100">
+
+    <FrameLayout
+        android:id="@+id/donors"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginTop="0dp"
+        android:background="@color/colorPrimaryDark"
+        android:layout_marginBottom="3dp"
+        android:layout_weight="50"
+        android:clickable="true">
+
+        <TextView
+            android:id="@+id/donor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:clickable="true"
+            android:fontFamily="casual"
+            android:gravity="center"
+            android:text="תורמים"
+            android:textColor="@color/colorAccent"
+            android:textSize="80sp" />
+    </FrameLayout>
+
+    <FrameLayout
+        android:clickable="true"
+        android:id="@+id/nonProfit"
+        android:layout_width="match_parent"
+        android:layout_weight="50"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_gravity="center">
+
+        <TextView
+            android:id="@+id/non_profit"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:text="עמותות"
+            android:textColor="@color/colorAccent"
+            android:textSize="80sp" />
+
+    </FrameLayout>
+
+</LinearLayout>

@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -23,14 +24,17 @@ import java.util.Set;
 
 public class DataManager {
 
-    private static Map<String, Donation> donations; // holding only available and saved items
+    private Map<String, Donation> donations; // holding only available and saved items
+    private Map<String, Donation> ownedDonations;
     private static DataManager instance;
     private static final String AVAILABLE = "0";
-    private static boolean initialized;
+    private boolean initialized;
 
-    private DataManager(){
+    private DataManager(Context context){
         donations = new LinkedHashMap<>();
+        ownedDonations = new LinkedHashMap<>();
         initialized = false;
+        new FetchDataTask(context, null).execute();
     }
 
     public static DataManager get(Context context) {
@@ -44,13 +48,11 @@ public class DataManager {
     }
 
     private static DataManager build(Context context) {
-        instance = new DataManager();
-        new FetchDataTask(context, null).execute();
+        instance = new DataManager(context);
         return instance;
     }
 
-    private static void getDonationsFromFile(Context context){
-        initialized = true;
+    private void getDonationsFromFile(Context context){
         try {
             // Load data
             String jsonString = loadJsonFromAsset("donations.json", context);
@@ -69,7 +71,7 @@ public class DataManager {
                 else donation.setState(Donation.State.SAVED);
 
                 String id = donation.getId();
-                DataManager.donations.put(id, donation);
+                this.donations.put(id, donation);
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -132,24 +134,63 @@ public class DataManager {
         return all;
     }
 
-//    public void saveEvent(String id) {
-//        Donation d = donations.get(id);
-//        if(d.isAvailable())  // available => saved
-//            d.setState(Donation.State.SAVED);
-//        else if(d.isSaved())  // saved => available
-//            d.setState(Donation.State.AVAILABLE);
-//
-//        AdapterManager.get().updateDataSourceAll();
-//    }
+    public List<Donation> getInCart() {
+        final List<Donation> inCart = new ArrayList<>();
+        for(Donation d: donations.values())
+            if(d.inCart())
+                inCart.add(d);
+        return inCart;
+    }
 
-    public void saveEvent(String id) {
-        Donation d = donations.get(id);
+    public List<Donation> getOwned() {
+        final List<Donation> owned = new ArrayList<>();
+        owned.addAll(ownedDonations.values());
+        return owned;
+    }
+
+    public void saveEvent(String donationId) {
+        if(!donations.containsKey(donationId))
+            return;
+        Donation d = donations.get(donationId);
         d.setState(Donation.State.SAVED);
     }
 
-    public void unSaveEvent(String id) {
-        Donation d = donations.get(id);
-        d.setState(Donation.State.AVAILABLE);}
+    public void unSaveEvent(String donationId) {
+        if(!donations.containsKey(donationId))
+            return;
+        Donation d = donations.get(donationId);
+        d.setState(Donation.State.AVAILABLE);
+    }
+
+    public int addToCartEvent(String donationId) {
+        if(!donations.containsKey(donationId))
+            return 0;
+        Donation donation = donations.get(donationId);
+        int added = donation.inCart() ? 0: 1;
+        donation.setInCart(true);
+        return added;
+    }
+
+    public int removeFromCartEvent(String donationId) {
+        if(!donations.containsKey(donationId))
+            return 0;
+        Donation donation = donations.get(donationId);
+        int removed = donation.inCart() ? -1 : 0;
+        donation.setInCart(false);
+        return removed;
+    }
+
+    public void ownedEvent(List<Donation> ownedDonations) {
+        List<String> donationIds = new LinkedList<>();
+        for(Donation d: ownedDonations) {
+            donationIds.add(d.getId());
+            d.setState(Donation.State.OWNED);
+            this.ownedDonations.put(d.getId(), d);
+        }
+
+        donations.keySet().removeAll(donationIds);
+        AdapterManager.get().updateDataSourceAll();
+    }
 
     public void selectEvent(String id) {
         Donation d = donations.get(id);
@@ -176,33 +217,21 @@ public class DataManager {
         // TODO
     }
 
-    public List<Donation> getInCart() {
-        final List<Donation> inCart = new ArrayList<>();
-        for(Donation d: donations.values())
-            if(d.inCart())
-                inCart.add(d);
-        return inCart;
-    }
+    public void returnOwnedDonation(String donationId) {
+        if(!ownedDonations.containsKey(donationId))
+            return;
 
-    public Donation getDonation(String donationId) {
-        return donations.get(donationId);
-    }
-
-    public int addToCartEvent(String donationId) {
-        Donation donation = donations.get(donationId);
-        int added = donation.inCart() ? 0: 1;
-        donation.setInCart(true);
-        return added;
-    }
-
-    public int removeFromCartEvent(String donationId) {
-        Donation donation = donations.get(donationId);
-        int removed = donation.inCart() ? -1 : 0;
+        Donation donation = ownedDonations.get(donationId);
+        donation.setState(Donation.State.AVAILABLE);
         donation.setInCart(false);
-        return removed;
+        ownedDonations.remove(donationId);
+        donations.put(donationId, donation);
+        AdapterManager.get().updateDataSourceAll();
+
     }
 
-    private static class FetchDataTask extends AsyncTask<String, Void, Integer> {
+
+    private class FetchDataTask extends AsyncTask<String, Void, Integer> {
         private final Context mContext;
         private final OnResult mCallback;
 
@@ -214,6 +243,7 @@ public class DataManager {
         @Override
         protected Integer doInBackground(String... params) {
             getDonationsFromFile(mContext);
+            initialized = true;
             if(donations.size() == 0)
                 return 0;
             return 1; // successful
