@@ -6,7 +6,7 @@
     android:weightSum="100">
 
     <FrameLayout
-        android:id="@+id/donors"
+        android:id="@+id/donors_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -18,23 +18,27 @@
         android:layout_weight="50"
         android:clickable="true">
 
-        <TextView
+        <Button
+            android:background="@color/colorPrimaryDark"
             android:id="@+id/donor"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:clickable="true"
             android:fontFamily="casual"
             android:gravity="center"
             android:text="תורמים"
             android:textColor="@color/colorAccent"
-            android:textSize="80sp" />
+            android:textSize="60sp" />
     </FrameLayout>
 
     <FrameLayout
         android:clickable="true"
-        android:id="@+id/nonProfit"
+        android:id="@+id/non_profit_container"
         android:layout_width="match_parent"
+        android:background="@android:color/white"
         android:layout_weight="50"
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
@@ -43,15 +47,20 @@
         android:layout_marginBottom="0dp"
         android:layout_gravity="center">
 
-        <TextView
+        <Button
             android:id="@+id/non_profit"
-            android:layout_width="match_parent"
+            android:fontFamily="casual"
+            android:clickable="true"
+            android:layout_width="wrap_content"
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
+            android:background="@android:color/white"
             android:text="עמותות"
             android:textColor="@color/colorAccent"
-            android:textSize="80sp" />
+            android:textSize="60sp" />
 
     </FrameLayout>
 

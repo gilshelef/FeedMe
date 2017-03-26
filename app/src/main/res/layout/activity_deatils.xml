@@ -59,7 +59,7 @@
             android:layout_width="180dp"
             android:layout_height="200dp"
             android:contentDescription="@string/thumbnail"
-            android:src="@drawable/placeholder"
+            android:src="@drawable/ic_placeholder"
             android:transitionName="profile"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true" />

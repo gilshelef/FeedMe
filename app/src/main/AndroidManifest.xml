@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/MyTheme">
 
-        <activity android:name="launcher.RegistrationActivity">
+        <activity android:name="com.gilshelef.feedme.launcher.RegistrationActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -21,20 +21,20 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="launcher.RegistrationDonorActivity"
+        <activity android:name="com.gilshelef.feedme.launcher.RegistrationDonorActivity"
             android:theme="@style/MyTheme">
         </activity>
 
-        <activity android:name="launcher.RegistrationNonProfitActivity"
+        <activity android:name="com.gilshelef.feedme.launcher.RegistrationNonProfitActivity"
             android:theme="@style/MyTheme">
         </activity>
 
 
-        <activity android:name=".activities.NonProfitMainActivity"
+        <activity android:name=".nonprofit.activities.NonProfitMainActivity"
             android:theme="@style/MyTheme">
         </activity>
 
-        <activity android:name=".activities.DetailsActivity"
+        <activity android:name=".nonprofit.activities.DetailsActivity"
             android:theme="@style/MyTheme.Popup">
         </activity>
 

@@ -17,11 +17,11 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="association">עמותה</string>
-    <string name="email_placeholder">feedme.placeholder@gmail.com</string>
+    <string name="name_placeholder">lorem ipsum</string>
     <string name="home">Home</string>
     <string name="saved">Saved</string>
     <string name="my_donations">My Donations</string>
-    <string name="account">Account</string>
+    <string name="profile">My Profile</string>
     <string name="dialog_return_donation">אתה בטוח רוצה להחזיר תרומה זו?</string>
     <string name="yes">YES</string>
     <string name="cancel">@android:string/cancel</string>

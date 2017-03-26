@@ -82,7 +82,7 @@
             android:paddingEnd="12dp"
             android:paddingStart="12dp"
             android:paddingTop="0dp"
-            tools:context="com.gilshelef.feedme.activities.NonProfitMainActivity">
+            tools:context=".nonprofit.activities.NonProfitMainActivity">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/list"
