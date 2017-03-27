@@ -14,24 +14,23 @@
     android:weightSum="1">
 
     <ImageView
-        android:id="@+id/association_profile"
-        android:layout_width="@dimen/navdrawer_profile_image_size"
-        android:layout_height="@dimen/navdrawer_profile_image_size"
-        android:layout_weight="0.16"
+        android:id="@+id/profile_thumbnail"
+        android:layout_width="70dp"
+        android:layout_height="70dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         app:srcCompat="@mipmap/donate_icon" />
 
     <TextView
-        android:id="@+id/association_name"
+        android:id="@+id/business_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:text="@string/association"
+        android:paddingTop="12dp"
+        android:text="שם עסק"
         android:gravity="center"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
     <TextView
-        android:id="@+id/non_profit_contact_name"
+        android:id="@+id/contact_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/name_placeholder" />

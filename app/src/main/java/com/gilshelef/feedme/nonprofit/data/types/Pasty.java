@@ -25,7 +25,7 @@ public class Pasty extends BaseType {
 
     @Override
     void setName() {
-        name = "Pastry";
+        name = Pasty.class.getSimpleName();
     }
 
     @Override

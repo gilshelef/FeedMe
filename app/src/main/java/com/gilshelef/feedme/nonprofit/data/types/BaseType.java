@@ -41,7 +41,7 @@ public abstract class BaseType implements Type {
 
     @Override
     public String toString(){
-        return name;
+        return hebrew();
     }
 
 
@@ -65,4 +65,5 @@ public abstract class BaseType implements Type {
         setDefaultThumbnail();
         setColor();
     }
+
 }

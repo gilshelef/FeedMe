@@ -2,7 +2,10 @@ package com.gilshelef.feedme.nonprofit.data.types;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -41,4 +44,35 @@ public class TypeManager {
         return dataSources.get(OTHER_DONATION);
     }
 
+    public List<Type> getAll() {
+        List<Type> types = new ArrayList<>();
+        types.addAll(dataSources.values());
+        return types;
+    }
+
+    public Type getTypeFromString(String type) {
+        return dataSources.containsKey(type) ? dataSources.get(type) : null;
+    }
+
+    public static class TypeComparator implements Comparator<Type> {
+        private final Type donationType;
+
+        public TypeComparator(Type donationType) {
+            this.donationType = donationType;
+        }
+
+        @Override
+        public int compare(Type t1, Type t2) {
+            if(t1.equals(donationType))
+                return -1;
+            if(t2.equals(donationType))
+                return 1;
+            if(t1 instanceof Other)
+                return 1;
+            if(t2 instanceof Other)
+                return -1;
+
+            return 0;
+        }
+    }
 }

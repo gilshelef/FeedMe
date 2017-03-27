@@ -91,9 +91,9 @@ public class NonProfitMainActivity extends AppCompatActivity implements
 
         //drawer header
         View header = navigationView.getHeaderView(0);
-        TextView associationName = (TextView)  header.findViewById(R.id.association_name);
+        TextView associationName = (TextView)  header.findViewById(R.id.business_name);
         associationName.setText(Association.get(this).getName());
-        TextView nonProfitContactName = (TextView) header.findViewById(R.id.non_profit_contact_name);
+        TextView nonProfitContactName = (TextView) header.findViewById(R.id.contact_name);
         nonProfitContactName.setText(Association.get(this).getContact());
 
 
@@ -131,6 +131,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
 
         //set first fragment - map
         onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_home));
+        navigationView.setCheckedItem(R.id.nav_home);
         new NavigationViewCounterTask().execute();
 
         String welcomeText = getString(R.string.Hello) + " " + Association.get(this).getName();
@@ -160,7 +161,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         }
     }
 
-    public void setFragment(String fragmentName) {
+    private void setFragment(String fragmentName) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.fragment_container, mFragments.get(fragmentName));
         fragmentTransaction.addToBackStack(null);
@@ -169,7 +170,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu, menu);
+        getMenuInflater().inflate(R.menu.non_profit_main_menu, menu);
         final View menuShoppingCart = menu.findItem(R.id.menu_shopping_cart).getActionView();
         shoppingCartUI = (TextView) menuShoppingCart.findViewById(R.id.shopping_cart_text);
         updateShoppingCartNumber(shoppingCartNumber);
@@ -295,7 +296,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
                 setFragment(OwnedFragment.TAG);
                 getSupportActionBar().setTitle(R.string.my_donations);
                 break;
-            case R.id.nav_account:
+            case R.id.nav_profile:
                 setFragment(ProfileFragment.TAG);
                 getSupportActionBar().setTitle(R.string.profile);
                 break;

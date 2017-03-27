@@ -21,12 +21,12 @@ public class Other extends BaseType{
 
     @Override
     void setHebrewName() {
-        hebrewName = "תרומה";
+        hebrewName = "אחר";
     }
 
     @Override
     void setName() {
-        name = "Donation";
+        name = Other.class.getSimpleName();
     }
 
 

@@ -21,11 +21,14 @@
             </intent-filter>
         </activity>
 
-        <activity android:name="com.gilshelef.feedme.launcher.RegistrationDonorActivity"
+        <activity android:name="com.gilshelef.feedme.donors.activities.RegistrationDonorActivity"
+            android:theme="@style/MyTheme">
+        </activity>
+        <activity android:name="com.gilshelef.feedme.donors.activities.DonorMainActivity"
             android:theme="@style/MyTheme">
         </activity>
 
-        <activity android:name="com.gilshelef.feedme.launcher.RegistrationNonProfitActivity"
+        <activity android:name="com.gilshelef.feedme.nonprofit.activities.RegistrationNonProfitActivity"
             android:theme="@style/MyTheme">
         </activity>
 

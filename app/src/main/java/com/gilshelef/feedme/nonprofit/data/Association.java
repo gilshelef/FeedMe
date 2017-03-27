@@ -22,8 +22,8 @@ public class Association{
     public static final String KEY_LNG = "key_longitude";
     public static final String KEY_UUID = "key_uuid";
     public static final String KEY_ADDRESS = "key_address";
-    private static Association instance;
 
+    private static Association instance;
     private String contactPhone;
     private String UUID;
     private LatLng basePosition;
@@ -52,7 +52,7 @@ public class Association{
     }
 
     private static Association build(Activity activity) {
-        SharedPreferences sharedPref = activity.getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
+        SharedPreferences sharedPref = activity.getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
         String uuid = sharedPref.getString(KEY_UUID, "0");
         String nonProfitName = sharedPref.getString(KEY_NAME, "עמותה"); // TODO change to null after registering
         String nonProfitAddress = sharedPref.getString(KEY_ADDRESS, "");
@@ -134,7 +134,7 @@ public class Association{
     }
 
     private SharedPreferences.Editor getEditor(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
         return prefs.edit();
     }
 

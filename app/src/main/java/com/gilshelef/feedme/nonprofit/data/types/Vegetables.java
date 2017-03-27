@@ -26,7 +26,7 @@ class Vegetables extends BaseType {
 
     @Override
     void setName() {
-        name = "Vegetable";
+        name = Vegetables.class.getSimpleName();
     }
 
     @Override

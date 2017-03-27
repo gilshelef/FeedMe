@@ -1,4 +1,4 @@
-package com.gilshelef.feedme.nonprofit.fragments;
+package com.gilshelef.feedme.donors.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -9,71 +9,74 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.Association;
-import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
+import com.gilshelef.feedme.nonprofit.data.types.Type;
+import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
- * Created by gilshe on 3/2/17.
+ * Created by gilshe on 3/26/17.
  */
-public class ProfileFragment extends Fragment {
-    public static final String TAG = ProfileFragment.class.getSimpleName();
 
-    TextView nonProfitName;
-    TextView address;
-    TextView contactName;
-    TextView phone;
-    Button removeRegistration;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState){
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.menu_filter);
-        item.setVisible(false);
-    }
+public class ProfileDonorFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+    public static final String TAG = ProfileDonorFragment.class.getSimpleName();
+    private TextView businessName;
+    private TextView contactName;
+    private TextView address;
+    private TextView phone;
+    private Button removeRegistration;
+    private Spinner spinner;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.non_profit_fragment_profile, container, false);
-        ((ToggleHomeBar) getActivity()).drawHomeBar(false);
+        View rootView = inflater.inflate(R.layout.donors_fragment_profile, container, false);
 
-        nonProfitName = (TextView) rootView.findViewById(R.id.non_profit_name);
-        address = (TextView) rootView.findViewById(R.id.non_profit_address);
-        contactName = (TextView) rootView.findViewById(R.id.contact_name);
+        businessName = (TextView) rootView.findViewById(R.id.business_name);
+        contactName = (TextView) rootView.findViewById(R.id.donor_name);
+        address = (TextView) rootView.findViewById(R.id.donor_address);
         phone = (TextView) rootView.findViewById(R.id.contact_phone);
         removeRegistration = (Button) rootView.findViewById(R.id.remove_registration_btn);
+        TextView tvSpinner = (TextView) rootView.findViewById(R.id.donation_type);
 
-        final Association instance = Association.get(getActivity());
-        nonProfitName.setText(instance.getName());
-        address.setText(instance.getAddress());
+        spinner = (Spinner) rootView.findViewById(R.id.donation_type_spinner);
+        List<Type> typesArray = TypeManager.get().getAll();
+        Collections.sort(typesArray, new TypeManager.TypeComparator(Donor.get(getActivity()).getDonationType()));
+        ArrayAdapter<Type> adapter = new ArrayAdapter<>(
+                getContext(), android.R.layout.simple_spinner_item, typesArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
+        spinner.setEnabled(false);
+
+        final Donor instance = Donor.get(getActivity());
+        businessName.setText(instance.getBusinessName());
         contactName.setText(instance.getContact());
+        address.setText(instance.getAddress());
         phone.setText(instance.getPhone());
 
-        nonProfitName.setOnClickListener(new View.OnClickListener() {
+        businessName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                createNonProfitDialog();
+                createBusinessDialog();
             }
-
-
         });
         address.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -86,6 +89,7 @@ public class ProfileFragment extends Fragment {
             public void onClick(View v) {
                 createContactDialog();
             }
+
         });
         phone.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,6 +101,13 @@ public class ProfileFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 removeRegistration();
+            }
+        });
+
+        tvSpinner.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                spinner.setEnabled(true);
             }
         });
         return rootView;
@@ -112,7 +123,7 @@ public class ProfileFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         SharedPreferences prefs = getContext().getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean(RegistrationActivity.NON_PROFIT, false);
+                        editor.putBoolean(RegistrationActivity.DONOR, false);
                         editor.apply();
 
                         Intent intent = new Intent(getActivity(), RegistrationActivity.class);
@@ -130,49 +141,6 @@ public class ProfileFragment extends Fragment {
                 });
 
         alertDialog.show();
-    }
-
-    private void createNonProfitDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle("שם עמותה");
-        alertDialog.setMessage("הכנס שם של עמותה");
-
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-
-        alertDialog.setPositiveButton("עדכן",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String newNonProfitName = input.getText().toString();
-                        if (!RegistrationHandler.isEmpty(input)) {
-                            OnBooleanResult callBack = new OnBooleanResult() {
-                                @Override
-                                public void onResult(boolean listed) {
-                                    if(listed){
-                                        nonProfitName.setText(newNonProfitName);
-                                        Toast.makeText(getActivity(), "שם עמותה שונה בהצלחה", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            };
-                            new RegistrationHandler.CheckForNonProfitListingTask(getActivity(), newNonProfitName, callBack).execute();
-                        }
-                    }
-                });
-
-        alertDialog.setNegativeButton("בטל",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-        alertDialog.show();
-
-
     }
 
     private void createPhoneDialog() {
@@ -232,10 +200,9 @@ public class ProfileFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            Association.get(getActivity()).setContact(getContext(), newContact);
+                            Donor.get(getActivity()).setContact(getContext(), newContact);
                             contactName.setText(newContact);
                             Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
-
                         }
 
                     }
@@ -273,7 +240,7 @@ public class ProfileFragment extends Fragment {
                             if(latLng == null)
                                 input.setError(getString(R.string.unrecognized_address));
                             else {
-                                Association.get(getActivity()).setAddress(getContext(), latLng, newAddress);
+                                Donor.get(getActivity()).setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
                                 Toast.makeText(getActivity(), R.string.address_changes_successfully, Toast.LENGTH_LONG).show();
                             }
@@ -291,10 +258,52 @@ public class ProfileFragment extends Fragment {
         alertDialog.show();
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ((ToggleHomeBar) getActivity()).drawHomeBar(true);
+    private void createBusinessDialog() {
+        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
+        alertDialog.setTitle(R.string.business_name);
+        alertDialog.setMessage(R.string.enter_business_name);
+
+        final EditText input = new EditText(getContext());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        input.setLayoutParams(lp);
+        alertDialog.setView(input);
+        alertDialog.setIcon(R.drawable.ic_work_black_24dp);
+
+        alertDialog.setPositiveButton(R.string.update,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String newBusinessName = input.getText().toString();
+                        if (!RegistrationHandler.isEmpty(input)) {
+                            Donor.get(getActivity()).setBusinessName(getContext(), newBusinessName);
+                            businessName.setText(newBusinessName);
+                            Toast.makeText(getActivity(), R.string.business_name_changed_successfully, Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+
+        alertDialog.setNegativeButton(getString(R.string.cancel),
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+        alertDialog.show();
+
     }
 
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        String donationType = parent.getItemAtPosition(position).toString();
+        Donor.get(getActivity()).setTypeByString(getContext(), donationType);
+        Toast.makeText(getActivity(), R.string.donation_type_changed_successfully, Toast.LENGTH_LONG).show();
+        spinner.setEnabled(false);
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        Toast.makeText(getContext(), "נא לבחור סוג תרומה אחד לפחות", Toast.LENGTH_LONG).show();
+    }
 }

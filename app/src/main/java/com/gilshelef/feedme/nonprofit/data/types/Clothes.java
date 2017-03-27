@@ -27,7 +27,7 @@ public class Clothes extends BaseType {
 
     @Override
     void setName() {
-        name = "Clothes";
+        name = Clothes.class.getSimpleName();
     }
 
 

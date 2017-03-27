@@ -79,7 +79,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.map_menu, menu);
+        inflater.inflate(R.menu.non_profit_map_menu, menu);
     }
 
     @Override

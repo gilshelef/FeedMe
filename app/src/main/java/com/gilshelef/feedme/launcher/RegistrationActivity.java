@@ -11,9 +11,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.donors.activities.DonorMainActivity;
+import com.gilshelef.feedme.donors.activities.RegistrationDonorActivity;
 import com.gilshelef.feedme.nonprofit.activities.NonProfitMainActivity;
-
-import com.gilshelef.feedme.donors.DonorMainActivity;
+import com.gilshelef.feedme.nonprofit.activities.RegistrationNonProfitActivity;
 
 /**
  * Created by gilshe on 3/21/17.
@@ -74,8 +75,8 @@ public class RegistrationActivity extends AppCompatActivity {
        if (requestCode == RegistrationDonorActivity.REGISTER_DONOR) {
            if (resultCode == RESULT_OK) {
                markRegister(DONOR);
-//               Intent intent = new Intent(RegistrationActivity.this, NonProfitMainActivity.class);
-//               startActivity(intent);
+               Intent intent = new Intent(RegistrationActivity.this, DonorMainActivity.class);
+               startActivity(intent);
            }
        }
 

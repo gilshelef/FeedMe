@@ -26,7 +26,7 @@
         android:backgroundTint="@color/colorPrimaryDark"
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
-        android:hint="שם העמותה" />
+        android:hint="@string/non_profit_name" />
 
     <EditText
         android:id="@+id/non_profit_address"
@@ -35,7 +35,7 @@
         android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:hint="כתובת העמותה" />
+        android:hint="@string/non_profit_address" />
 
     <EditText
         android:id="@+id/contact_name"
@@ -44,7 +44,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:hint="שם איש קשר" />
+        android:hint="@string/contact_name" />
 
     <EditText
         android:id="@+id/contact_phone"
@@ -53,7 +53,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:hint="טלפון איש קשר"
+        android:hint="@string/contact_phone"
         android:inputType="phone" />
 
     <android.support.v7.widget.CardView
@@ -74,7 +74,7 @@
             android:paddingLeft="70dp"
             android:paddingRight="70dp"
             android:textSize="25sp"
-            android:text="הרשם"
+            android:text="@string/register"
             android:textColor="@color/lightPrimaryColor" />
     </android.support.v7.widget.CardView>
 </LinearLayout>

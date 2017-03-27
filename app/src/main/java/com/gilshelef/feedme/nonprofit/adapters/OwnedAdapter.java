@@ -44,7 +44,7 @@ public class OwnedAdapter extends RecycledBaseAdapter {
             public void onClick(DialogInterface dialog, int id) {
                 //TODO notify data base, service!
                 DataManager.get(mActivity).returnOwnedDonation(donation.getId());
-                Toast.makeText(mActivity, "Returned Donation Successfully", Toast.LENGTH_LONG).show();
+                Toast.makeText(mActivity, R.string.returned_donation_successfully, Toast.LENGTH_LONG).show();
                 ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
             }
         });

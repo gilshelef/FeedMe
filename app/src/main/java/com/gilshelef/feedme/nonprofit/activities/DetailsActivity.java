@@ -244,15 +244,15 @@ public class DetailsActivity extends AppCompatActivity {
 //            Picasso.with(getApplicationContext())
 //                    .load(donation.getImageUrl())
 //                    .fit()
-//                    .error(donation.getType().defaultThumbnail())
+//                    .error(donation.getDonationType().defaultThumbnail())
 //                    .into(im);
 //
 //        else
 //            Picasso.with(getApplicationContext())
-//                    .load(donation.getType().defaultThumbnail())
+//                    .load(donation.getDonationType().defaultThumbnail())
 //                    .fit()
 //                    .into(im);
-//        tv.setText(donation.getType().hebrew());
+//        tv.setText(donation.getDonationType().hebrew());
 //
 //
 //        //TODO when finish pass back the donation and flag if added to cart

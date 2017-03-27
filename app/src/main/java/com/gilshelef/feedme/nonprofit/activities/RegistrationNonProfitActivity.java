@@ -1,4 +1,4 @@
-package com.gilshelef.feedme.launcher;
+package com.gilshelef.feedme.nonprofit.activities;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -13,6 +13,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.launcher.RegistrationActivity;
+import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.Association;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -23,7 +25,6 @@ import com.google.android.gms.maps.model.LatLng;
 
 public class RegistrationNonProfitActivity extends AppCompatActivity {
     public static final int REGISTER_NON_PROFIT = 1;
-    Button submit;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +37,7 @@ public class RegistrationNonProfitActivity extends AppCompatActivity {
         final EditText contactName = (EditText) findViewById(R.id.contact_name);
         final EditText contactPhone = (EditText) findViewById(R.id.contact_phone);
 
-        submit = (Button) findViewById(R.id.submit_btn);
+        Button submit = (Button) findViewById(R.id.submit_btn);
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -55,7 +56,7 @@ public class RegistrationNonProfitActivity extends AppCompatActivity {
                     if(latLng == null)
                         return;
 
-                    SharedPreferences prefs = getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
+                    SharedPreferences prefs = getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putString(Association.KEY_NAME, nonProfitName.getText().toString());
                     editor.putString(Association.KEY_CONTACT, contactName.getText().toString());

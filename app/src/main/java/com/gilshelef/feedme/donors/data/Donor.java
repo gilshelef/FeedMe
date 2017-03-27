@@ -1,0 +1,130 @@
+package com.gilshelef.feedme.donors.data;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import com.gilshelef.feedme.launcher.RegistrationActivity;
+import com.gilshelef.feedme.nonprofit.data.types.Type;
+import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
+import com.google.android.gms.maps.model.LatLng;
+
+/**
+ * Created by gilshe on 3/26/17.
+ */
+
+public class Donor {
+
+    public static final String KEY_BUS_NAME = "key_name";
+    public static final String KEY_CONTACT = "key_contact_name";
+    public static final String KEY_PHONE = "key_contact_phone";
+    public static final String KEY_LAT = "key_latitude";
+    public static final String KEY_LNG = "key_longitude";
+    public static final String KEY_UUID = "key_uuid";
+    public static final String KEY_ADDRESS = "key_address";
+    public static final String KAY_TYPE = "key_type";
+
+
+    private static Donor instance;
+    private String UUID;
+    private LatLng position;
+    private String businessName;
+    private String contactName;
+    private String address;
+    private String phone;
+    private Type donationType;
+
+
+    private Donor(String uuid, String businessName, String address, String contactName, String phone, LatLng basePosition, Type donationType){
+        this.UUID = uuid;
+        this.businessName = businessName;
+        this.address = address;
+        this.contactName = contactName;
+        this.phone = phone;
+        this.position = basePosition;
+        this.donationType = donationType;
+    }
+
+    public static Donor get(Activity activity) {
+        if (instance == null) {
+            synchronized (Donor.class) {
+                if (instance == null)
+                    return build(activity);
+            }
+        }
+        return instance;
+    }
+
+    private static Donor build(Activity activity) {
+        SharedPreferences sharedPref = activity.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
+        String uuid = sharedPref.getString(KEY_UUID, "0");
+        String businessName = sharedPref.getString(KEY_BUS_NAME, "");
+        String address = sharedPref.getString(KEY_ADDRESS, "");
+        float latitude = sharedPref.getFloat(KEY_LAT, 31.252973f);
+        float longitude = sharedPref.getFloat(KEY_LNG, 34.791462f);
+        String contactName = sharedPref.getString(KEY_CONTACT, "איש קשר");
+        String phone = sharedPref.getString(KEY_PHONE, "");
+        Type donationType = TypeManager.get().getTypeFromString(sharedPref.getString(KAY_TYPE, TypeManager.OTHER_DONATION));
+        LatLng basePosition = new LatLng(latitude, longitude);
+        instance = new Donor(uuid, businessName, address, contactName, phone, basePosition, donationType);
+        return instance;
+    }
+
+    public String getBusinessName() {
+        return businessName;
+    }
+
+    public String getContact() {
+        return contactName;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setAddress(Context context, LatLng latLng, String address) {
+        SharedPreferences.Editor editor = getEditor(context);
+        editor.putString(Donor.KEY_ADDRESS, address);
+        editor.putFloat(Donor.KEY_LAT, (float) latLng.latitude);
+        editor.putFloat(Donor.KEY_LNG, (float) latLng.longitude);
+        editor.apply();
+
+        this.address = address;
+        this.position = latLng;
+    }
+
+    private SharedPreferences.Editor getEditor(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
+        return prefs.edit();
+    }
+
+    public void setTypeByString(Context context, String typeStr) {
+        SharedPreferences prefs = context.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
+        prefs.edit().putString(Donor.KAY_TYPE, typeStr).apply();
+        this.donationType  = TypeManager.get().getType(typeStr);
+    }
+
+    public void setBusinessName(Context context, String newBusinessName) {
+        SharedPreferences.Editor editor = getEditor(context);
+        editor.putString(Donor.KEY_BUS_NAME, newBusinessName);
+        editor.apply();
+        this.businessName = newBusinessName;
+    }
+
+    public void setContact(Context context, String newContact) {
+        SharedPreferences.Editor editor = getEditor(context);
+        editor.putString(Donor.KEY_CONTACT, newContact);
+        editor.apply();
+        this.contactName = newContact;
+    }
+
+    public Type getDonationType() {
+        return donationType;
+    }
+
+
+}
