@@ -55,4 +55,17 @@
     <string name="enter_business_name">הכנס שם של בית העסק</string>
     <string name="business_name_changed_successfully">שם בית העסק שונה בהצלחה</string>
     <string name="donation_type_changed_successfully">סוג התרומות שונה בהצלחה</string>
+    <string name="new_donation">תרומה חדשה של</string>
+    <string name="donation_description">מה תרצה לתרום?</string>
+    <string name="add_image">תרצה להוסיף תמונה?</string>
+    <string name="donation_time">עד איזה שעה אפשר להגיע?</string>
+    <string name="add_new_donation">שגר</string>
+    <string name="description_hint">למשל: 2 קילו עגבניות</string>
+    <string name="remove_donation">אתה בטוח רוצה לבטל תרומה זו?</string>
+    <string name="remove_donation_successfully">התרומה הוסרה בהצלחה</string>
+    <string name="time_to_pick" formatted="false">ניתן לאסוף עד %1$s</string>
+    <string name="first_name">שם פרטי</string>
+    <string name="last_name">שם משפחה</string>
+    <string name="edit_contact_deatils">ערוך פרטי התקשרות</string>
+
 </resources>

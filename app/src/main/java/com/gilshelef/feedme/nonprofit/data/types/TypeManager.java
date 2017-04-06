@@ -54,6 +54,16 @@ public class TypeManager {
         return dataSources.containsKey(type) ? dataSources.get(type) : null;
     }
 
+    public int getTypePosition(Type donationType) {
+        int i = 0;
+        for(Type t: dataSources.values()){
+            if(t.equals(donationType))
+                return i;
+            i++;
+        }
+        return i;
+    }
+
     public static class TypeComparator implements Comparator<Type> {
         private final Type donationType;
 

@@ -14,9 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.gilshelef.feedme.nonprofit.Constants;
+import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.nonprofit.data.Association;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.google.android.gms.common.api.Status;
@@ -125,7 +125,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
     private void setUpMap() {
         Log.d(TAG, "setUpMap");
         mMap.setOnMarkerClickListener(this);
-        Association association = Association.get(getActivity());
+        NonProfit association = NonProfit.get(getActivity());
         displayMark(association.getBasePosition(), association.getName());
 
         if (ActivityCompat.checkSelfPermission(getActivity(),

@@ -24,7 +24,7 @@ public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<ItemView
     protected Activity mActivity;
     protected OnActionEvent mListener;
 
-    RecycledBaseAdapter(Activity activity, List<Donation> dataSource, OnActionEvent listener) {
+    public RecycledBaseAdapter(Activity activity, List<Donation> dataSource, OnActionEvent listener) {
         this.mDataSource = dataSource;
         this.mActivity = activity;
         this.mListener = listener;

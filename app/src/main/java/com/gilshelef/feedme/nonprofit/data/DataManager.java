@@ -15,7 +15,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Created by gilshe on 2/25/17.
@@ -192,26 +191,6 @@ public class DataManager {
         AdapterManager.get().updateDataSourceAll();
     }
 
-    public void selectEvent(String id) {
-        Donation d = donations.get(id);
-        if (!d.isInCart())
-            d.setInCart(true);
-        else d.setInCart(false);
-
-        AdapterManager.get().updateDataSourceAll();
-    }
-
-    public void removeAll(Set<String> items) {
-        donations.keySet().removeAll(items);
-        AdapterManager.get().updateDataSourceAll();
-    }
-
-    public void returnAll(Set<String> selected) {
-        for(String id: selected)
-            donations.get(id).setInCart(false);
-        AdapterManager.get().updateDataSourceAll();
-
-    }
 
     public static void applyFilter(Filter filter) {
         // TODO

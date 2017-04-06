@@ -26,11 +26,6 @@ public class ListAdapter extends RecycledBaseAdapter {
             super.setUnSelected(holder);
     }
 
-    //cant remove items from home
-    @Override
-    public void onItemDismiss(int position) {
-    }
-
     @Override
     protected void onItemDismiss(Donation donation) {
     }

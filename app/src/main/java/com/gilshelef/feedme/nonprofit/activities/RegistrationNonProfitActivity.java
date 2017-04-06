@@ -15,7 +15,7 @@ import android.widget.Toast;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
-import com.gilshelef.feedme.nonprofit.data.Association;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.google.android.gms.maps.model.LatLng;
 
 
@@ -51,19 +51,18 @@ public class RegistrationNonProfitActivity extends AppCompatActivity {
                         return;
 
                     //checking location
-                    LatLng latLng = RegistrationHandler.getLocationFromAddress(getApplicationContext(),
-                            nonProfitAddress.getText().toString());
+                    LatLng latLng = RegistrationHandler.getLocationFromAddress(getApplicationContext(), nonProfitAddress);
                     if(latLng == null)
                         return;
 
                     SharedPreferences prefs = getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = prefs.edit();
-                    editor.putString(Association.KEY_NAME, nonProfitName.getText().toString());
-                    editor.putString(Association.KEY_CONTACT, contactName.getText().toString());
-                    editor.putString(Association.KEY_PHONE, contactPhone.getText().toString());
-                    editor.putString(Association.KEY_ADDRESS, nonProfitAddress.getText().toString());
-                    editor.putFloat(Association.KEY_LAT, (float) latLng.latitude);
-                    editor.putFloat(Association.KEY_LNG, (float) latLng.longitude);
+                    editor.putString(NonProfit.KEY_NAME, nonProfitName.getText().toString());
+                    editor.putString(NonProfit.KEY_CONTACT, contactName.getText().toString());
+                    editor.putString(NonProfit.KEY_PHONE, contactPhone.getText().toString());
+                    editor.putString(NonProfit.KEY_ADDRESS, nonProfitAddress.getText().toString());
+                    editor.putFloat(NonProfit.KEY_LAT, (float) latLng.latitude);
+                    editor.putFloat(NonProfit.KEY_LNG, (float) latLng.longitude);
 
                     //checking non profit listing
                     new CheckForNonProfitListingTask(editor, nonProfitName.getText().toString()).execute();
@@ -113,7 +112,7 @@ public class RegistrationNonProfitActivity extends AppCompatActivity {
         protected void onPostExecute(Boolean listed){
             if(progress != null) progress.dismiss();
             if(listed) {
-                editor.putString(Association.KEY_UUID, uuid);
+                editor.putString(NonProfit.KEY_UUID, uuid);
                 editor.apply();
                 finish(RESULT_OK);
             }

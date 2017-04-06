@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.nonprofit.data.Association;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -38,7 +38,8 @@ public class RegistrationHandler {
         return true;
     }
 
-    public static LatLng getLocationFromAddress(Context context, String strAddress) {
+    public static LatLng getLocationFromAddress(Context context, EditText input) {
+        String strAddress = input.getText().toString();
         Locale lHebrew = new Locale.Builder().setLanguage(HEBREW).build();
         Geocoder geocoder = new Geocoder(context, lHebrew);
         List<Address> address;
@@ -46,7 +47,7 @@ public class RegistrationHandler {
         try {
             //TODO move to async task
             address = geocoder.getFromLocationName(strAddress, 1);
-            if (address == null)
+            if (address == null || address.size() == 0)
                 return null;
 
             Address location = address.get(0);
@@ -55,7 +56,7 @@ public class RegistrationHandler {
             Log.e(TAG, e.getMessage());
         }finally {
             if(latLng == null)
-                Toast.makeText(context, RESULT_UNKNOWN_LOCATION, Toast.LENGTH_LONG).show();
+                input.setError(RESULT_UNKNOWN_LOCATION);
         }
 
         return latLng;
@@ -123,7 +124,7 @@ public class RegistrationHandler {
         protected void onPostExecute(Boolean listed){
             if(progress != null) progress.dismiss();
             if(listed)
-                Association.get(activity).setNonProfitName(activity, nonProfitName, uuid);
+                NonProfit.get(activity).setNonProfitName(activity, nonProfitName, uuid);
 
             else
                 Toast.makeText(activity, RESULT_UNKNOWN_NON_PROFIT, Toast.LENGTH_LONG).show();

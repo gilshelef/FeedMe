@@ -4,7 +4,7 @@
     {
       "type": "ירקות",
       "imageUrl" : "http://www.tekoafarms.co.il/media/catalog/items/cache/c889234799e865bbe90cee71f6cd2e53_XL.jpg",
-      "phone": "tel:0542298382",
+      "phone": "0542298382",
       "description": "1 קילו עגבניות",
       "firstName": "גיל",
       "lastName": "שלף",
@@ -13,13 +13,14 @@
       "state":"0",
       "latitude": 31.259158,
       "longitude":34.794655,
-      "businessName":"חזי ירקות"
+      "businessName":"חזי ירקות",
+      "calender":"10:59 01.04.2017"
 
     },
     {
       "type": "מאפים",
       "imageUrl" : "https://www.bonjour.co.il/tm-content/uploads/2014/09/bonjour_0004_6921387-434x289.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "2 מאפי גבינה",
       "firstName": "נעמי",
       "lastName": "צוקר",
@@ -28,15 +29,14 @@
       "state":"0",
       "latitude": 31.262218,
       "longitude":34.801461,
-      "businessName":"מאפיית אנג'ל"
-
-
+      "businessName":"מאפיית אנג'ל",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "ירקות",
       "imageUrl" : "",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "כל מיני ירקות",
       "firstName": "יניב",
       "lastName": "ליפוביצקי",
@@ -45,15 +45,14 @@
       "state":"2",
       "latitude": 31.253308,
       "longitude":34.785730,
-      "businessName":"ירקן"
-
-
+      "businessName":"ירקן",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "ירקות",
       "imageUrl" : "http://3vimir3l0i0322tm4k1i9ks4.wpengine.netdna-cdn.com/wp-content/uploads/2013/01/Broccoli-Parthenon.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "10 ברוקולי",
       "firstName": "הדר",
       "lastName": "אבירם",
@@ -62,15 +61,14 @@
       "state":"0",
       "latitude": 31.241013,
       "longitude":34.787383,
-      "businessName":"ירקן"
-
-
+      "businessName":"ירקן",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "מאפים",
       "imageUrl" : "",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "כל מיני בורקסים",
       "firstName": "יניב",
       "lastName": "ליפוביצקי",
@@ -79,14 +77,14 @@
       "state":"1",
       "latitude": 31.256941,
       "longitude":34.795332,
-      "businessName":"מאפייה"
-
+      "businessName":"מאפייה",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "ירקות",
       "imageUrl" : "",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "כל מיני ירקות",
       "firstName": "מור",
       "lastName": "קריספיל",
@@ -95,13 +93,14 @@
       "state":"0",
       "latitude": 31.262370,
       "longitude":34.844770,
-      "businessName":"ירקן"
+      "businessName":"ירקן",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "ירקות",
       "imageUrl" : "http://www.tekoafarms.co.il/media/catalog/items/cache/c889234799e865bbe90cee71f6cd2e53_XL.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "5 קילו עגבניות",
       "firstName": "קים",
       "lastName": "קארדשיין",
@@ -110,7 +109,8 @@
       "state":"0",
       "latitude": 31.278677,
       "longitude":34.801211,
-      "businessName":"ירקן"
+      "businessName":"ירקן",
+      "calender":"10:59 01.04.2017"
 
 
     },
@@ -118,7 +118,7 @@
     {
       "type": "מאפים",
       "imageUrl" : "",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "עוגה",
       "firstName": "יעל",
       "lastName": "גורדון",
@@ -127,15 +127,15 @@
       "state":"2",
       "latitude": 31.248974,
       "longitude":34.789131,
-      "businessName":"מאפייה"
-
+      "businessName":"מאפייה",
+      "calender":"10:59 01.04.2017"
 
     },
 
     {
       "type": "בגדים",
       "imageUrl" : "",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "2 חולצות, 5 מכנסים",
       "firstName": "ורד",
       "lastName": "ליכטנברג",
@@ -144,15 +144,14 @@
       "state":"0",
       "latitude": 31.251329,
       "longitude":34.780703,
-      "businessName":"זארה"
-
-
+      "businessName":"זארה",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "ירקות",
       "imageUrl" : "http://3vimir3l0i0322tm4k1i9ks4.wpengine.netdna-cdn.com/wp-content/uploads/2013/01/Broccoli-Parthenon.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "3 קילו ברוקולי",
       "firstName": "שלום",
       "lastName": "עולם",
@@ -161,15 +160,13 @@
       "state":"0",
       "latitude": 31.245745,
       "longitude":34.771707,
-      "businessName":"ירקן"
-
-
-
+      "businessName":"ירקן",
+      "calender":"10:59 01.04.2017"
     },
     {
       "type": "מאפים",
       "imageUrl" : "http://img.mako.co.il/2012/05/20/baeks_cheesecake1_c.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "2 עוגות",
       "firstName": "נעמי",
       "lastName": "צוקר",
@@ -178,16 +175,14 @@
       "state":"1",
       "latitude": 31.236268,
       "longitude":34.768167,
-      "businessName":"מאפייה"
-
-
-
+      "businessName":"מאפייה",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "בגדים",
       "imageUrl" : "http://www.golfwrx.com/wp-content/uploads/2014/08/Pants.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "2 מכנסיים",
       "firstName": "יניב",
       "lastName": "ליפוביצקי",
@@ -196,14 +191,13 @@
       "state":"0",
       "latitude":31.226360,
       "longitude":34.810739,
-      "businessName":"זארה"
-
-
+      "businessName":"זארה",
+      "calender":"10:59 01.04.2017"
     },
     {
       "type": "מאפים",
       "imageUrl" : "http://img.mako.co.il/2012/05/20/baeks_cheesecake1_c.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "20 עוגות",
       "firstName": "נעמי",
       "lastName": "צוקר",
@@ -212,15 +206,14 @@
       "state":"1",
       "latitude": 31.242956,
       "longitude":34.806855,
-      "businessName":"מאפייה"
-
-
+      "businessName":"מאפייה",
+      "calender":"10:59 01.04.2017"
     },
 
     {
       "type": "בגדים",
       "imageUrl" : "http://www.theadairgroup.com/images/Assorted_Toddler_T_Shirts_large.jpg",
-      "phone": "tel:0526898380",
+      "phone": "0542298382",
       "description": "5 חולצות",
       "firstName": "מיה",
       "lastName": "שלף",
@@ -229,9 +222,8 @@
       "state":"0",
       "latitude": 31.253230,
       "longitude":34.797542,
-      "businessName":"זארה"
-
-
+      "businessName":"זארה",
+      "calender":"10:59 01.04.2017"
     }
   ]
 }

@@ -21,11 +21,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gilshelef.feedme.nonprofit.Constants;
-import com.gilshelef.feedme.nonprofit.OnCounterChangeListener;
+import com.gilshelef.feedme.util.OnInfoUpdateListener;
+import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
-import com.gilshelef.feedme.nonprofit.data.Association;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
@@ -51,7 +52,7 @@ import static android.widget.Toast.LENGTH_SHORT;
  */
 
 public class NonProfitMainActivity extends AppCompatActivity implements
-        BaseFragment.OnDetailsListener, ToggleHomeBar, NavigationView.OnNavigationItemSelectedListener, MapFragment.OnSearchListener, OnCounterChangeListener {
+        BaseFragment.OnDetailsListener, ToggleHomeBar, NavigationView.OnNavigationItemSelectedListener, MapFragment.OnSearchListener, OnCounterChangeListener, OnInfoUpdateListener {
 
     private static final String TAG = NonProfitMainActivity.class.getSimpleName();
     private Toolbar mAppToolBar;
@@ -60,19 +61,21 @@ public class NonProfitMainActivity extends AppCompatActivity implements
     private int shoppingCartNumber = 0;
     private TextView shoppingCartUI = null;
     private Map<String, Fragment> mFragments;
-    View mapAndList;
-    NavigationView navigationView;
+    private View mapAndList;
+    private NavigationView navigationView;
+    private TextView associationName;
+    private TextView nonProfitContactName;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.association_activity_main);
+        setContentView(R.layout.non_profit_activity_main);
 
         View main = findViewById(R.id.main);
 
         //initialize app's data
-        Association.get(this);
+        NonProfit.get(this);
         DataManager.get(this);
         TypeManager.get();
 
@@ -91,11 +94,10 @@ public class NonProfitMainActivity extends AppCompatActivity implements
 
         //drawer header
         View header = navigationView.getHeaderView(0);
-        TextView associationName = (TextView)  header.findViewById(R.id.business_name);
-        associationName.setText(Association.get(this).getName());
-        TextView nonProfitContactName = (TextView) header.findViewById(R.id.contact_name);
-        nonProfitContactName.setText(Association.get(this).getContact());
-
+        associationName = (TextView)  header.findViewById(R.id.business_name);
+        onBusinessChange(NonProfit.get(this).getName());
+        nonProfitContactName = (TextView) header.findViewById(R.id.contact_name);
+        onContactChange(NonProfit.get(this).getContact());
 
         //create fragments
         mFragments = new HashMap<>();
@@ -106,7 +108,6 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         mFragments.put(OwnedFragment.TAG, new OwnedFragment());
         mFragments.put(ProfileFragment.TAG, new ProfileFragment());
         //TODO add filter fragment
-
 
         //set buttons
         mMapBtn = (Button) main.findViewById(R.id.map_fragment_btn);
@@ -134,8 +135,10 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         navigationView.setCheckedItem(R.id.nav_home);
         new NavigationViewCounterTask().execute();
 
-        String welcomeText = getString(R.string.Hello) + " " + Association.get(this).getName();
+        String welcomeText = getString(R.string.Hello) + " " + NonProfit.get(this).getName();
         Toast.makeText(getApplicationContext(), welcomeText, Toast.LENGTH_LONG).show();
+
+        Log.d(TAG, "onCreate");
     }
 
     private void setButtonStyle(Button selected, Button unselected) {
@@ -143,11 +146,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         unselected.setSelected(false);
     }
 
-    @Override
-    protected void onResume(){
-        super.onResume();
-        Log.d(TAG, "onResume");
-    }
+
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -323,6 +322,16 @@ public class NonProfitMainActivity extends AppCompatActivity implements
     @Override
     public void updateViewCounters(){
         new NavigationViewCounterTask().execute();
+    }
+
+    @Override
+    public void onContactChange(String contact) {
+        nonProfitContactName.setText(contact);
+    }
+
+    @Override
+    public void onBusinessChange(String businessName) {
+        associationName.setText(businessName);
     }
 
     private class NavigationViewCounterTask extends AsyncTask<Void, Void, Void>{

@@ -21,29 +21,31 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.donors.data.DonationsManager;
 import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
-import com.gilshelef.feedme.nonprofit.data.Association;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
+import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Created by gilshe on 3/26/17.
  */
 
-public class ProfileDonorFragment extends Fragment implements AdapterView.OnItemSelectedListener {
+public class ProfileDonorFragment extends Fragment implements AdapterView.OnItemSelectedListener, OnCounterChangeListener {
     public static final String TAG = ProfileDonorFragment.class.getSimpleName();
     private TextView businessName;
     private TextView contactName;
     private TextView address;
     private TextView phone;
-    private Button removeRegistration;
     private Spinner spinner;
+    private TextView medalCount;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,16 +55,13 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         contactName = (TextView) rootView.findViewById(R.id.donor_name);
         address = (TextView) rootView.findViewById(R.id.donor_address);
         phone = (TextView) rootView.findViewById(R.id.contact_phone);
-        removeRegistration = (Button) rootView.findViewById(R.id.remove_registration_btn);
-        TextView tvSpinner = (TextView) rootView.findViewById(R.id.donation_type);
-
         spinner = (Spinner) rootView.findViewById(R.id.donation_type_spinner);
         List<Type> typesArray = TypeManager.get().getAll();
-        Collections.sort(typesArray, new TypeManager.TypeComparator(Donor.get(getActivity()).getDonationType()));
         ArrayAdapter<Type> adapter = new ArrayAdapter<>(
                 getContext(), android.R.layout.simple_spinner_item, typesArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
+        spinner.setSelection(TypeManager.get().getTypePosition(Donor.get(getActivity()).getDonationType()), false);
         spinner.setOnItemSelectedListener(this);
         spinner.setEnabled(false);
 
@@ -71,7 +70,11 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         contactName.setText(instance.getContact());
         address.setText(instance.getAddress());
         phone.setText(instance.getPhone());
+        return rootView;
+    }
 
+    @Override
+    public void onViewCreated (View view, Bundle savedInstanceState){
         businessName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -97,6 +100,8 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                 createPhoneDialog();
             }
         });
+
+        Button removeRegistration = (Button) view.findViewById(R.id.remove_registration_btn);
         removeRegistration.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -104,13 +109,17 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
             }
         });
 
+        TextView tvSpinner = (TextView) view.findViewById(R.id.donation_type);
         tvSpinner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 spinner.setEnabled(true);
+                spinner.performClick();
             }
         });
-        return rootView;
+
+        medalCount = (TextView) view.findViewById(R.id.medal_counter);
+        updateViewCounters();
     }
 
     private void removeRegistration() {
@@ -125,7 +134,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean(RegistrationActivity.DONOR, false);
                         editor.apply();
-
+                        Donor.get(getActivity()).clear();
                         Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                         Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
                         startActivity(intent);
@@ -163,7 +172,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                         String newPhone = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
                             if(RegistrationHandler.checkPhone(getContext(), newPhone)) {
-                                Association.get(getActivity()).setPhone(getContext(), newPhone);
+                                NonProfit.get(getActivity()).setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
                                 Toast.makeText(getActivity(), R.string.conatct_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
@@ -202,6 +211,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                         if (!RegistrationHandler.isEmpty(input)) {
                             Donor.get(getActivity()).setContact(getContext(), newContact);
                             contactName.setText(newContact);
+                            ((OnInfoUpdateListener)getActivity()).onContactChange(newContact);
                             Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
                         }
 
@@ -234,12 +244,10 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         alertDialog.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String newAddress = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), newAddress);
-                            if(latLng == null)
-                                input.setError(getString(R.string.unrecognized_address));
-                            else {
+                            String newAddress = input.getText().toString();
+                            LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), input);
+                            if(latLng != null){
                                 Donor.get(getActivity()).setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
                                 Toast.makeText(getActivity(), R.string.address_changes_successfully, Toast.LENGTH_LONG).show();
@@ -278,6 +286,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                         if (!RegistrationHandler.isEmpty(input)) {
                             Donor.get(getActivity()).setBusinessName(getContext(), newBusinessName);
                             businessName.setText(newBusinessName);
+                            ((OnInfoUpdateListener)getActivity()).onBusinessChange(newBusinessName);
                             Toast.makeText(getActivity(), R.string.business_name_changed_successfully, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -299,11 +308,16 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         String donationType = parent.getItemAtPosition(position).toString();
         Donor.get(getActivity()).setTypeByString(getContext(), donationType);
         Toast.makeText(getActivity(), R.string.donation_type_changed_successfully, Toast.LENGTH_LONG).show();
-        spinner.setEnabled(false);
     }
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         Toast.makeText(getContext(), "נא לבחור סוג תרומה אחד לפחות", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void updateViewCounters() {
+        if(medalCount != null)
+            medalCount.setText(String.valueOf(DonationsManager.get().getAll().size()));
     }
 }

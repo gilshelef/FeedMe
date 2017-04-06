@@ -11,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.gilshelef.feedme.nonprofit.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;

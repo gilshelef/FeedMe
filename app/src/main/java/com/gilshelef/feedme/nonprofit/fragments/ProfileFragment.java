@@ -19,10 +19,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
-import com.gilshelef.feedme.nonprofit.data.Association;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -61,12 +62,16 @@ public class ProfileFragment extends Fragment {
         phone = (TextView) rootView.findViewById(R.id.contact_phone);
         removeRegistration = (Button) rootView.findViewById(R.id.remove_registration_btn);
 
-        final Association instance = Association.get(getActivity());
+        final NonProfit instance = NonProfit.get(getActivity());
         nonProfitName.setText(instance.getName());
         address.setText(instance.getAddress());
         contactName.setText(instance.getContact());
         phone.setText(instance.getPhone());
+        return rootView;
+    }
 
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         nonProfitName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -99,7 +104,6 @@ public class ProfileFragment extends Fragment {
                 removeRegistration();
             }
         });
-        return rootView;
     }
 
     private void removeRegistration() {
@@ -114,7 +118,7 @@ public class ProfileFragment extends Fragment {
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean(RegistrationActivity.NON_PROFIT, false);
                         editor.apply();
-
+                        NonProfit.get(getActivity()).clear();
                         Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                         Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
                         startActivity(intent);
@@ -154,6 +158,7 @@ public class ProfileFragment extends Fragment {
                                 public void onResult(boolean listed) {
                                     if(listed){
                                         nonProfitName.setText(newNonProfitName);
+                                        ((OnInfoUpdateListener)getActivity()).onBusinessChange(newNonProfitName);
                                         Toast.makeText(getActivity(), "שם עמותה שונה בהצלחה", Toast.LENGTH_LONG).show();
                                     }
                                 }
@@ -195,7 +200,7 @@ public class ProfileFragment extends Fragment {
                         String newPhone = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
                             if(RegistrationHandler.checkPhone(getContext(), newPhone)) {
-                                Association.get(getActivity()).setPhone(getContext(), newPhone);
+                                NonProfit.get(getActivity()).setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
                                 Toast.makeText(getActivity(), R.string.conatct_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
@@ -232,8 +237,9 @@ public class ProfileFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            Association.get(getActivity()).setContact(getContext(), newContact);
+                            NonProfit.get(getActivity()).setContact(getContext(), newContact);
                             contactName.setText(newContact);
+                            ((OnInfoUpdateListener)getActivity()).onContactChange(newContact);
                             Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
 
                         }
@@ -267,13 +273,11 @@ public class ProfileFragment extends Fragment {
         alertDialog.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        String newAddress = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), newAddress);
-                            if(latLng == null)
-                                input.setError(getString(R.string.unrecognized_address));
-                            else {
-                                Association.get(getActivity()).setAddress(getContext(), latLng, newAddress);
+                            String newAddress = input.getText().toString();
+                            LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), input);
+                            if(latLng != null){
+                                NonProfit.get(getActivity()).setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
                                 Toast.makeText(getActivity(), R.string.address_changes_successfully, Toast.LENGTH_LONG).show();
                             }

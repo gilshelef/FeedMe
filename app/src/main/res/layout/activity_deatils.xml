@@ -87,7 +87,7 @@
 
             <!--description-->
             <TextView
-                android:text="מלא דברים שרוצים לתרום בלה"
+                android:text="תיאור של התרומה"
                 android:textSize="14sp"
                 android:id="@+id/details_description"
                 android:layout_width="wrap_content"
@@ -99,6 +99,18 @@
                 android:layout_below="@id/details_business_name"
                 android:layout_centerVertical="true"
                 android:layout_centerHorizontal="true" />
+
+            <ImageButton
+                android:clickable="true"
+                android:id="@+id/edit_description"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:background="@null"
+                android:layout_toEndOf="@id/details_description"
+                android:src="@drawable/ic_edit_black_24dp"
+                android:layout_below="@id/details_business_name" />
+
         </RelativeLayout>
     </RelativeLayout>
 

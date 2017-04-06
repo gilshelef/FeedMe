@@ -1,0 +1,46 @@
+{
+  "donations": [
+    {
+      "type": "ירקות",
+      "imageUrl" : "",
+      "phone": "0526898380",
+      "description": "כל מיני ירקות",
+      "firstName": "גיל",
+      "lastName": "שלף",
+      "date":"30.5.2010 22:15:52",
+      "latitude": 31.278677,
+      "longitude":34.801211,
+      "businessName":"ירקן",
+      "id":"1",
+      "calender":"10:59 01.04.2017"
+    },
+    {
+      "type": "ירקות",
+      "imageUrl" : "http://www.tekoafarms.co.il/media/catalog/items/cache/c889234799e865bbe90cee71f6cd2e53_XL.jpg",
+      "phone": "0526898380",
+      "description": "5 קילו עגבניות",
+      "firstName": "גיל",
+      "lastName": "שלף",
+      "date":"30.5.2010 22:15:52",
+      "latitude": 31.278677,
+      "longitude":34.801211,
+      "businessName":"ירקן",
+      "id":"2",
+      "calender":"10:59 01.04.2017"
+    },
+    {
+      "type": "ירקות",
+      "imageUrl" : "http://3vimir3l0i0322tm4k1i9ks4.wpengine.netdna-cdn.com/wp-content/uploads/2013/01/Broccoli-Parthenon.jpg",
+      "phone": "0526898380",
+      "description": "3 קילו ברוקולי",
+      "firstName": "גיל",
+      "lastName": "שלף",
+      "date":"30.5.2010 22:15:52",
+      "latitude": 31.278677,
+      "longitude":34.801211,
+      "businessName":"ירקן",
+      "id":"3",
+      "calender":"10:59 01.04.2017"
+    }
+  ]
+}

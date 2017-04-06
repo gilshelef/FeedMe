@@ -2,7 +2,7 @@ package com.gilshelef.feedme.nonprofit.adapters;
 
 import android.app.Activity;
 
-import com.gilshelef.feedme.nonprofit.OnCounterChangeListener;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 

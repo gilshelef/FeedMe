@@ -1,4 +1,4 @@
-package com.gilshelef.feedme.nonprofit;
+package com.gilshelef.feedme.nonprofit.fragments;
 
 import android.content.Context;
 import android.support.design.widget.CoordinatorLayout;

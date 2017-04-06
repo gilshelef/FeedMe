@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
-import com.gilshelef.feedme.nonprofit.OnCounterChangeListener;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
@@ -56,6 +56,7 @@ public class OwnedAdapter extends RecycledBaseAdapter {
         });
 
         final AlertDialog dialog = builder.create();
+        dialog.setCanceledOnTouchOutside(false);
         mActivity.runOnUiThread(new Runnable() {
             @Override
             public void run() {

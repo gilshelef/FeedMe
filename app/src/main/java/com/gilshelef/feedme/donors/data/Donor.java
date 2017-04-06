@@ -16,7 +16,8 @@ import com.google.android.gms.maps.model.LatLng;
 public class Donor {
 
     public static final String KEY_BUS_NAME = "key_name";
-    public static final String KEY_CONTACT = "key_contact_name";
+    public static final String KEY_FIRST_NAME = "key_fname";
+    public static final String KEY_LAST_NAME = "key_lname";
     public static final String KEY_PHONE = "key_contact_phone";
     public static final String KEY_LAT = "key_latitude";
     public static final String KEY_LNG = "key_longitude";
@@ -29,17 +30,19 @@ public class Donor {
     private String UUID;
     private LatLng position;
     private String businessName;
-    private String contactName;
     private String address;
     private String phone;
     private Type donationType;
+    private String firstName;
+    private String lastName;
 
 
-    private Donor(String uuid, String businessName, String address, String contactName, String phone, LatLng basePosition, Type donationType){
+    private Donor(String uuid, String businessName, String address, String contactFName, String contactLName, String phone, LatLng basePosition, Type donationType){
         this.UUID = uuid;
         this.businessName = businessName;
         this.address = address;
-        this.contactName = contactName;
+        this.firstName = contactFName;
+        this.lastName = contactLName;
         this.phone = phone;
         this.position = basePosition;
         this.donationType = donationType;
@@ -62,11 +65,12 @@ public class Donor {
         String address = sharedPref.getString(KEY_ADDRESS, "");
         float latitude = sharedPref.getFloat(KEY_LAT, 31.252973f);
         float longitude = sharedPref.getFloat(KEY_LNG, 34.791462f);
-        String contactName = sharedPref.getString(KEY_CONTACT, "איש קשר");
+        String contactFName = sharedPref.getString(KEY_FIRST_NAME, "");
+        String contactLName = sharedPref.getString(KEY_LAST_NAME, "");
         String phone = sharedPref.getString(KEY_PHONE, "");
         Type donationType = TypeManager.get().getTypeFromString(sharedPref.getString(KAY_TYPE, TypeManager.OTHER_DONATION));
         LatLng basePosition = new LatLng(latitude, longitude);
-        instance = new Donor(uuid, businessName, address, contactName, phone, basePosition, donationType);
+        instance = new Donor(uuid, businessName, address, contactFName, contactLName, phone, basePosition, donationType);
         return instance;
     }
 
@@ -75,7 +79,7 @@ public class Donor {
     }
 
     public String getContact() {
-        return contactName;
+        return firstName + " " + lastName;
     }
 
     public String getAddress() {
@@ -116,10 +120,11 @@ public class Donor {
     }
 
     public void setContact(Context context, String newContact) {
+        //TODO last name
         SharedPreferences.Editor editor = getEditor(context);
-        editor.putString(Donor.KEY_CONTACT, newContact);
+        editor.putString(Donor.KEY_FIRST_NAME, newContact);
         editor.apply();
-        this.contactName = newContact;
+        this.firstName = newContact;
     }
 
     public Type getDonationType() {
@@ -127,4 +132,19 @@ public class Donor {
     }
 
 
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public LatLng getPosition() {
+        return position;
+    }
+
+    public void clear() {
+        instance = null;
+    }
 }

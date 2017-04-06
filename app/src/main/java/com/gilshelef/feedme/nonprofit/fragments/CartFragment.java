@@ -13,12 +13,12 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.gilshelef.feedme.nonprofit.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.adapters.CartAdapter;
 import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.util.OnUpdateCount;
 
 import java.util.List;
 
@@ -26,7 +26,7 @@ import java.util.List;
  * Created by gilshe on 3/17/17.
  */
 
-public class CartFragment extends BaseFragment implements View.OnClickListener, CartAdapter.OnUpdateCount {
+public class CartFragment extends BaseFragment implements View.OnClickListener, OnUpdateCount {
     public static final String TAG = CartFragment.class.getSimpleName();
     private FloatingActionButton mCheckoutBtn;
     private CoordinatorLayout mCoordinator;
@@ -97,7 +97,7 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
     public void onClick(View v) {
 
         Snackbar snackbar = Snackbar
-                .make(mCoordinator, "Take Donations", Snackbar.LENGTH_LONG)
+                .make(mCoordinator, "Taking Donations", Snackbar.LENGTH_LONG)
                 .setAction("UNDO", new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

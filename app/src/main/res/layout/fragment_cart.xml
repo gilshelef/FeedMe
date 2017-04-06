@@ -104,7 +104,7 @@
             android:src="@drawable/ic_checkout_white_24dp"
             android:background="@color/colorAccent"
             android:visibility="visible"
-            app:layout_behavior="com.gilshelef.feedme.ScrollAwareFABBehavior"
+            app:layout_behavior="com.gilshelef.feedme.nonprofit.fragments.ScrollAwareFABBehavior"
             app:elevation="6dp"
             app:fabSize="normal" />
 

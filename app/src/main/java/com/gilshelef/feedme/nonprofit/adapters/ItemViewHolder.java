@@ -7,7 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.nonprofit.data.Association;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.like.LikeButton;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
@@ -25,7 +25,7 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
     private TextView type;
     private TextView description;
     public LikeButton save;
-    private TextView distance;
+    public TextView distance;
 
     ItemViewHolder(View view) {
         super(view);
@@ -62,7 +62,7 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
         description.setText(donation.getDescription());
 
         //distance
-        double distance = Association.get(activity).calcDistance(mDonation.getPosition());
+        double distance = NonProfit.get(activity).calcDistance(mDonation.getPosition());
         String text = String.format(activity.getResources().getString(R.string.distance), distance);
         this.distance.setText(text);
     }

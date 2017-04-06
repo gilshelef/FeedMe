@@ -26,6 +26,7 @@ public class ListFragment extends BaseFragment {
         return new ListAdapter(getActivity(), mDataSource, this);
     }
 
+    //overriding to not allow item dismiss
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {}
 

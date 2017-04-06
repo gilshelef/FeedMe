@@ -1,5 +1,7 @@
 package com.gilshelef.feedme.nonprofit.activities;
 
+import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.location.Address;
@@ -7,30 +9,39 @@ import android.location.Geocoder;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.TimePicker;
 
-import com.gilshelef.feedme.nonprofit.Constants;
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.donors.fragments.TimePickerFragment;
+import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
 /**
  * Created by gilshe on 3/4/17.
  */
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements TimePickerDialog.OnTimeSetListener {
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
     public static final String EXTRA_DONATION = "donation";
@@ -41,10 +52,10 @@ public class DetailsActivity extends AppCompatActivity {
             sendDataAndFinish();
         }
     };
-    private final View.OnClickListener contactListener = new View.OnClickListener() {
+    private final View.OnClickListener callListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(donation.getPhone()));
+            Intent intent = new Intent(Intent.ACTION_DIAL, Uri.parse(Constants.TEL_PREFIX + donation.getPhone()));
             startActivity(intent);
         }
     };
@@ -66,9 +77,12 @@ public class DetailsActivity extends AppCompatActivity {
     View contactBtn;
     TextView contactInfo;
     TextView timeInfo;
+    View timeBtn;
     View addressBtn;
     TextView addressInfo;
     Button addToCartBtn;
+    ImageButton editDescription;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +90,6 @@ public class DetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_deatils);
         donation = getIntent().getParcelableExtra(EXTRA_DONATION);
         extractContainers();
-
-        if(donation.isSaved())
-            save.setLiked(true);
 
         //thumbnail
         if(!donation.getImageUrl().isEmpty())
@@ -98,15 +109,26 @@ public class DetailsActivity extends AppCompatActivity {
         description.setText(donation.getDescription());
 
         //contact
-        contactInfo.setText(donation.getContactInfo());
-        timeInfo.setText(donation.getTime());
+        String contactStr = donation.getContactInfo() + " " + donation.getPhone();
+        contactInfo.setText(contactStr);
+        String text = String.format(getString(R.string.time_to_pick), donation.calenderToString());
+        timeInfo.setText(text);
 
-        styleCartBtn();
+        if(donation.isSaved())
+            save.setLiked(true);
 
-        if(donation.isOwned()) {
+        if(donation.isOwned() || donation.isDonor()) {
             save.setVisibility(View.GONE);
             addToCartBtn.setVisibility(View.GONE);
         }
+        else styleCartBtn();
+
+        if(donation.isDonor()) {
+            editDescription.setVisibility(View.VISIBLE);
+            editDescription.setOnClickListener(descriptionListener);
+            timeBtn.setOnClickListener(timeListener);
+        }
+        else contactBtn.setOnClickListener(callListener);
 
         new ListenerTask().execute();
     }
@@ -128,6 +150,8 @@ public class DetailsActivity extends AppCompatActivity {
         intent.putExtra(Constants.DONATION_ID, donation.getId());
         intent.putExtra(Constants.DONATION_STATE, donation.getState().name());
         intent.putExtra(Constants.IN_CART, donation.inCart());
+        intent.putExtra(Constants.DONATION_DESCRIPTION, donation.getDescription());
+        intent.putExtra(Constants.DONATION_TIME, donation.calenderToString());
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -143,6 +167,7 @@ public class DetailsActivity extends AppCompatActivity {
         //text
         business = (TextView) findViewById(R.id.details_business_name);
         description = (TextView) findViewById(R.id.details_description);
+        editDescription = (ImageButton) findViewById(R.id.edit_description);
 
         //contact
         contactBtn = findViewById(R.id.details_contact);
@@ -150,6 +175,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         //time
         timeInfo = (TextView) findViewById(R.id.details_time_info);
+        timeBtn = findViewById(R.id.details_time);
 
         //address
         addressBtn = findViewById(R.id.details_address);
@@ -164,7 +190,17 @@ public class DetailsActivity extends AppCompatActivity {
         sendDataAndFinish();
     }
 
+    @Override
+    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, hourOfDay);
+        cal.set(Calendar.MINUTE, minute);
+        donation.calendar = cal;
+        timeInfo.setText(donation.calenderToString());
+    }
+
     private class ListenerTask extends AsyncTask<Void, Void, String>{
+
 
         @Override
         protected String doInBackground(Void... params) {
@@ -180,7 +216,6 @@ public class DetailsActivity extends AppCompatActivity {
                     donation.setState(Donation.State.AVAILABLE);
                 }
             });
-            contactBtn.setOnClickListener(contactListener);
             addToCartBtn.setOnClickListener(addToCartListener);
 
             Geocoder geocoder;
@@ -214,7 +249,53 @@ public class DetailsActivity extends AppCompatActivity {
         protected void onPostExecute(String addressDetails){
             addressInfo.setText(addressDetails);
         }
+
     }
+
+    private View.OnClickListener timeListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            FragmentManager fm = getSupportFragmentManager();
+            DialogFragment dialog = new TimePickerFragment();
+            dialog.show(fm, "dialog");
+        }
+    };
+
+
+    private final View.OnClickListener descriptionListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            AlertDialog.Builder alertDialog = new AlertDialog.Builder(DetailsActivity.this);
+            alertDialog.setTitle(getString(R.string.donation_description));
+
+            final EditText input = new EditText(DetailsActivity.this);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            input.setLayoutParams(lp);
+            alertDialog.setView(input);
+
+            alertDialog.setPositiveButton(R.string.update,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            String newDescription = input.getText().toString();
+                            if (!RegistrationHandler.isEmpty(input)) {
+                                donation.setDescription(newDescription);
+                                description.setText(newDescription);
+                            }
+                        }
+                    });
+
+            alertDialog.setNegativeButton(R.string.cancel,
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.cancel();
+                        }
+                    });
+
+            alertDialog.show();
+        }
+    };
 
     private void launchNavigationApp() {
         LatLng latLng = donation.getPosition();
@@ -223,6 +304,7 @@ public class DetailsActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
     }
+
 //    @Override
 //    protected void onCreate(Bundle savedInstanceState) {
 //        super.onCreate(savedInstanceState);

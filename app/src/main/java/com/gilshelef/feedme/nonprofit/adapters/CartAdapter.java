@@ -2,9 +2,10 @@ package com.gilshelef.feedme.nonprofit.adapters;
 
 import android.app.Activity;
 
-import com.gilshelef.feedme.nonprofit.OnCounterChangeListener;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
+import com.gilshelef.feedme.util.OnUpdateCount;
 
 import java.util.List;
 
@@ -41,7 +42,4 @@ public class CartAdapter extends RecycledBaseAdapter {
 
     }
 
-    public interface OnUpdateCount extends OnActionEvent {
-        void updateItemsCount();
-    }
 }

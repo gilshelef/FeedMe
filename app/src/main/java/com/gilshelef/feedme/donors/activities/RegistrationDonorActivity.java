@@ -48,7 +48,8 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
         prefs = getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
 
         final EditText businessName = (EditText) findViewById(R.id.donor_business_name);
-        final EditText contactName = (EditText) findViewById(R.id.donor_name);
+        final EditText contactFirstName = (EditText) findViewById(R.id.donor_fname);
+        final EditText contactLastName = (EditText) findViewById(R.id.donor_lname);
         final EditText donorAddress = (EditText) findViewById(R.id.donor_address);
         final EditText contactPhone = (EditText) findViewById(R.id.donor_phone);
 
@@ -57,7 +58,8 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
             @Override
             public void onClick(View v) {
                 if(!RegistrationHandler.isEmpty(businessName) &&
-                        !RegistrationHandler.isEmpty(contactName) &&
+                        !RegistrationHandler.isEmpty(contactFirstName) &&
+                        !RegistrationHandler.isEmpty(contactLastName) &&
                         !RegistrationHandler.isEmpty(donorAddress) &&
                         !RegistrationHandler.isEmpty(contactPhone) ){
 
@@ -66,14 +68,14 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
                         return;
 
                     //checking location
-                    LatLng latLng = RegistrationHandler.getLocationFromAddress(getApplicationContext(),
-                            donorAddress.getText().toString());
+                    LatLng latLng = RegistrationHandler.getLocationFromAddress(getApplicationContext(), donorAddress);
                     if(latLng == null)
                         return;
 
                     SharedPreferences.Editor editor = prefs.edit();
                     editor.putString(Donor.KEY_BUS_NAME, businessName.getText().toString());
-                    editor.putString(Donor.KEY_CONTACT, contactName.getText().toString());
+                    editor.putString(Donor.KEY_FIRST_NAME, contactFirstName.getText().toString());
+                    editor.putString(Donor.KEY_LAST_NAME, contactLastName.getText().toString());
                     editor.putString(Donor.KEY_PHONE, contactPhone.getText().toString());
                     editor.putString(Donor.KEY_ADDRESS, donorAddress.getText().toString());
                     editor.putFloat(Donor.KEY_LAT, (float) latLng.latitude);
