@@ -3,6 +3,7 @@ package com.gilshelef.feedme.nonprofit.adapters;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
+import android.view.View;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
@@ -30,16 +31,14 @@ public class OwnedAdapter extends RecycledBaseAdapter {
 
     @Override
     protected void styleListItem(ItemViewHolder holder, Donation donation) {
-        holder.save.setEnabled(false);
-        holder.save.setAlpha(0.7f);
-        holder.itemView.setAlpha(0.7f);
+        holder.save.setVisibility(View.GONE);
     }
 
     @Override
     protected void onItemDismiss(final Donation donation) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setTitle(R.string.dialog_return_donation);
+        builder.setMessage(R.string.dialog_return_donation);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 //TODO notify data base, service!

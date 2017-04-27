@@ -71,11 +71,15 @@ public class TypeManager {
             this.donationType = donationType;
         }
 
+        public TypeComparator(){
+            donationType = null;
+        }
+
         @Override
         public int compare(Type t1, Type t2) {
-            if(t1.equals(donationType))
+            if(donationType != null && t1.equals(donationType))
                 return -1;
-            if(t2.equals(donationType))
+            if(donationType != null && t2.equals(donationType))
                 return 1;
             if(t1 instanceof Other)
                 return 1;

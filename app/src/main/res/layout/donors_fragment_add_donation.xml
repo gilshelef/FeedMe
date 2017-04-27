@@ -5,7 +5,8 @@
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:background="@color/cardview_light_background"
     android:weightSum="1"
-    android:baselineAligned="false">
+    android:baselineAligned="false"
+    android:orientation="vertical">
 
     <TextView
         android:id="@+id/donation_type_header"

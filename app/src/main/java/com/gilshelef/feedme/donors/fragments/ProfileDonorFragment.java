@@ -32,6 +32,7 @@ import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -57,6 +58,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         phone = (TextView) rootView.findViewById(R.id.contact_phone);
         spinner = (Spinner) rootView.findViewById(R.id.donation_type_spinner);
         List<Type> typesArray = TypeManager.get().getAll();
+        Collections.sort(typesArray, new TypeManager.TypeComparator(Donor.get(getActivity()).getDonationType()));
         ArrayAdapter<Type> adapter = new ArrayAdapter<>(
                 getContext(), android.R.layout.simple_spinner_item, typesArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

@@ -21,6 +21,7 @@ import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -39,6 +40,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
 
         final Spinner spinner = (Spinner) findViewById(R.id.donation_type_spinner);
         List<Type> typesArray = TypeManager.get().getAll();
+        Collections.sort(typesArray, new TypeManager.TypeComparator());
         ArrayAdapter<Type> adapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_item, typesArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

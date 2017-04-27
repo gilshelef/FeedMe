@@ -156,7 +156,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         else if (getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();
         } else {
-            super.onBackPressed();
+//            super.onBackPressed();
         }
     }
 
@@ -214,7 +214,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
     }
 
     private void moveToFilters() {
-        Toast.makeText(getApplicationContext(), "Filters fragment", LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Sorry, filters are not implemented yet", LENGTH_SHORT).show();
     }
 
     @Override
@@ -277,6 +277,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         else
             getSupportActionBar().hide();
     }
+
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {

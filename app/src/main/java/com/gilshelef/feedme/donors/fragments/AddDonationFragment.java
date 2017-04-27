@@ -172,6 +172,8 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     private void clearAll() {
         this.description.setText("");
         this.timeView.setVisibility(View.GONE);
+        this.imageView.setVisibility(View.GONE);
+
     }
 
 

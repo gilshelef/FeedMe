@@ -22,7 +22,7 @@
     <string name="saved">Saved</string>
     <string name="my_donations">My Donations</string>
     <string name="profile">My Profile</string>
-    <string name="dialog_return_donation">אתה בטוח רוצה להחזיר תרומה זו?</string>
+    <string name="dialog_return_donation">פעולה זו תחזיר את התרומה למאגר התרומות כך שתיהיה זמינה שוב לכולם. האם אתה בטוח?</string>
     <string name="yes">כן</string>
     <string name="cancel">בטל</string>
     <string name="Hello">שלום</string>

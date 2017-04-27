@@ -40,6 +40,7 @@ public class RegistrationHandler {
 
     public static LatLng getLocationFromAddress(Context context, EditText input) {
         String strAddress = input.getText().toString();
+//        new ResolveAddressTask(strAddress, input, context).execute();
         Locale lHebrew = new Locale.Builder().setLanguage(HEBREW).build();
         Geocoder geocoder = new Geocoder(context, lHebrew);
         List<Address> address;
@@ -47,18 +48,17 @@ public class RegistrationHandler {
         try {
             //TODO move to async task
             address = geocoder.getFromLocationName(strAddress, 1);
-            if (address == null || address.size() == 0)
+            if (address == null || address.size() == 0) {
+                input.setError(RESULT_UNKNOWN_LOCATION);
                 return null;
+            }
 
             Address location = address.get(0);
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
-        }finally {
-            if(latLng == null)
-                input.setError(RESULT_UNKNOWN_LOCATION);
+            input.setError("נראה שיש בעיות בחיבור לאינטרנט, נא נסה שנית מאוחר יותר");
         }
-
         return latLng;
     }
 
@@ -131,6 +131,64 @@ public class RegistrationHandler {
             callback.onResult(listed);
         }
     }
+//    private static class ResolveAddressTask extends AsyncTask<Void, Void, Boolean> {
+//        private final String strAddress;
+//        private final EditText inputView;
+//        private final Context context;
+//        private ProgressDialog progress;
+//
+//        private ResolveAddressTask(String strAddress, EditText input, Context context) {
+//            this.strAddress = strAddress;
+//            this.inputView = input;
+//            this.context = context;
+//        }
+//
+//        @Override
+//        protected void onPreExecute(){
+//
+//            progress = new ProgressDialog(context);
+//            progress.setTitle(context.getString(R.string.please_wait));
+//            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+//            progress.setIndeterminate(true);
+//            progress.setCanceledOnTouchOutside(false);
+//            progress.show();
+//        }
+//
+//        @Override
+//        protected Boolean doInBackground(Void... params) {
+//            Locale lHebrew = new Locale.Builder().setLanguage(HEBREW).build();
+//            Geocoder geocoder = new Geocoder(context, lHebrew);
+//            List<Address> address;
+//            LatLng latLng = null;
+//            try {
+//                address = geocoder.getFromLocationName(strAddress, 1);
+//                if (address == null || address.size() == 0)
+//                    return null;
+//
+//                Address location = address.get(0);
+//                latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//            } catch (IOException e) {
+//                Log.e(TAG, e.getMessage());
+//                input.setError("it seems you have connection error, please try again later");
+//            }finally {
+//                if(latLng == null)
+//                    input.setError(RESULT_UNKNOWN_LOCATION);
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean listed){
+//            if(progress != null) progress.dismiss();
+//            if(listed) {
+//                editor.putString(NonProfit.KEY_UUID, uuid);
+//                editor.apply();
+//                finish(RESULT_OK);
+//            }
+//            else
+//                Toast.makeText(getApplicationContext(), RegistrationHandler.RESULT_UNKNOWN_NON_PROFIT, Toast.LENGTH_LONG).show();
+//
+//        }
+//    }
 
 
 

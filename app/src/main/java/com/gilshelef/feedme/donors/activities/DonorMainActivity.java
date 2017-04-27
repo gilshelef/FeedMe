@@ -179,7 +179,9 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
 
 
     }
-
+    @Override
+    public void onBackPressed () {
+    }
 
     @Override
     public void onDetails(View v, Donation donation) {
