@@ -19,19 +19,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
+import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 /**
  * Created by gilshe on 3/2/17.
  */
-public class ProfileFragment extends Fragment {
-    public static final String TAG = ProfileFragment.class.getSimpleName();
+public class ProfileNonProfitFragment extends Fragment {
+    public static final String TAG = ProfileNonProfitFragment.class.getSimpleName();
+    private DatabaseReference mDatabase;
 
     TextView nonProfitName;
     TextView address;
@@ -39,10 +43,13 @@ public class ProfileFragment extends Fragment {
     TextView phone;
     Button removeRegistration;
 
+    NonProfit nonProfit;
+
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
     }
 
     @Override
@@ -56,12 +63,14 @@ public class ProfileFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.non_profit_fragment_profile, container, false);
         ((ToggleHomeBar) getActivity()).drawHomeBar(false);
 
+        //views
         nonProfitName = (TextView) rootView.findViewById(R.id.non_profit_name);
         address = (TextView) rootView.findViewById(R.id.non_profit_address);
         contactName = (TextView) rootView.findViewById(R.id.contact_name);
         phone = (TextView) rootView.findViewById(R.id.contact_phone);
         removeRegistration = (Button) rootView.findViewById(R.id.remove_registration_btn);
 
+        //set values
         final NonProfit instance = NonProfit.get(getActivity());
         nonProfitName.setText(instance.getName());
         address.setText(instance.getAddress());
@@ -104,6 +113,7 @@ public class ProfileFragment extends Fragment {
                 removeRegistration();
             }
         });
+        nonProfit = NonProfit.get(getActivity());
     }
 
     private void removeRegistration() {
@@ -118,11 +128,13 @@ public class ProfileFragment extends Fragment {
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean(RegistrationActivity.NON_PROFIT, false);
                         editor.apply();
-                        NonProfit.get(getActivity()).clear();
+
+                        mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).removeValue();
+                        nonProfit.clear();
+
                         Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                         Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
                         startActivity(intent);
-                        //TODO notify db?
                     }
                 });
 
@@ -158,7 +170,9 @@ public class ProfileFragment extends Fragment {
                                 public void onResult(boolean listed) {
                                     if(listed){
                                         nonProfitName.setText(newNonProfitName);
+                                        nonProfit.setNonProfitName(getActivity(), newNonProfitName);
                                         ((OnInfoUpdateListener)getActivity()).onBusinessChange(newNonProfitName);
+                                        updateDataBase("name", newNonProfitName);
                                         Toast.makeText(getActivity(), "שם עמותה שונה בהצלחה", Toast.LENGTH_LONG).show();
                                     }
                                 }
@@ -200,8 +214,9 @@ public class ProfileFragment extends Fragment {
                         String newPhone = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
                             if(RegistrationHandler.checkPhone(getContext(), newPhone)) {
-                                NonProfit.get(getActivity()).setPhone(getContext(), newPhone);
+                                nonProfit.setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
+                                updateDataBase("phone", newPhone);
                                 Toast.makeText(getActivity(), R.string.conatct_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
@@ -218,6 +233,8 @@ public class ProfileFragment extends Fragment {
 
         alertDialog.show();
     }
+
+
 
     private void createContactDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
@@ -237,8 +254,9 @@ public class ProfileFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            NonProfit.get(getActivity()).setContact(getContext(), newContact);
+                            nonProfit.setContact(getContext(), newContact);
                             contactName.setText(newContact);
+                            updateDataBase("contact", newContact);
                             ((OnInfoUpdateListener)getActivity()).onContactChange(newContact);
                             Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
 
@@ -256,6 +274,7 @@ public class ProfileFragment extends Fragment {
 
         alertDialog.show();
     }
+
 
     private void createAddressDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
@@ -277,8 +296,12 @@ public class ProfileFragment extends Fragment {
                             String newAddress = input.getText().toString();
                             LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), input);
                             if(latLng != null){
-                                NonProfit.get(getActivity()).setAddress(getContext(), latLng, newAddress);
+                                nonProfit.setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
+                                updateDataBase("address", newAddress);
+
+                                mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).child("basePosition").child("latitude").setValue(latLng.latitude);
+                                mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).child("basePosition").child("longitude").setValue(latLng.longitude);
                                 Toast.makeText(getActivity(), R.string.address_changes_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
@@ -294,6 +317,11 @@ public class ProfileFragment extends Fragment {
 
         alertDialog.show();
     }
+
+    private void updateDataBase(String key, String value) {
+        mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).child(key).setValue(value);
+    }
+
 
     @Override
     public void onDestroyView() {

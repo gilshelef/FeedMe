@@ -14,7 +14,7 @@ import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.donors.activities.DonorMainActivity;
 import com.gilshelef.feedme.donors.activities.RegistrationDonorActivity;
 import com.gilshelef.feedme.nonprofit.activities.NonProfitMainActivity;
-import com.gilshelef.feedme.nonprofit.activities.RegistrationNonProfitActivity;
+import com.gilshelef.feedme.nonprofit.activities.NonProfitRegistrationActivity;
 
 /**
  * Created by gilshe on 3/21/17.
@@ -55,8 +55,8 @@ public class RegistrationActivity extends AppCompatActivity {
             nonProfit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent intent = new Intent(RegistrationActivity.this, RegistrationNonProfitActivity.class);
-                    startActivityForResult(intent, RegistrationNonProfitActivity.REGISTER_NON_PROFIT);
+                    Intent intent = new Intent(RegistrationActivity.this, NonProfitRegistrationActivity.class);
+                    startActivityForResult(intent, NonProfitRegistrationActivity.REGISTER_NON_PROFIT);
                 }
             });
 
@@ -80,7 +80,7 @@ public class RegistrationActivity extends AppCompatActivity {
            }
        }
 
-       else if(requestCode == RegistrationNonProfitActivity.REGISTER_NON_PROFIT){
+       else if(requestCode == NonProfitRegistrationActivity.REGISTER_NON_PROFIT){
            if(resultCode == RESULT_OK){
                markRegister(NON_PROFIT);
                Intent intent = new Intent(RegistrationActivity.this, NonProfitMainActivity.class);

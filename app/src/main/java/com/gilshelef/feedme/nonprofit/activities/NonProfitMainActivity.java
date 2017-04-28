@@ -30,7 +30,7 @@ import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
-import com.gilshelef.feedme.nonprofit.fragments.ProfileFragment;
+import com.gilshelef.feedme.nonprofit.fragments.ProfileNonProfitFragment;
 import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
 import com.gilshelef.feedme.nonprofit.fragments.CartFragment;
 import com.gilshelef.feedme.nonprofit.fragments.ListFragment;
@@ -106,7 +106,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         mFragments.put(CartFragment.TAG, new CartFragment());
         mFragments.put(SaveFragment.TAG, new SaveFragment());
         mFragments.put(OwnedFragment.TAG, new OwnedFragment());
-        mFragments.put(ProfileFragment.TAG, new ProfileFragment());
+        mFragments.put(ProfileNonProfitFragment.TAG, new ProfileNonProfitFragment());
         //TODO add filter fragment
 
         //set buttons
@@ -297,7 +297,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
                 getSupportActionBar().setTitle(R.string.my_donations);
                 break;
             case R.id.nav_profile:
-                setFragment(ProfileFragment.TAG);
+                setFragment(ProfileNonProfitFragment.TAG);
                 getSupportActionBar().setTitle(R.string.profile);
                 break;
         }

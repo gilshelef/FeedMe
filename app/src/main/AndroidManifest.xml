@@ -30,7 +30,7 @@
             android:theme="@style/MyTheme">
         </activity>
 
-        <activity android:name="com.gilshelef.feedme.nonprofit.activities.RegistrationNonProfitActivity"
+        <activity android:name="com.gilshelef.feedme.nonprofit.activities.NonProfitRegistrationActivity"
             android:theme="@style/MyTheme">
         </activity>
 

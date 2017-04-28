@@ -23,4 +23,9 @@ public class Constants {
     public static final String DONATION_ID = "donationId";
     public static final String DATE_FORMAT = "HH:mm dd.MM.yyyy";
     public static final String DONATION_TIME = "time";
+
+
+    public static final String DB_DONOR_KEY = "donor";
+    public static final String DB_NON_PROFIT_KEY = "non_profit";
+
 }

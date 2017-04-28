@@ -21,16 +21,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.donors.data.DonationsManager;
 import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
-import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
+import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,31 +48,42 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     private TextView phone;
     private Spinner spinner;
     private TextView medalCount;
+    private DatabaseReference mDatabase;
+    private Donor mDonor;
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.donors_fragment_profile, container, false);
 
+        //views
         businessName = (TextView) rootView.findViewById(R.id.business_name);
         contactName = (TextView) rootView.findViewById(R.id.donor_name);
         address = (TextView) rootView.findViewById(R.id.donor_address);
         phone = (TextView) rootView.findViewById(R.id.contact_phone);
         spinner = (Spinner) rootView.findViewById(R.id.donation_type_spinner);
+
+        //spinner
         List<Type> typesArray = TypeManager.get().getAll();
         Collections.sort(typesArray, new TypeManager.TypeComparator(Donor.get(getActivity()).getDonationType()));
         ArrayAdapter<Type> adapter = new ArrayAdapter<>(
                 getContext(), android.R.layout.simple_spinner_item, typesArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        spinner.setSelection(TypeManager.get().getTypePosition(Donor.get(getActivity()).getDonationType()), false);
         spinner.setOnItemSelectedListener(this);
         spinner.setEnabled(false);
 
-        final Donor instance = Donor.get(getActivity());
-        businessName.setText(instance.getBusinessName());
-        contactName.setText(instance.getContact());
-        address.setText(instance.getAddress());
-        phone.setText(instance.getPhone());
+        mDonor = Donor.get(getActivity());
+        businessName.setText(mDonor.getBusinessName());
+        contactName.setText(mDonor.getContact());
+        address.setText(mDonor.getAddress());
+        phone.setText(mDonor.getPhone());
         return rootView;
     }
 
@@ -132,15 +144,15 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         alertDialog.setPositiveButton(R.string.yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+                        mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).removeValue();
                         SharedPreferences prefs = getContext().getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = prefs.edit();
                         editor.putBoolean(RegistrationActivity.DONOR, false);
                         editor.apply();
-                        Donor.get(getActivity()).clear();
+                        mDonor.clear();
                         Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                         Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
                         startActivity(intent);
-                        //TODO notify db?
                     }
                 });
 
@@ -174,12 +186,12 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                         String newPhone = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
                             if(RegistrationHandler.checkPhone(getContext(), newPhone)) {
-                                NonProfit.get(getActivity()).setPhone(getContext(), newPhone);
+                                mDonor.setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
+                                updateDataBase("phone", newPhone);
                                 Toast.makeText(getActivity(), R.string.conatct_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
-
                     }
                 });
 
@@ -211,9 +223,10 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            Donor.get(getActivity()).setContact(getContext(), newContact);
+                            mDonor.setContact(getContext(), newContact);
                             contactName.setText(newContact);
                             ((OnInfoUpdateListener)getActivity()).onContactChange(newContact);
+                            updateDataBase("contact", newContact);
                             Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
                         }
 
@@ -250,7 +263,11 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                             String newAddress = input.getText().toString();
                             LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), input);
                             if(latLng != null){
-                                Donor.get(getActivity()).setAddress(getContext(), latLng, newAddress);
+                                updateDataBase("address", newAddress);
+                                mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).child("position").child("latitude").setValue(latLng.latitude);
+                                mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).child("position").child("longitude").setValue(latLng.longitude);
+
+                                mDonor.setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
                                 Toast.makeText(getActivity(), R.string.address_changes_successfully, Toast.LENGTH_LONG).show();
                             }
@@ -286,9 +303,10 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                     public void onClick(DialogInterface dialog, int which) {
                         String newBusinessName = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            Donor.get(getActivity()).setBusinessName(getContext(), newBusinessName);
+                            mDonor.setBusinessName(getContext(), newBusinessName);
                             businessName.setText(newBusinessName);
                             ((OnInfoUpdateListener)getActivity()).onBusinessChange(newBusinessName);
+                            updateDataBase("businessName", newBusinessName);
                             Toast.makeText(getActivity(), R.string.business_name_changed_successfully, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -305,10 +323,18 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
     }
 
+    private void updateDataBase(String key, String value) {
+        mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).child(key).setValue(value);
+    }
+
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String donationType = parent.getItemAtPosition(position).toString();
-        Donor.get(getActivity()).setTypeByString(getContext(), donationType);
+        mDonor.setTypeByString(getContext(), donationType);
+        mDatabase.child(Constants.DB_DONOR_KEY)
+                .child(mDonor.getId())
+                .child("donationType")
+                .setValue(TypeManager.get().getType(donationType));
         Toast.makeText(getActivity(), R.string.donation_type_changed_successfully, Toast.LENGTH_LONG).show();
     }
 
@@ -320,6 +346,6 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void updateViewCounters() {
         if(medalCount != null)
-            medalCount.setText(String.valueOf(DonationsManager.get().getAll().size()));
+            medalCount.setText(String.valueOf(mDonor.getDonationCount()));
     }
 }

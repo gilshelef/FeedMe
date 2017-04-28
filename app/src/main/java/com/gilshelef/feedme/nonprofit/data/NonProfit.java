@@ -32,7 +32,7 @@ public class NonProfit {
     private String nonProfitAddress;
 
 
-    private NonProfit(String uuid, LatLng basePosition, String nonProfitName, String contactName, String contactPhone, String nonProfitAddress){
+    public NonProfit(String uuid, LatLng basePosition, String nonProfitName, String contactName, String contactPhone, String nonProfitAddress){
         this.UUID = uuid;
         this.basePosition = basePosition;
         this.nonProfitName = nonProfitName;
@@ -123,14 +123,12 @@ public class NonProfit {
         this.contactPhone = contactPhone;
     }
 
-    public void setNonProfitName(Context context, String nonProfitName, String uuid) {
+    public void setNonProfitName(Context context, String nonProfitName) {
         SharedPreferences.Editor editor = getEditor(context);
-        editor.putString(NonProfit.KEY_UUID, uuid);
         editor.putString(NonProfit.KEY_NAME, nonProfitName);
         editor.apply();
 
         this.nonProfitName = nonProfitName;
-        this.UUID = uuid;
     }
 
     private SharedPreferences.Editor getEditor(Context context) {

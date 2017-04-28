@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.google.android.gms.maps.model.LatLng;
 
@@ -40,7 +39,6 @@ public class RegistrationHandler {
 
     public static LatLng getLocationFromAddress(Context context, EditText input) {
         String strAddress = input.getText().toString();
-//        new ResolveAddressTask(strAddress, input, context).execute();
         Locale lHebrew = new Locale.Builder().setLanguage(HEBREW).build();
         Geocoder geocoder = new Geocoder(context, lHebrew);
         List<Address> address;
@@ -62,15 +60,14 @@ public class RegistrationHandler {
         return latLng;
     }
 
-    public static String checkForNonProfitListing(String nonProfitName){
-        String uuid = "1";
+    public static boolean isNonProfitListed(String nonProfitName){
         //TODO check with DB for non profit name
         try {
             Thread.sleep(4000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        return uuid;
+        return true;
     }
 
 
@@ -89,7 +86,6 @@ public class RegistrationHandler {
         private ProgressDialog progress;
         private String nonProfitName;
         private Activity activity;
-        String uuid;
 
         public CheckForNonProfitListingTask(Activity activity, String nonProfitName, OnBooleanResult callback) {
             this.nonProfitName = nonProfitName;
@@ -110,25 +106,16 @@ public class RegistrationHandler {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            //TODO check with DB for non profit name
-            try {
-                Thread.sleep(4000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            uuid = "1";
-            return true;
+            return isNonProfitListed(nonProfitName);
         }
 
         @Override
         protected void onPostExecute(Boolean listed){
             if(progress != null) progress.dismiss();
-            if(listed)
-                NonProfit.get(activity).setNonProfitName(activity, nonProfitName, uuid);
-
-            else
+            if(!listed)
                 Toast.makeText(activity, RESULT_UNKNOWN_NON_PROFIT, Toast.LENGTH_LONG).show();
-            callback.onResult(listed);
+            else
+                callback.onResult(listed);
         }
     }
 //    private static class ResolveAddressTask extends AsyncTask<Void, Void, Boolean> {

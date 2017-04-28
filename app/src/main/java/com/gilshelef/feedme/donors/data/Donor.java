@@ -9,6 +9,8 @@ import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.StringTokenizer;
+
 /**
  * Created by gilshe on 3/26/17.
  */
@@ -24,7 +26,7 @@ public class Donor {
     public static final String KEY_UUID = "key_uuid";
     public static final String KEY_ADDRESS = "key_address";
     public static final String KAY_TYPE = "key_type";
-
+    public static final String KEY_DONATION_COUNT = "key_donation_count";
 
     private static Donor instance;
     private String UUID;
@@ -35,9 +37,10 @@ public class Donor {
     private Type donationType;
     private String firstName;
     private String lastName;
+    private int donationCount;
 
 
-    private Donor(String uuid, String businessName, String address, String contactFName, String contactLName, String phone, LatLng basePosition, Type donationType){
+    public Donor(String uuid, String businessName, String address, String contactFName, String contactLName, String phone, LatLng basePosition, Type donationType, int donationCount){
         this.UUID = uuid;
         this.businessName = businessName;
         this.address = address;
@@ -46,6 +49,7 @@ public class Donor {
         this.phone = phone;
         this.position = basePosition;
         this.donationType = donationType;
+        this.donationCount = donationCount;
     }
 
     public static Donor get(Activity activity) {
@@ -69,8 +73,9 @@ public class Donor {
         String contactLName = sharedPref.getString(KEY_LAST_NAME, "");
         String phone = sharedPref.getString(KEY_PHONE, "");
         Type donationType = TypeManager.get().getTypeFromString(sharedPref.getString(KAY_TYPE, TypeManager.OTHER_DONATION));
-        LatLng basePosition = new LatLng(latitude, longitude);
-        instance = new Donor(uuid, businessName, address, contactFName, contactLName, phone, basePosition, donationType);
+        LatLng position = new LatLng(latitude, longitude);
+        int donationCount = sharedPref.getInt(KEY_DONATION_COUNT, 0);
+        instance = new Donor(uuid, businessName, address, contactFName, contactLName, phone, position, donationType, donationCount);
         return instance;
     }
 
@@ -120,17 +125,21 @@ public class Donor {
     }
 
     public void setContact(Context context, String newContact) {
-        //TODO last name
+        StringTokenizer tokenizer = new StringTokenizer(newContact, " ");
+        firstName = tokenizer.nextToken();
+        if(tokenizer.hasMoreTokens())
+            this.lastName = tokenizer.nextToken();
+        else lastName = "";
+
         SharedPreferences.Editor editor = getEditor(context);
-        editor.putString(Donor.KEY_FIRST_NAME, newContact);
+        editor.putString(Donor.KEY_FIRST_NAME, firstName);
+        editor.putString(Donor.KEY_LAST_NAME, lastName);
         editor.apply();
-        this.firstName = newContact;
     }
 
     public Type getDonationType() {
         return donationType;
     }
-
 
     public String getFirstName() {
         return firstName;
@@ -146,5 +155,20 @@ public class Donor {
 
     public void clear() {
         instance = null;
+    }
+
+    public String getId() {
+        return UUID;
+    }
+
+    public void setPhone(Context context, String contactPhone) {
+        SharedPreferences.Editor editor = getEditor(context);
+        editor.putString(Donor.KEY_PHONE, contactPhone);
+        editor.apply();
+        this.phone = contactPhone;
+    }
+
+    public int getDonationCount() {
+        return donationCount;
     }
 }
