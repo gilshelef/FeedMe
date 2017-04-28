@@ -13,13 +13,13 @@
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/colorPrimary"
         android:layout_marginBottom="3dp"
         android:layout_weight="50"
         android:clickable="true">
 
         <Button
-            android:background="@color/colorPrimaryDark"
+            android:background="@color/colorPrimary"
             android:id="@+id/donor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
