@@ -75,6 +75,7 @@
             android:textSize="18sp" />
 
         <ImageButton
+            android:id="@+id/time_image"
             android:layout_marginStart="16dp"
             android:background="@null"
             android:layout_alignParentStart="true"

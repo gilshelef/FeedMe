@@ -8,6 +8,7 @@ import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.Exclude;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,26 +26,29 @@ public class Donation implements Parcelable{
 
     private static final String TAG = Donation.class.getSimpleName();
 
+    public enum State {AVAILABLE, SAVED, OWNED, DONOR, TAKEN, UNAVAILABLE}
 
-
-    public enum State {AVAILABLE, SAVED, OWNED, DONOR}
-
-    // minimum qualification for donation
     public Type type;
     public String phone;
     public String firstName;
     public String lastName;
-    public LatLng location;
+    public LatLng position;
     public String businessName;
-    private String id; // donation id
+    private String id;
+    public String donorId;
 
-    public Calendar calendar;
     public String description;
     public String imageUrl;
     private State state;
     private boolean inCart;
 
+
+    @Exclude
+    public Calendar calendar;
+
+
     public Donation(){
+        inCart = false;
     }
 
     public Donation(JSONObject obj) {
@@ -58,7 +62,7 @@ public class Donation implements Parcelable{
             description = safeStringGet(obj, "description");
             imageUrl = safeStringGet(obj, "imageUrl");
             businessName = safeStringGet(obj, "businessName");
-            location = new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude"));
+            position = new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude"));
 
             Locale locale = new Locale.Builder().setLanguage("he").build();
             String calenderStr = safeStringGet(obj, "calender");
@@ -73,92 +77,35 @@ public class Donation implements Parcelable{
         }
     }
 
-    public boolean isDonor() {
-        return state == State.DONOR;
-    }
-    public boolean isOwned() {return state == State.OWNED;}
-    public boolean inCart() {
-        return inCart;
-    }
-    public State getState() {
-        return state;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-    public void setCalendar(String calender) {
-        this.calendar = stringToCalender(calender);
-    }
-
-    private String safeStringGet(JSONObject obj, String key) {
-       if(obj.has(key))
-           try {
-               return obj.getString(key);
-           } catch (JSONException e) {
-               e.printStackTrace();
-           }
-        return "";
-    }
-
-    public String getBusinessName() {
-        return businessName;
-    }
-
+    //getters
     public Type getType() {
         return type;
     }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public String getContactInfo() {
-        return firstName + " " + lastName;
-    }
-
-    public String getImageUrl() {
-        return imageUrl;
-    }
-
     public String getPhone() {
         return phone;
     }
-
-    public void setId(String id) {
-        this.id = id;
+    public String getFirstName() { return firstName; }
+    public String getLastName() { return lastName; }
+    @Exclude
+    public String getContactInfo() {
+        return firstName + " " + lastName;
     }
-
-    public void setState(State state) {
-        this.state = state;
-    }
-
     public LatLng getPosition() {
-        return location;
+        return position;
     }
-
-    public boolean isAvailable() {
-        return state.equals(State.AVAILABLE);
+    public String getBusinessName() {
+        return businessName;
     }
-
-    public boolean isSaved() {
-        return state.equals(State.SAVED);
-    }
-
-    public boolean isInCart(){
-        return inCart;
-    }
-
     public String getId() {
         return id;
     }
+    public String getDonorId(){ return donorId; }
 
     public String calenderToString() {
         Locale locale = new Locale.Builder().setLanguage("he").build();
         SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT, locale);
         return sdf.format(calendar.getTime());
     }
-
     public static Calendar stringToCalender(String calenderStr){
         Calendar calendar = null;
         Locale locale = new Locale.Builder().setLanguage("he").build();
@@ -172,6 +119,63 @@ public class Donation implements Parcelable{
 
         return calendar != null ? calendar : Calendar.getInstance();
     }
+    public String getDescription() {
+        return description;
+    }
+    public String getImageUrl() {
+        return imageUrl;
+    }
+    public State getState() {
+        return state;
+    }
+
+    private String safeStringGet(JSONObject obj, String key) {
+        if(obj.has(key))
+            try {
+                return obj.getString(key);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        return "";
+    }
+
+
+    // state
+    @Exclude
+    public boolean isDonor() {
+        return state == State.DONOR;
+    }
+    @Exclude
+    public boolean isOwned() {return state == State.OWNED;}
+    public boolean getInCart() {
+        return inCart;
+    }
+    @Exclude
+    public boolean isAvailable() {
+        return state.equals(State.AVAILABLE);
+    }
+    @Exclude
+    public boolean isSaved() {
+        return state.equals(State.SAVED);
+    }
+
+    //setters
+    public void setInCart(boolean val) {
+        inCart = val;
+    }
+    public void setDescription(String description) {
+        this.description = description;
+    }
+    public void setCalendar(String calender) {
+        this.calendar = stringToCalender(calender);
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+    public void setState(State state) {
+        this.state = state;
+    }
+    public void setDonorId(String donorId) { this.donorId = donorId; }
 
     @Override
     public boolean equals(Object o) {
@@ -187,10 +191,6 @@ public class Donation implements Parcelable{
         return id.hashCode();
     }
 
-    public void setInCart(boolean val) {
-        inCart = val;
-    }
-
     public static final Parcelable.Creator<Donation> CREATOR = new Creator<Donation>() {
         public Donation createFromParcel(Parcel source) {
             Donation donation = new Donation();
@@ -200,7 +200,7 @@ public class Donation implements Parcelable{
             donation.lastName = source.readString();
             float latitude = source.readFloat();
             float longitude = source.readFloat();
-            donation.location = new LatLng(latitude, longitude);
+            donation.position = new LatLng(latitude, longitude);
             donation.businessName = source.readString();
             donation.description = source.readString();
             donation.imageUrl = source.readString();
@@ -214,7 +214,6 @@ public class Donation implements Parcelable{
             return new Donation[size];
         }
     };
-
     public int describeContents() {
         return 0;
     }
@@ -223,8 +222,8 @@ public class Donation implements Parcelable{
         parcel.writeString(phone);
         parcel.writeString(firstName);
         parcel.writeString(lastName);
-        parcel.writeFloat((float)location.latitude);
-        parcel.writeFloat((float)location.longitude);
+        parcel.writeFloat((float) position.latitude);
+        parcel.writeFloat((float) position.longitude);
         parcel.writeString(businessName);
         parcel.writeString(description);
         parcel.writeString(imageUrl);

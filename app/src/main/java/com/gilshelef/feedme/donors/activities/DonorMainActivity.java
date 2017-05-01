@@ -13,6 +13,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -39,7 +40,7 @@ import java.util.Map;
  * Created by gilshe on 3/26/17.
  */
 
-public class DonorMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AddDonationFragment.OnActionEvent, OnCounterChangeListener, OnInfoUpdateListener, BaseFragment.OnDetailsListener {
+public class DonorMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AddDonationFragment.OnCameraEvent, OnCounterChangeListener, OnInfoUpdateListener, BaseFragment.OnDetailsListener {
 
     private static final String TAG = DonorMainActivity.class.getSimpleName();
     private Toolbar mAppToolBar;
@@ -56,7 +57,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         //initialize activity's data
         TypeManager.get();
         Donor.get(this);
-        DonationsManager.get(getApplicationContext());
+        DonationsManager.get(this);
 
         View main = findViewById(R.id.main);
 
@@ -79,7 +80,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         onBusinessChange(Donor.get(this).getBusinessName());
         businessName.setText(Donor.get(this).getBusinessName());
         contactName = (TextView) header.findViewById(R.id.contact_name);
-        onContactChange(Donor.get(this).getContact());
+        onContactChange(Donor.get(this).getContactInfo());
 
         //create fragments
         mFragments = new HashMap<>();
@@ -92,9 +93,22 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         navigationView.setCheckedItem(R.id.nav_add_donation);
 
         //welcome
-        String welcomeText = getString(R.string.Hello) + " " + Donor.get(this).getContact();
+        String welcomeText = getString(R.string.Hello) + " " + Donor.get(this).getContactInfo();
         Toast.makeText(getApplicationContext(), welcomeText, Toast.LENGTH_LONG).show();
         updateViewCounters();
+        Log.d("BUG", "onCreate");
+    }
+
+    @Override
+    protected void onStart(){
+        super.onStart();
+        Log.d("BUG", "onStart");
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.d("BUG", "onResume");
     }
 
     @Override
@@ -127,12 +141,6 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
     }
 
     @Override
-    public void newDonationEvent(Donation donation) {
-        DonationsManager.get().newDonationEvent(donation);
-        updateViewCounters();
-    }
-
-    @Override
     public void onCameraEvent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null)
@@ -141,10 +149,9 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void updateViewCounters() {
-        int donationsCount = DonationsManager.get().getAll().size();
+        int donationsCount = DonationsManager.get(DonorMainActivity.this).getAll().size();
         setMenuCounter(R.id.nav_my_donations, donationsCount);
         ((OnCounterChangeListener)mFragments.get(ProfileDonorFragment.TAG)).updateViewCounters();
-
     }
 
     private void setMenuCounter(@IdRes int itemId, int count) {
@@ -171,7 +178,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
                 String description = data.getStringExtra(Constants.DONATION_DESCRIPTION);
                 String calenderStr = data.getStringExtra(Constants.DONATION_TIME);
 
-                DonationsManager.get(getApplicationContext()).update(donationId, description, calenderStr);
+                DonationsManager.get().update(donationId, description, calenderStr);
             }
         }
         else if (requestCode == AddDonationFragment.REQUEST_IMAGE_CAPTURE)
@@ -194,5 +201,14 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
             startActivityForResult(intent, Constants.DETAILS_REQUEST_CODE, options.toBundle());
         }
         else startActivityForResult(intent, Constants.DETAILS_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onStop(){
+        Log.d("BUG", "onStop");
+        super.onStop();
+//        final Donor donor = Donor.get(this);
+//        donor.onStop(this);
+//        donor.clear();
     }
 }

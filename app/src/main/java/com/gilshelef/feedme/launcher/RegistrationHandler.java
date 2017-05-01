@@ -152,8 +152,8 @@ public class RegistrationHandler {
 //                if (address == null || address.size() == 0)
 //                    return null;
 //
-//                Address location = address.get(0);
-//                latLng = new LatLng(location.getLatitude(), location.getLongitude());
+//                Address position = address.get(0);
+//                latLng = new LatLng(position.getLatitude(), position.getLongitude());
 //            } catch (IOException e) {
 //                Log.e(TAG, e.getMessage());
 //                input.setError("it seems you have connection error, please try again later");
@@ -167,7 +167,7 @@ public class RegistrationHandler {
 //        protected void onPostExecute(Boolean listed){
 //            if(progress != null) progress.dismiss();
 //            if(listed) {
-//                editor.putString(NonProfit.KEY_UUID, uuid);
+//                editor.putString(NonProfit.KEY_ID, uuid);
 //                editor.apply();
 //                finish(RESULT_OK);
 //            }

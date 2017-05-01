@@ -19,8 +19,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.util.UUID;
-
 
 /**
  * Created by gilshe on 3/21/17.
@@ -28,7 +26,7 @@ import java.util.UUID;
 
 public class NonProfitRegistrationActivity extends AppCompatActivity implements View.OnClickListener, OnBooleanResult {
     public static final int REGISTER_NON_PROFIT = 1;
-    private DatabaseReference mDatabase;
+    private DatabaseReference mNonProfitRef;
     private EditText mNonProfitName;
     private EditText mNonProfitAddress;
     private EditText mContactName;
@@ -41,7 +39,7 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_non_profit);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT_KEY);
 
         //views
         mNonProfitName = (EditText) findViewById(R.id.non_profit_name);
@@ -72,7 +70,7 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
             if(!RegistrationHandler.checkPhone(getApplicationContext(), mContactPhone.getText().toString()))
                 return;
 
-            //checking location
+            //checking position
             mLatLng = RegistrationHandler.getLocationFromAddress(getApplicationContext(), mNonProfitAddress);
             if(mLatLng == null)
                 return;
@@ -99,9 +97,8 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
     }
 
     private void writeNewNonProfit() {
-        String uuid = UUID.randomUUID().toString();
         NonProfit nonProfit = new NonProfit(
-                uuid,
+                "",
                 mLatLng,
                 mNonProfitName.getText().toString(),
                 mContactName.getText().toString(),
@@ -109,7 +106,9 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
                 mNonProfitAddress.getText().toString());
 
         //to database
-        mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(uuid).setValue(nonProfit);
+        String nonProfitId = mNonProfitRef.push().getKey();
+        nonProfit.setId(nonProfitId);
+        mNonProfitRef.child(nonProfitId).setValue(nonProfit);
 
         // to shared prefs
         SharedPreferences prefs = getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
@@ -120,10 +119,8 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
         editor.putString(NonProfit.KEY_ADDRESS, mNonProfitAddress.getText().toString());
         editor.putFloat(NonProfit.KEY_LAT, (float) mLatLng.latitude);
         editor.putFloat(NonProfit.KEY_LNG, (float) mLatLng.longitude);
-        editor.putString(NonProfit.KEY_UUID, uuid);
+        editor.putString(NonProfit.KEY_ID, nonProfitId);
         editor.apply();
-
-
         finish(RESULT_OK);
 
     }

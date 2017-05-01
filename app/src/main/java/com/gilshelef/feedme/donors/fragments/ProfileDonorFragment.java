@@ -1,13 +1,16 @@
 package com.gilshelef.feedme.donors.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,17 +24,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.donors.data.DonationsManager;
 import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
+import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.data.OnResult;
 import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Collections;
 import java.util.List;
@@ -48,14 +57,15 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     private TextView phone;
     private Spinner spinner;
     private TextView medalCount;
-    private DatabaseReference mDatabase;
-    private Donor mDonor;
+    private static DatabaseReference mDonorRef;
+    private static Donor mDonor;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDonor = Donor.get(getActivity());
+        mDonorRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONOR_KEY).child(mDonor.getId());
     }
 
     @Override
@@ -76,12 +86,16 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                 getContext(), android.R.layout.simple_spinner_item, typesArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
-        spinner.setOnItemSelectedListener(this);
-        spinner.setEnabled(false);
 
-        mDonor = Donor.get(getActivity());
+
+        spinner.post(new Runnable() {
+            public void run() {
+                spinner.setOnItemSelectedListener(ProfileDonorFragment.this);
+            }
+        });
+
         businessName.setText(mDonor.getBusinessName());
-        contactName.setText(mDonor.getContact());
+        contactName.setText(mDonor.getContactInfo());
         address.setText(mDonor.getAddress());
         phone.setText(mDonor.getPhone());
         return rootView;
@@ -127,7 +141,6 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         tvSpinner.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                spinner.setEnabled(true);
                 spinner.performClick();
             }
         });
@@ -144,15 +157,14 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         alertDialog.setPositiveButton(R.string.yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).removeValue();
-                        SharedPreferences prefs = getContext().getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean(RegistrationActivity.DONOR, false);
-                        editor.apply();
-                        mDonor.clear();
-                        Intent intent = new Intent(getActivity(), RegistrationActivity.class);
-                        Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
-                        startActivity(intent);
+                        Log.d("BUG", "remove donor: " + mDonor.getId());
+                        new RemoveDonorTask(new OnResult() {
+                            @Override
+                            public void onResult() {
+                                Intent intent = new Intent(getActivity(), RegistrationActivity.class);
+                                startActivity(intent);
+                            }
+                        }, getContext()).execute();
                     }
                 });
 
@@ -223,7 +235,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            mDonor.setContact(getContext(), newContact);
+                            mDonor.setContactInfo(getContext(), newContact);
                             contactName.setText(newContact);
                             ((OnInfoUpdateListener)getActivity()).onContactChange(newContact);
                             updateDataBase("contact", newContact);
@@ -264,8 +276,8 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                             LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), input);
                             if(latLng != null){
                                 updateDataBase("address", newAddress);
-                                mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).child("position").child("latitude").setValue(latLng.latitude);
-                                mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).child("position").child("longitude").setValue(latLng.longitude);
+                                mDonorRef.child("position").child("latitude").setValue(latLng.latitude);
+                                mDonorRef.child("position").child("longitude").setValue(latLng.longitude);
 
                                 mDonor.setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
@@ -324,16 +336,15 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     }
 
     private void updateDataBase(String key, String value) {
-        mDatabase.child(Constants.DB_DONOR_KEY).child(mDonor.getId()).child(key).setValue(value);
+        mDonorRef.child(key).setValue(value);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Log.d("BUG", "onItemSelected");
         String donationType = parent.getItemAtPosition(position).toString();
         mDonor.setTypeByString(getContext(), donationType);
-        mDatabase.child(Constants.DB_DONOR_KEY)
-                .child(mDonor.getId())
-                .child("donationType")
+        mDonorRef.child("donationType")
                 .setValue(TypeManager.get().getType(donationType));
         Toast.makeText(getActivity(), R.string.donation_type_changed_successfully, Toast.LENGTH_LONG).show();
     }
@@ -348,4 +359,63 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         if(medalCount != null)
             medalCount.setText(String.valueOf(mDonor.getDonationCount()));
     }
+
+
+    private static class RemoveDonorTask extends AsyncTask<Void, Void, Void>{
+
+        private final Context mContext;
+        private ProgressDialog progress;
+        private OnResult mCallback;
+
+        private RemoveDonorTask(OnResult callback, Context context) {
+            this.mContext = context;
+            this.mCallback = callback;
+        }
+
+        @Override
+        protected void onPreExecute(){
+            progress = new ProgressDialog(mContext);
+            progress.setTitle(mContext.getString(R.string.please_wait));
+            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progress.setIndeterminate(true);
+            progress.setCanceledOnTouchOutside(false);
+            progress.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            ValueEventListener donationListener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    DatabaseReference mDonationRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONATION_KEY);
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        try {
+                            String donationId = child.getKey();
+                            mDonationRef.child(donationId).child(Constants.DB_DONATION_STATE_KEY).setValue(Donation.State.UNAVAILABLE);
+                        }catch (Exception e){
+                            Log.e(TAG, e.getMessage());
+                        }
+                    }
+                    mDonorRef.removeValue();
+                    DonationsManager.get().clear();
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {}
+            };
+
+            mDonorRef.child(Constants.DB_DONATION_KEY).addListenerForSingleValueEvent(donationListener);
+            SharedPreferences prefs = mContext.getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
+            prefs.edit().putBoolean(RegistrationActivity.DONOR, false).apply();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void p){
+            mDonor.clear();
+            Toast.makeText(mContext, R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
+            mCallback.onResult();
+        }
+    }
+
 }

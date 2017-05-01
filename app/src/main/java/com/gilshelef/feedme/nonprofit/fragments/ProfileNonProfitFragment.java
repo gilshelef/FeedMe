@@ -35,21 +35,22 @@ import com.google.firebase.database.FirebaseDatabase;
  */
 public class ProfileNonProfitFragment extends Fragment {
     public static final String TAG = ProfileNonProfitFragment.class.getSimpleName();
-    private DatabaseReference mDatabase;
+    private DatabaseReference mNonProfitRef;
 
     TextView nonProfitName;
     TextView address;
     TextView contactName;
     TextView phone;
     Button removeRegistration;
+    NonProfit mNonProfit;
 
-    NonProfit nonProfit;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mNonProfit = NonProfit.get(getActivity());
+        mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT_KEY).child(mNonProfit.getId());
     }
 
     @Override
@@ -71,11 +72,10 @@ public class ProfileNonProfitFragment extends Fragment {
         removeRegistration = (Button) rootView.findViewById(R.id.remove_registration_btn);
 
         //set values
-        final NonProfit instance = NonProfit.get(getActivity());
-        nonProfitName.setText(instance.getName());
-        address.setText(instance.getAddress());
-        contactName.setText(instance.getContact());
-        phone.setText(instance.getPhone());
+        nonProfitName.setText(mNonProfit.getName());
+        address.setText(mNonProfit.getAddress());
+        contactName.setText(mNonProfit.getContact());
+        phone.setText(mNonProfit.getPhone());
         return rootView;
     }
 
@@ -113,7 +113,6 @@ public class ProfileNonProfitFragment extends Fragment {
                 removeRegistration();
             }
         });
-        nonProfit = NonProfit.get(getActivity());
     }
 
     private void removeRegistration() {
@@ -129,8 +128,8 @@ public class ProfileNonProfitFragment extends Fragment {
                         editor.putBoolean(RegistrationActivity.NON_PROFIT, false);
                         editor.apply();
 
-                        mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).removeValue();
-                        nonProfit.clear();
+                        mNonProfitRef.removeValue();
+                        mNonProfit.clear();
 
                         Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                         Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
@@ -170,7 +169,7 @@ public class ProfileNonProfitFragment extends Fragment {
                                 public void onResult(boolean listed) {
                                     if(listed){
                                         nonProfitName.setText(newNonProfitName);
-                                        nonProfit.setNonProfitName(getActivity(), newNonProfitName);
+                                        mNonProfit.setName(getActivity(), newNonProfitName);
                                         ((OnInfoUpdateListener)getActivity()).onBusinessChange(newNonProfitName);
                                         updateDataBase("name", newNonProfitName);
                                         Toast.makeText(getActivity(), "שם עמותה שונה בהצלחה", Toast.LENGTH_LONG).show();
@@ -214,7 +213,7 @@ public class ProfileNonProfitFragment extends Fragment {
                         String newPhone = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
                             if(RegistrationHandler.checkPhone(getContext(), newPhone)) {
-                                nonProfit.setPhone(getContext(), newPhone);
+                                mNonProfit.setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
                                 updateDataBase("phone", newPhone);
                                 Toast.makeText(getActivity(), R.string.conatct_phone_changed_successfully, Toast.LENGTH_LONG).show();
@@ -234,8 +233,6 @@ public class ProfileNonProfitFragment extends Fragment {
         alertDialog.show();
     }
 
-
-
     private void createContactDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
         alertDialog.setTitle(getString(R.string.contact_name));
@@ -254,7 +251,7 @@ public class ProfileNonProfitFragment extends Fragment {
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            nonProfit.setContact(getContext(), newContact);
+                            mNonProfit.setContact(getContext(), newContact);
                             contactName.setText(newContact);
                             updateDataBase("contact", newContact);
                             ((OnInfoUpdateListener)getActivity()).onContactChange(newContact);
@@ -274,7 +271,6 @@ public class ProfileNonProfitFragment extends Fragment {
 
         alertDialog.show();
     }
-
 
     private void createAddressDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
@@ -296,12 +292,12 @@ public class ProfileNonProfitFragment extends Fragment {
                             String newAddress = input.getText().toString();
                             LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), input);
                             if(latLng != null){
-                                nonProfit.setAddress(getContext(), latLng, newAddress);
+                                mNonProfit.setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
                                 updateDataBase("address", newAddress);
 
-                                mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).child("basePosition").child("latitude").setValue(latLng.latitude);
-                                mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).child("basePosition").child("longitude").setValue(latLng.longitude);
+                                mNonProfitRef.child("basePosition").child("latitude").setValue(latLng.latitude);
+                                mNonProfitRef.child("basePosition").child("longitude").setValue(latLng.longitude);
                                 Toast.makeText(getActivity(), R.string.address_changes_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
@@ -319,9 +315,8 @@ public class ProfileNonProfitFragment extends Fragment {
     }
 
     private void updateDataBase(String key, String value) {
-        mDatabase.child(Constants.DB_NON_PROFIT_KEY).child(nonProfit.getId()).child(key).setValue(value);
+        mNonProfitRef.child(key).setValue(value);
     }
-
 
     @Override
     public void onDestroyView() {

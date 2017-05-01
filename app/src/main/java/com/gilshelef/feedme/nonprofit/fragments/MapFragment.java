@@ -126,7 +126,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         Log.d(TAG, "setUpMap");
         mMap.setOnMarkerClickListener(this);
         NonProfit association = NonProfit.get(getActivity());
-        displayMark(association.getBasePosition(), association.getName());
+        displayMark(association.getPosition(), association.getName());
 
         if (ActivityCompat.checkSelfPermission(getActivity(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -140,7 +140,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     Constants.PERMISSIONS_REQUEST_LOCATION);
-            Log.i(TAG, "no permission for my location enable");
+            Log.i(TAG, "no permission for my position enable");
             return;
         }
         //TODO why not showing?

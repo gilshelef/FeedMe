@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,10 @@ import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.donors.data.DonationsManager;
 import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
+import com.gilshelef.feedme.util.Constants;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Calendar;
 import java.util.Locale;
@@ -42,6 +47,14 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     private TextView timeView;
     private ImageView imageView;
     private Calendar calendar;
+    private DatabaseReference mDatabase;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState);
+        mDatabase = FirebaseDatabase.getInstance().getReference();
+    }
+
 
     @Override
     public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,8 +68,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     @Override
     public void onViewCreated (View view, Bundle savedInstanceState){
         description = (EditText) view.findViewById(R.id.donation_description);
-        View time = view.findViewById(R.id.pick_time_btn);
-        time.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener timeClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -64,20 +76,23 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
                 dialog.setTargetFragment(AddDonationFragment.this, 0);
                 dialog.show(fm, "dialog");
             }
-        });
+        };
 
-        View image = view.findViewById(R.id.add_image_btn);
-        image.setOnClickListener(new View.OnClickListener() {
+        view.findViewById(R.id.pick_time_btn).setOnClickListener(timeClick);
+        view.findViewById(R.id.time_image).setOnClickListener(timeClick);
+
+        View.OnClickListener imageClick = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((OnActionEvent) getActivity()).onCameraEvent();
+                ((OnCameraEvent) getActivity()).onCameraEvent();
 //                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 //                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null)
 //                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 
             }
-        });
+        };
 
+        view.findViewById(R.id.add_image_btn).setOnClickListener(imageClick);
 
         Button addDonation = (Button) view.findViewById(R.id.add_donation_btn);
         addDonation.setOnClickListener(new View.OnClickListener() {
@@ -124,48 +139,51 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
             progress.setCanceledOnTouchOutside(true);
             progress.show();
         }
+
         @Override
         protected Boolean doInBackground(Void... params) {
-            Donor donor = Donor.get(getActivity());
-            donation = new Donation();
-            donation.type = donor.getDonationType();
-            donation.phone = donor.getPhone();
-            donation.firstName = donor.getFirstName();
-            donation.lastName = donor.getLastName();
-            donation.location =  donor.getPosition();
-            donation.businessName = donor.getBusinessName();
-            donation.description = description.getText().toString();
-            donation.setState(Donation.State.DONOR);
-
-            String id = String.valueOf(DonationsManager.get().getAll().size() + 1);
-            donation.setId(id);
-            donation.imageUrl = "";
-            Locale locale = new Locale.Builder().setLanguage("he").build();
-            donation.calendar = calendar != null ? calendar : Calendar.getInstance(locale);
-            //TODO handle image
-            //TODO upload donation to db
-            //TODO notify data base with my donations - mysql
-            //TODO retrieve donation ID
-
             try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+                final Donor donor = Donor.get(getActivity());
+                donor.addDonation(1);
+
+                donation = new Donation();
+                donation.type = donor.getDonationType();
+                donation.phone = donor.getPhone();
+                donation.firstName = donor.getFirstName();
+                donation.lastName = donor.getLastName();
+                donation.position = donor.getPosition();
+                donation.businessName = donor.getBusinessName();
+                donation.description = description.getText().toString();
+                donation.setState(Donation.State.DONOR);
+                donation.imageUrl = "";
+                Locale locale = new Locale.Builder().setLanguage("he").build();
+                donation.calendar = calendar != null ? calendar : Calendar.getInstance(locale);
+
+                //set id
+                String donationId = mDatabase.child(Constants.DB_DONATION_KEY).push().getKey();
+                donation.setId(donationId);
+                donation.donorId = donor.getId();
+                DonationsManager.get().newDonationEvent(donation);
+                //TODO handle image
+                return true;
             }
-            return true;
+            catch (Exception e){
+                Log.e(TAG, e.getMessage());
+                return false;
+            }
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
             if(progress != null) progress.dismiss();
             if(result) {
-                ((OnActionEvent)getActivity()).newDonationEvent(donation);
-                clearAll();
+                ((OnCounterChangeListener)getActivity()).updateViewCounters();
                 Toast.makeText(getContext(), "תרומתך הועלתה בהצלחה", Toast.LENGTH_LONG).show();
             }
-            else{
+            else
                 Toast.makeText(getContext(), "תקלה ארעה בזמן העלת התרומה, נא נסה שנית בעוד מספר דקות", Toast.LENGTH_LONG).show();
-            }
+
+            clearAll();
         }
     }
 
@@ -173,12 +191,10 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
         this.description.setText("");
         this.timeView.setVisibility(View.GONE);
         this.imageView.setVisibility(View.GONE);
-
     }
 
 
-    public interface OnActionEvent {
-        void newDonationEvent(Donation donation);
+    public interface OnCameraEvent {
         void onCameraEvent();
     }
 }

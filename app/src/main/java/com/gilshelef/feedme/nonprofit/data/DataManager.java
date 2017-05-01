@@ -136,7 +136,7 @@ public class DataManager {
     public List<Donation> getInCart() {
         final List<Donation> inCart = new ArrayList<>();
         for(Donation d: donations.values())
-            if(d.inCart())
+            if(d.getInCart())
                 inCart.add(d);
         return inCart;
     }
@@ -165,7 +165,7 @@ public class DataManager {
         if(!donations.containsKey(donationId))
             return 0;
         Donation donation = donations.get(donationId);
-        int added = donation.inCart() ? 0: 1;
+        int added = donation.getInCart() ? 0: 1;
         donation.setInCart(true);
         return added;
     }
@@ -174,7 +174,7 @@ public class DataManager {
         if(!donations.containsKey(donationId))
             return 0;
         Donation donation = donations.get(donationId);
-        int removed = donation.inCart() ? -1 : 0;
+        int removed = donation.getInCart() ? -1 : 0;
         donation.setInCart(false);
         return removed;
     }

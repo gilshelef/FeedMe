@@ -49,7 +49,7 @@ public class RegistrationActivity extends AppCompatActivity {
 
         else{
             setContentView(R.layout.activity_registration);
-            Button donors = (Button) findViewById(R.id.donor);
+            Button donor = (Button) findViewById(R.id.donor);
             Button nonProfit = (Button) findViewById(R.id.non_profit);
 
             nonProfit.setOnClickListener(new View.OnClickListener() {
@@ -60,7 +60,7 @@ public class RegistrationActivity extends AppCompatActivity {
                 }
             });
 
-            donors.setOnClickListener(new View.OnClickListener() {
+            donor.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     Intent intent = new Intent(RegistrationActivity.this, RegistrationDonorActivity.class);

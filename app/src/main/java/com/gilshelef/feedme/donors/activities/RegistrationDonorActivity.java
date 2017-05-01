@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -26,7 +27,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created by gilshe on 3/21/17.
@@ -34,7 +34,8 @@ import java.util.UUID;
 
 public class RegistrationDonorActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
     public static final int REGISTER_DONOR = 2;
-    private DatabaseReference mDatabase;
+    private static final String TAG = RegistrationDonorActivity.class.getSimpleName();
+    private DatabaseReference mDonorRef;
 
     private EditText mBusinessName;
     private EditText mContactFirstName;
@@ -49,7 +50,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_donor);
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        mDonorRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONOR_KEY);
 
         mSpinner = (Spinner) findViewById(R.id.donation_type_spinner);
         List<Type> typesArray = TypeManager.get().getAll();
@@ -98,7 +99,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
             if(!RegistrationHandler.checkPhone(getApplicationContext(), mContactPhone.getText().toString()))
                 return;
 
-            //checking location
+            //checking position
             mLatLng = RegistrationHandler.getLocationFromAddress(getApplicationContext(), mDonorAddress);
             if(mLatLng == null)
                 return;
@@ -109,11 +110,9 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
 
 
     private void writeNewDonor() {
-        String uuid = UUID.randomUUID().toString();
         String donationTypeStr = mSpinner.getSelectedItem().toString();
-
         Donor donor = new Donor(
-                uuid,
+                "",
                 mBusinessName.getText().toString(),
                 mDonorAddress.getText().toString(),
                 mContactFirstName.getText().toString(),
@@ -121,23 +120,27 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
                 mContactPhone.getText().toString(),
                 mLatLng,
                 TypeManager.get().getType(donationTypeStr),
-                0
+                0 // initial donationCount
         );
 
-        mDatabase.child(Constants.DB_DONOR_KEY).child(uuid).setValue(donor);
+        // to database
+        String donorId = mDonorRef.push().getKey();
+        Log.d("BUG", "creating new donor with id: " + donorId);
+        donor.setId(donorId);
+        mDonorRef.child(donorId).setValue(donor);
 
+        // to shared prefs
         SharedPreferences prefs = getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-
-        editor.putString(Donor.KEY_BUS_NAME, mBusinessName.getText().toString());
+        editor.putString(Donor.KEY_BUIS_NAME, mBusinessName.getText().toString());
         editor.putString(Donor.KEY_FIRST_NAME, mContactFirstName.getText().toString());
         editor.putString(Donor.KEY_LAST_NAME, mContactLastName.getText().toString());
         editor.putString(Donor.KEY_PHONE, mContactPhone.getText().toString());
         editor.putString(Donor.KEY_ADDRESS, mDonorAddress.getText().toString());
         editor.putFloat(Donor.KEY_LAT, (float) mLatLng.latitude);
         editor.putFloat(Donor.KEY_LNG, (float) mLatLng.longitude);
-        editor.putString(Donor.KAY_TYPE, donationTypeStr);
-        editor.putString(Donor.KEY_UUID, uuid);
+        editor.putString(Donor.KEY_TYPE, donationTypeStr);
+        editor.putString(Donor.KEY_ID, donorId);
         editor.putInt(Donor.KEY_DONATION_COUNT, 0);
         editor.apply();
 

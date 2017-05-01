@@ -63,7 +63,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
     private final View.OnClickListener addToCartListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            donation.setInCart(!donation.inCart());
+            donation.setInCart(!donation.getInCart());
             styleCartBtn();
         }
     };
@@ -135,7 +135,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
     }
 
     private void styleCartBtn() {
-        if(donation.inCart())
+        if(donation.getInCart())
             setCartBtnStyle(R.string.remove_from_cart, R.drawable.rounded_shape_accent);
         else setCartBtnStyle(R.string.add_to_cart, R.drawable.rounded_shape_primary);
     }
@@ -150,7 +150,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         Intent intent = new Intent();
         intent.putExtra(Constants.DONATION_ID, donation.getId());
         intent.putExtra(Constants.DONATION_STATE, donation.getState().name());
-        intent.putExtra(Constants.IN_CART, donation.inCart());
+        intent.putExtra(Constants.IN_CART, donation.getInCart());
         intent.putExtra(Constants.DONATION_DESCRIPTION, donation.getDescription());
         intent.putExtra(Constants.DONATION_TIME, donation.calenderToString());
         setResult(RESULT_OK, intent);
@@ -226,7 +226,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
             LatLng latlng = donation.getPosition();
             String addressDetails = "";
             try {
-                addresses = geocoder.getFromLocation(latlng.latitude, latlng.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                addresses = geocoder.getFromLocation(latlng.latitude, latlng.longitude, 1); // Here 1 represent max position result to returned, by documents it recommended 1 to 5
                 String address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                 String city = addresses.get(0).getLocality();
                 String country = addresses.get(0).getCountryName();

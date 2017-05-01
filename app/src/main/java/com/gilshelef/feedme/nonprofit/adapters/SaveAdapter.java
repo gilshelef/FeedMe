@@ -22,7 +22,7 @@ public class SaveAdapter extends RecycledBaseAdapter {
 
     @Override
     protected void styleListItem(ItemViewHolder holder, Donation donation) {
-        if(donation.inCart())
+        if(donation.getInCart())
             super.setSelected(holder);
         else
             super.setUnSelected(holder);

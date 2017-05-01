@@ -20,25 +20,25 @@ public class NonProfit {
     public static final String KEY_PHONE = "key_contact_phone";
     public static final String KEY_LAT = "key_latitude";
     public static final String KEY_LNG = "key_longitude";
-    public static final String KEY_UUID = "key_uuid";
+    public static final String KEY_ID = "key_id";
     public static final String KEY_ADDRESS = "key_address";
 
     private static NonProfit instance;
     private String contactPhone;
-    private String UUID;
-    private LatLng basePosition;
-    private String nonProfitName;
+    private String id;
+    private LatLng position;
+    private String name;
     private String contactName;
-    private String nonProfitAddress;
+    private String address;
 
 
-    public NonProfit(String uuid, LatLng basePosition, String nonProfitName, String contactName, String contactPhone, String nonProfitAddress){
-        this.UUID = uuid;
-        this.basePosition = basePosition;
-        this.nonProfitName = nonProfitName;
+    public NonProfit(String id, LatLng position, String name, String contactName, String contactPhone, String address){
+        this.id = id;
+        this.position = position;
+        this.name = name;
         this.contactName = contactName;
         this.contactPhone = contactPhone;
-        this.nonProfitAddress = nonProfitAddress;
+        this.address = address;
     }
 
     public static NonProfit get(Activity activity) {
@@ -53,7 +53,7 @@ public class NonProfit {
 
     private static NonProfit build(Activity activity) {
         SharedPreferences sharedPref = activity.getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
-        String uuid = sharedPref.getString(KEY_UUID, "0");
+        String uuid = sharedPref.getString(KEY_ID, "0");
         String nonProfitName = sharedPref.getString(KEY_NAME, "עמותה"); // TODO change to null after registering
         String nonProfitAddress = sharedPref.getString(KEY_ADDRESS, "");
         float latitude = sharedPref.getFloat(KEY_LAT, 31.252973f);
@@ -65,25 +65,18 @@ public class NonProfit {
         return instance;
     }
 
-    public float calcDistance(LatLng location) {
-        float[] result = new float[1];
-        Location.distanceBetween(location.latitude, location.longitude, basePosition.latitude, basePosition.longitude, result);
 
-        if(result.length == 0)
-            return Integer.MAX_VALUE;
-        return (result[0] / KILOMETER);
-    }
-
+    //getters
     public String getId() {
-        return UUID;
+        return id;
     }
 
     public String getName() {
-        return nonProfitName;
+        return name;
     }
 
-    public LatLng getBasePosition() {
-        return basePosition;
+    public LatLng getPosition() {
+        return position;
     }
 
     public String getContact() {
@@ -95,9 +88,10 @@ public class NonProfit {
     }
 
     public String getAddress() {
-        return nonProfitAddress;
+        return address;
     }
 
+    //setters
     public void setAddress(Context context, LatLng latLng, String address) {
         SharedPreferences.Editor editor = getEditor(context);
         editor.putString(NonProfit.KEY_ADDRESS, address);
@@ -105,8 +99,8 @@ public class NonProfit {
         editor.putFloat(NonProfit.KEY_LNG, (float) latLng.longitude);
         editor.apply();
 
-        this.nonProfitAddress = address;
-        this.basePosition = latLng;
+        this.address = address;
+        this.position = latLng;
     }
 
     public void setContact(Context context, String contactName) {
@@ -123,12 +117,27 @@ public class NonProfit {
         this.contactPhone = contactPhone;
     }
 
-    public void setNonProfitName(Context context, String nonProfitName) {
+    public void setName(Context context, String nonProfitName) {
         SharedPreferences.Editor editor = getEditor(context);
         editor.putString(NonProfit.KEY_NAME, nonProfitName);
         editor.apply();
 
-        this.nonProfitName = nonProfitName;
+        this.name = nonProfitName;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+
+
+    public float calcDistance(LatLng location) {
+        float[] result = new float[1];
+        Location.distanceBetween(location.latitude, location.longitude, position.latitude, position.longitude, result);
+
+        if(result.length == 0)
+            return Integer.MAX_VALUE;
+        return (result[0] / KILOMETER);
     }
 
     private SharedPreferences.Editor getEditor(Context context) {
@@ -139,4 +148,5 @@ public class NonProfit {
     public void clear() {
         instance = null;
     }
+
 }
