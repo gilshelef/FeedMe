@@ -35,4 +35,5 @@ public class Constants {
     public static final String DB_DONATION_STATE_KEY = DONATION_STATE;
     public static final String DB_DONATION_DESC_KEY = "description";
     public static final String DB_DONATION_CAL_KEY = "calendar";
+    public static final String DB_IMAGE_KEY = "imageUrl";
 }

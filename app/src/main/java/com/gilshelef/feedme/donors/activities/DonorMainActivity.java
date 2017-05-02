@@ -203,12 +203,4 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         else startActivityForResult(intent, Constants.DETAILS_REQUEST_CODE);
     }
 
-    @Override
-    protected void onStop(){
-        Log.d("BUG", "onStop");
-        super.onStop();
-//        final Donor donor = Donor.get(this);
-//        donor.onStop(this);
-//        donor.clear();
-    }
 }

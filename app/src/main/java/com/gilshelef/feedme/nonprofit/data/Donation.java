@@ -28,21 +28,28 @@ public class Donation implements Parcelable{
 
     public enum State {AVAILABLE, SAVED, OWNED, DONOR, TAKEN, UNAVAILABLE}
 
+    //donor's property
+    @Exclude
     public Type type;
+    @Exclude
     public String phone;
+    @Exclude
     public String firstName;
+    @Exclude
     public String lastName;
+    @Exclude
     public LatLng position;
+    @Exclude
     public String businessName;
+
     private String id;
     public String donorId;
-
     public String description;
     public String imageUrl;
     private State state;
     private boolean inCart;
 
-
+    //added separately
     @Exclude
     public Calendar calendar;
 
@@ -78,29 +85,35 @@ public class Donation implements Parcelable{
     }
 
     //getters
+    @Exclude
     public Type getType() {
         return type;
     }
+    @Exclude
     public String getPhone() {
         return phone;
     }
+    @Exclude
     public String getFirstName() { return firstName; }
+    @Exclude
     public String getLastName() { return lastName; }
     @Exclude
     public String getContactInfo() {
         return firstName + " " + lastName;
     }
+    @Exclude
     public LatLng getPosition() {
         return position;
     }
+    @Exclude
     public String getBusinessName() {
         return businessName;
     }
+
     public String getId() {
         return id;
     }
     public String getDonorId(){ return donorId; }
-
     public String calenderToString() {
         Locale locale = new Locale.Builder().setLanguage("he").build();
         SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT, locale);
@@ -141,15 +154,15 @@ public class Donation implements Parcelable{
 
 
     // state
+    public boolean getInCart() {
+        return inCart;
+    }
     @Exclude
     public boolean isDonor() {
         return state == State.DONOR;
     }
     @Exclude
     public boolean isOwned() {return state == State.OWNED;}
-    public boolean getInCart() {
-        return inCart;
-    }
     @Exclude
     public boolean isAvailable() {
         return state.equals(State.AVAILABLE);
@@ -176,6 +189,7 @@ public class Donation implements Parcelable{
         this.state = state;
     }
     public void setDonorId(String donorId) { this.donorId = donorId; }
+    public void setType(Type type) {this.type = type; }
 
     @Override
     public boolean equals(Object o) {

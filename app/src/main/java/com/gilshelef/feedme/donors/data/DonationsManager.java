@@ -5,17 +5,13 @@ import android.util.Log;
 
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
-import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
-import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -163,11 +159,13 @@ public class DonationsManager {
         private ValueEventListener getDonationsFromDataBase = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d(TAG, "onDataChange");
                 Donation current;
+                final Donor donor = Donor.get();
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     try {
                         String donorId = child.child("donorId").getValue().toString();
-                        if(!donorId.equals(Donor.get().getId()))
+                        if(!donorId.equals(donor.getId()))
                             continue;
 
                         Donation.State donationState = Donation.State.valueOf(child.child(Constants.DB_DONATION_STATE_KEY).getValue().toString());
@@ -175,21 +173,18 @@ public class DonationsManager {
                             continue;
 
                         current = new Donation();
-                        current.phone = child.child("phone").getValue().toString();
-                        current.firstName = child.child("firstName").getValue().toString();
-                        current.lastName = child.child("lastName").getValue().toString();
-                        JSONObject position = new JSONObject(child.child("position").getValue().toString());
-                        current.position = new LatLng(position.getDouble("latitude"), position.getDouble("longitude"));
-                        current.businessName = child.child("businessName").getValue().toString();
+                        current.phone = donor.getPhone();
+                        current.firstName = donor.getFirstName();
+                        current.lastName = donor.getLastName();
+                        current.position = donor.getPosition();
+                        current.businessName = donor.getBusinessName();
                         current.setId(child.child(Constants.DONATION_ID).getValue().toString());
                         current.calendar = Donation.stringToCalender(child.child(Constants.DB_DONATION_CAL_KEY).getValue().toString());
                         current.description = child.child(Constants.DB_DONATION_DESC_KEY).getValue().toString();
-                        current.imageUrl = child.child("imageUrl").getValue().toString();
+                        current.imageUrl = child.child(Constants.DB_IMAGE_KEY).getValue().toString();
                         current.setState(donationState);
                         current.setInCart(Boolean.valueOf(child.child("inCart").getValue().toString()));
-
-                        String donationType = child.child("type").child("hebrewName").getValue().toString();
-                        current.type = TypeManager.get().getType(donationType);
+                        current.type = donor.getDonationType();
                         current.donorId = donorId;
                         donations.put(current.getId(), current);
                     }catch (Exception e){
@@ -206,7 +201,7 @@ public class DonationsManager {
 
         @Override
         protected Void doInBackground(Void... params) {
-            mDatabase.child(Constants.DB_DONATION_KEY).addListenerForSingleValueEvent(getDonationsFromDataBase);
+            mDatabase.child(Constants.DB_DONATION_KEY).addValueEventListener(getDonationsFromDataBase);
             return null;
         }
     }

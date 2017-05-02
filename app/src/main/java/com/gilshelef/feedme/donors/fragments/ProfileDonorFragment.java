@@ -397,7 +397,8 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                         }
                     }
                     mDonorRef.removeValue();
-                    DonationsManager.get().clear();
+                    if(DonationsManager.get() != null)
+                        DonationsManager.get().clear();
                 }
 
                 @Override
