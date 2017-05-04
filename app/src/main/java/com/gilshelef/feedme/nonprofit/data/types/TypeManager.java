@@ -50,10 +50,6 @@ public class TypeManager {
         return types;
     }
 
-//    public Type getTypeFromString(String type) {
-//        return dataSources.containsKey(type) ? dataSources.get(type) : null;
-//    }
-
     public int getTypePosition(Type donationType) {
         int i = 0;
         for(Type t: dataSources.values()){

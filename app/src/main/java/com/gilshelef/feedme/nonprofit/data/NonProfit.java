@@ -1,13 +1,11 @@
 package com.gilshelef.feedme.nonprofit.data;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.location.Location;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import com.gilshelef.feedme.launcher.RegistrationActivity;
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by gilshe on 2/25/17.
@@ -41,18 +39,18 @@ public class NonProfit {
         this.address = address;
     }
 
-    public static NonProfit get(Activity activity) {
+    public static NonProfit get(Context context) {
         if (instance == null) {
             synchronized (NonProfit.class) {
                 if (instance == null)
-                    return build(activity);
+                    return build(context);
             }
         }
         return instance;
     }
 
-    private static NonProfit build(Activity activity) {
-        SharedPreferences sharedPref = activity.getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
+    private static NonProfit build(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
         String uuid = sharedPref.getString(KEY_ID, "0");
         String nonProfitName = sharedPref.getString(KEY_NAME, "עמותה"); // TODO change to null after registering
         String nonProfitAddress = sharedPref.getString(KEY_ADDRESS, "");
@@ -129,8 +127,6 @@ public class NonProfit {
         this.id = id;
     }
 
-
-
     public float calcDistance(LatLng location) {
         float[] result = new float[1];
         Location.distanceBetween(location.latitude, location.longitude, position.latitude, position.longitude, result);
@@ -145,8 +141,11 @@ public class NonProfit {
         return prefs.edit();
     }
 
-    public void clear() {
+    public static void clear() {
         instance = null;
     }
 
+    public boolean isOwned(Donation donation) {
+        return donation.getNonProfitId() != null && donation.getNonProfitId().equals(getId());
+    }
 }

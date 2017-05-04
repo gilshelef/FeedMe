@@ -70,8 +70,8 @@ public class RegistrationActivity extends AppCompatActivity {
         }
     }
 
-   @Override
-   public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
        if (requestCode == RegistrationDonorActivity.REGISTER_DONOR) {
            if (resultCode == RESULT_OK) {
                markRegister(DONOR);

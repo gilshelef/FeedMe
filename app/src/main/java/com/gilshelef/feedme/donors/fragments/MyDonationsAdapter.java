@@ -8,6 +8,7 @@ import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.donors.data.DonationsManager;
+import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.nonprofit.adapters.ItemViewHolder;
 import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.nonprofit.data.Donation;
@@ -51,6 +52,7 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
         builder.setTitle(R.string.remove_donation);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
+                Donor.get(mActivity).updateDonationCount(mActivity, -1);
                 DonationsManager.get().returnDonation(donation);
                 Toast.makeText(mActivity, R.string.remove_donation_successfully, Toast.LENGTH_LONG).show();
                 ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
@@ -71,6 +73,6 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
             }
         });
 
-        ((OnCounterChangeListener) mActivity).updateViewCounters();
+//        ((OnCounterChangeListener) mActivity).updateViewCounters();
     }
 }

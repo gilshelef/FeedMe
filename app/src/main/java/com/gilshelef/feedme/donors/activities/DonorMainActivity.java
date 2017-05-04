@@ -56,7 +56,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
 
         //initialize activity's data
         TypeManager.get();
-        Donor.get(this);
+        final Donor donor = Donor.get(this);
         DonationsManager.get(this);
 
         View main = findViewById(R.id.main);
@@ -77,10 +77,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         //drawer header
         View header = navigationView.getHeaderView(0);
         businessName = (TextView)  header.findViewById(R.id.business_name);
-        onBusinessChange(Donor.get(this).getBusinessName());
-        businessName.setText(Donor.get(this).getBusinessName());
         contactName = (TextView) header.findViewById(R.id.contact_name);
-        onContactChange(Donor.get(this).getContactInfo());
 
         //create fragments
         mFragments = new HashMap<>();
@@ -96,20 +93,13 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         String welcomeText = getString(R.string.Hello) + " " + Donor.get(this).getContactInfo();
         Toast.makeText(getApplicationContext(), welcomeText, Toast.LENGTH_LONG).show();
         updateViewCounters();
-        Log.d("BUG", "onCreate");
+
+        onBusinessChange(donor.getBusinessName());
+        onContactChange(donor.getContactInfo());
+
+        Log.d(TAG, "onCreate");
     }
 
-    @Override
-    protected void onStart(){
-        super.onStart();
-        Log.d("BUG", "onStart");
-    }
-
-    @Override
-    protected void onResume(){
-        super.onResume();
-        Log.d("BUG", "onResume");
-    }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -174,9 +164,9 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         if (requestCode == Constants.DETAILS_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 //get data from result
-                String donationId = data.getStringExtra(Constants.DONATION_ID);
-                String description = data.getStringExtra(Constants.DONATION_DESCRIPTION);
-                String calenderStr = data.getStringExtra(Constants.DONATION_TIME);
+                String donationId = data.getStringExtra(Donation.K_ID);
+                String description = data.getStringExtra(Donation.K_DESCRIPTION);
+                String calenderStr = data.getStringExtra(Donation.K_CALENDAR);
 
                 DonationsManager.get().update(donationId, description, calenderStr);
             }

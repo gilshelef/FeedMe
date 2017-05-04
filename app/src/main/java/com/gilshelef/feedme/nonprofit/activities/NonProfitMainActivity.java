@@ -146,7 +146,6 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         unselected.setSelected(false);
     }
 
-
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -155,8 +154,6 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         }
         else if (getFragmentManager().getBackStackEntryCount() > 0) {
             getFragmentManager().popBackStack();
-        } else {
-//            super.onBackPressed();
         }
     }
 
@@ -222,9 +219,9 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         if (requestCode == Constants.DETAILS_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 //get data from result
-                String donationId = data.getStringExtra(Constants.DONATION_ID);
-                Donation.State state = Donation.State.valueOf(data.getStringExtra(Constants.DONATION_STATE));
-                boolean inCart = data.getBooleanExtra(Constants.IN_CART, false);
+                String donationId = data.getStringExtra(Donation.K_ID);
+                Donation.State state = Donation.State.valueOf(data.getStringExtra(Donation.K_STATE));
+                boolean inCart = data.getBooleanExtra(Donation.K_CART, false);
 
                 // update save events
                 if (state == Donation.State.SAVED)
@@ -333,6 +330,13 @@ public class NonProfitMainActivity extends AppCompatActivity implements
     @Override
     public void onBusinessChange(String businessName) {
         associationName.setText(businessName);
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        NonProfit.clear();
+        DataManager.clear();
     }
 
     private class NavigationViewCounterTask extends AsyncTask<Void, Void, Void>{

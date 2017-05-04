@@ -1,6 +1,5 @@
 package com.gilshelef.feedme.donors.fragments;
 
-import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -127,24 +126,12 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     }
 
     private class UploadDonationTask extends AsyncTask<Void, Void, Boolean> {
-        private ProgressDialog progress;
         private Donation donation;
-
-        @Override
-        protected void onPreExecute() {
-            progress = new ProgressDialog(AddDonationFragment.this.getContext());
-            progress.setMessage("מוסיפים את תרומתך למאגר התרומות...");
-            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progress.setIndeterminate(true);
-            progress.setCanceledOnTouchOutside(true);
-            progress.show();
-        }
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
                 final Donor donor = Donor.get(getActivity());
-                donor.addDonation(1);
 
                 donation = new Donation();
                 donation.type = donor.getDonationType();
@@ -154,15 +141,15 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
                 donation.position = donor.getPosition();
                 donation.businessName = donor.getBusinessName();
                 donation.description = description.getText().toString();
-                donation.setState(Donation.State.DONOR);
                 donation.imageUrl = "";
                 Locale locale = new Locale.Builder().setLanguage("he").build();
                 donation.calendar = calendar != null ? calendar : Calendar.getInstance(locale);
 
                 //set id
-                String donationId = mDatabase.child(Constants.DB_DONATION_KEY).push().getKey();
+                String donationId = mDatabase.child(Constants.DB_DONATION).push().getKey();
                 donation.setId(donationId);
                 donation.donorId = donor.getId();
+                donor.updateDonationCount(getContext(), 1);
                 DonationsManager.get().newDonationEvent(donation);
                 //TODO handle image
                 return true;
@@ -175,7 +162,6 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
 
         @Override
         protected void onPostExecute(Boolean result) {
-            if(progress != null) progress.dismiss();
             if(result) {
                 ((OnCounterChangeListener)getActivity()).updateViewCounters();
                 Toast.makeText(getContext(), "תרומתך הועלתה בהצלחה", Toast.LENGTH_LONG).show();

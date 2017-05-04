@@ -1,6 +1,5 @@
 package com.gilshelef.feedme.donors.data;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
@@ -19,16 +18,18 @@ import java.util.StringTokenizer;
 
 public class Donor {
 
-    public static final String KEY_BUIS_NAME = "key_name";
-    public static final String KEY_FIRST_NAME = "key_fname";
-    public static final String KEY_LAST_NAME = "key_lname";
-    public static final String KEY_PHONE = "key_contact_phone";
-    public static final String KEY_LAT = "key_latitude";
-    public static final String KEY_LNG = "key_longitude";
-    public static final String KEY_ID = "key_uuid";
-    public static final String KEY_ADDRESS = "key_address";
-    public static final String KEY_TYPE = "key_type";
-    public static final String KEY_DONATION_COUNT = "key_donation_count";
+    public static final String K_BUSINESS = "businessName";
+    public static final String K_FIRST_NAME = "firstName";
+    public static final String K_LAST_NAME = "lastName";
+    public static final String K_PHONE = "phone";
+    public static final String K_LAT = "latitude";
+    public static final String K_LNG = "longitude";
+    public static final String K_ID = "id";
+    public static final String K_ADDRESS = "address";
+    public static final String K_TYPE = "donationType";
+    public static final String K_DONATION_COUNT = "donationCount";
+    public static final String K_POSITION = "position";
+
     private static final String TAG = Donor.class.getSimpleName();
 
     private static Donor instance;
@@ -59,33 +60,31 @@ public class Donor {
         return instance;
     }
 
-    public static Donor get(Activity activity) {
-        Log.d("BUG", "get in Donor");
+    public static Donor get(Context context) {
         if (instance == null) {
             synchronized (Donor.class) {
                 if (instance == null)
-                    return build(activity);
+                    return build(context);
             }
         }
         return instance;
     }
 
-    private static Donor build(Activity activity) {
+    private static Donor build(Context context) {
         Log.d("BUG", "build in Donor");
 
-        SharedPreferences sharedPref = activity.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
-
-        String id = sharedPref.getString(KEY_ID, "0");
-        String businessName = sharedPref.getString(KEY_BUIS_NAME, "");
-        String address = sharedPref.getString(KEY_ADDRESS, "");
-        float latitude = sharedPref.getFloat(KEY_LAT, 0);
-        float longitude = sharedPref.getFloat(KEY_LNG, 0);
-        String contactFName = sharedPref.getString(KEY_FIRST_NAME, "");
-        String contactLName = sharedPref.getString(KEY_LAST_NAME, "");
-        String phone = sharedPref.getString(KEY_PHONE, "");
-        Type donationType = TypeManager.get().getType(sharedPref.getString(KEY_TYPE, TypeManager.OTHER_DONATION));
+        SharedPreferences sharedPref = context.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
+        String id = sharedPref.getString(K_ID, "0");
+        String businessName = sharedPref.getString(K_BUSINESS, "");
+        String address = sharedPref.getString(K_ADDRESS, "");
+        float latitude = sharedPref.getFloat(K_LAT, 0);
+        float longitude = sharedPref.getFloat(K_LNG, 0);
+        String contactFName = sharedPref.getString(K_FIRST_NAME, "");
+        String contactLName = sharedPref.getString(K_LAST_NAME, "");
+        String phone = sharedPref.getString(K_PHONE, "");
+        Type donationType = TypeManager.get().getType(sharedPref.getString(K_TYPE, TypeManager.OTHER_DONATION));
         LatLng position = new LatLng(latitude, longitude);
-        int donationCount = sharedPref.getInt(KEY_DONATION_COUNT, 0);
+        int donationCount = sharedPref.getInt(K_DONATION_COUNT, 0);
         instance = new Donor(id, businessName, address, contactFName, contactLName, phone, position, donationType, donationCount);
         return instance;
     }
@@ -131,9 +130,9 @@ public class Donor {
     //setters
     public void setAddress(Context context, LatLng latLng, String address) {
         SharedPreferences.Editor editor = getEditor(context);
-        editor.putString(Donor.KEY_ADDRESS, address);
-        editor.putFloat(Donor.KEY_LAT, (float) latLng.latitude);
-        editor.putFloat(Donor.KEY_LNG, (float) latLng.longitude);
+        editor.putString(Donor.K_ADDRESS, address);
+        editor.putFloat(Donor.K_LAT, (float) latLng.latitude);
+        editor.putFloat(Donor.K_LNG, (float) latLng.longitude);
         editor.apply();
 
         this.address = address;
@@ -141,29 +140,23 @@ public class Donor {
     }
 
     public void setTypeByString(Context context, String typeStr) {
-        SharedPreferences prefs = context.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
-        prefs.edit().putString(Donor.KEY_TYPE, typeStr).apply();
+        getEditor(context).putString(Donor.K_TYPE, typeStr).apply();
         this.donationType  = TypeManager.get().getType(typeStr);
     }
 
     public void setBusinessName(Context context, String newBusinessName) {
-        SharedPreferences.Editor editor = getEditor(context);
-        editor.putString(Donor.KEY_BUIS_NAME, newBusinessName);
-        editor.apply();
+        getEditor(context).putString(Donor.K_BUSINESS, newBusinessName).apply();
         this.businessName = newBusinessName;
     }
 
-    public void setPhone(Context context, String contactPhone) {
-        SharedPreferences.Editor editor = getEditor(context);
-        editor.putString(Donor.KEY_PHONE, contactPhone);
-        editor.apply();
-        this.phone = contactPhone;
+    public void setPhone(Context context, String phone) {
+        getEditor(context).putString(Donor.K_PHONE, phone).apply();
+        this.phone = phone;
     }
 
     public void setId(String id) {
         this.id = id;
     }
-
 
     @Exclude
     public String getContactInfo() {
@@ -179,8 +172,8 @@ public class Donor {
         else lastName = "";
 
         SharedPreferences.Editor editor = getEditor(context);
-        editor.putString(Donor.KEY_FIRST_NAME, firstName);
-        editor.putString(Donor.KEY_LAST_NAME, lastName);
+        editor.putString(Donor.K_FIRST_NAME, firstName);
+        editor.putString(Donor.K_LAST_NAME, lastName);
         editor.apply();
     }
 
@@ -189,21 +182,14 @@ public class Donor {
         return prefs.edit();
     }
 
-    public void addDonation(int delta) {
+    public void updateDonationCount(Context context, int delta) {
         Log.d(TAG, "add donation: " + delta);
         this.donationCount += delta;
+        getEditor(context).putInt(Donor.K_DONATION_COUNT, donationCount).apply();
     }
 
     public void clear() {
         instance = null;
-        Log.d("BUG", "clear donor instance");
     }
 
-
-    public void onStop(Context context) {
-        Log.i("BUG", "onStop in Donor");
-        SharedPreferences.Editor editor = getEditor(context);
-        editor.putInt(Donor.KEY_DONATION_COUNT, donationCount);
-        editor.apply();
-    }
 }

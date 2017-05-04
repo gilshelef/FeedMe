@@ -18,9 +18,19 @@ import com.gilshelef.feedme.nonprofit.adapters.CartAdapter;
 import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
+import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.OnUpdateCount;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.MutableData;
+import com.google.firebase.database.Transaction;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by gilshe on 3/17/17.
@@ -123,8 +133,20 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
         snackbar.show();
     }
 
+    // task that notify data base that current non profit wants to take these donations.
+    // the task return only the donation that were in-fact taken and marked with nonprofit's id.
+    // add each donation taken to non-profit's data base reference in order to display in app (owned fragment)
     private class TakeDonationsTask extends AsyncTask<Void, Void, Void> {
         private ProgressDialog progress;
+        private List<String> takenDonations;
+        private AtomicInteger counter;
+        private final int counterBarrier;
+
+        TakeDonationsTask(){
+            takenDonations = new LinkedList<>();
+            counter = new AtomicInteger(0);
+            counterBarrier = mDataSource.size();
+        }
 
         @Override
         protected void onPreExecute(){
@@ -138,24 +160,52 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
 
         @Override
         protected Void doInBackground(Void... params) {
-            //TODO notify data base with my donations - mysql
-            //TODO notify service
-            //TODO change checkout event only for donations that were TAKEN!
-            //TODO notify db that donation taken - donation id + non profit id
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            DatabaseReference donationRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONATION);
+            final DatabaseReference nonProfitRef = FirebaseDatabase.getInstance().getReference()
+                    .child(Constants.DB_NON_PROFIT)
+                    .child(NonProfit.get(getContext()).getId())
+                    .child(Constants.DB_DONATION);
+
+            for (final Donation donation : mDataSource){
+                donationRef.child(donation.getId())
+                        .runTransaction(new Transaction.Handler() {
+                            @Override
+                            public Transaction.Result doTransaction(MutableData mutableData) {
+                                Donation d = mutableData.getValue(Donation.class);
+                                if (d == null || !d.isAvailable())
+                                    return Transaction.abort();
+                                if(d.isAvailable()){
+                                    d.setState(Donation.State.TAKEN);
+                                    d.setNonProfitId(NonProfit.get(getActivity()).getId());
+                                    mutableData.setValue(d);
+                                }
+                                return Transaction.success(mutableData);
+                            }
+
+                            @Override
+                            public void onComplete(DatabaseError error, boolean committed, DataSnapshot dataSnapshot) {
+                                if(committed){
+                                    Donation current = dataSnapshot.getValue(Donation.class);
+                                    takenDonations.add(current.getId());
+                                    nonProfitRef.child(current.getId()).setValue(true);
+                                }
+                                
+                                if(counter.incrementAndGet() == counterBarrier)
+                                    onTransactionsComplete();
+                            }
+                        });
             }
+
+            //TODO notify service that manages time of donations
             return null;
         }
-        @Override
-        protected void onPostExecute(Void result) {
-            DataManager.get(getActivity()).ownedEvent(mDataSource);
+        
+        private void onTransactionsComplete(){
+            //TODO make sure this runs on UI thread
+            if(progress != null && progress.isShowing()) progress.dismiss();
+            DataManager.get(getActivity()).ownedEvent(takenDonations);
             ((OnCounterChangeListener)getActivity()).updateViewCounters();
-            if(progress != null) progress.dismiss();
         }
-
     }
 }
 

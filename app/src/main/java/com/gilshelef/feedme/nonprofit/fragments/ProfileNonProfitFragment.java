@@ -50,7 +50,7 @@ public class ProfileNonProfitFragment extends Fragment {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
         mNonProfit = NonProfit.get(getActivity());
-        mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT_KEY).child(mNonProfit.getId());
+        mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT).child(mNonProfit.getId());
     }
 
     @Override

@@ -7,6 +7,8 @@ import java.io.Serializable;
  */
 
 public interface Type extends Serializable {
+    String K_HEBREW = "hebrewName";
+
     String hebrew();
     String english();
     int defaultThumbnail();

@@ -39,7 +39,7 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_non_profit);
 
-        mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT_KEY);
+        mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT);
 
         //views
         mNonProfitName = (EditText) findViewById(R.id.non_profit_name);
@@ -95,7 +95,6 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
             writeNewNonProfit();
 
     }
-
     private void writeNewNonProfit() {
         NonProfit nonProfit = new NonProfit(
                 "",

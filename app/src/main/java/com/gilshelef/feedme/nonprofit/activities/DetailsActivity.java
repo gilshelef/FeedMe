@@ -148,11 +148,11 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
 
     private void sendDataAndFinish() {
         Intent intent = new Intent();
-        intent.putExtra(Constants.DONATION_ID, donation.getId());
-        intent.putExtra(Constants.DONATION_STATE, donation.getState().name());
-        intent.putExtra(Constants.IN_CART, donation.getInCart());
-        intent.putExtra(Constants.DONATION_DESCRIPTION, donation.getDescription());
-        intent.putExtra(Constants.DONATION_TIME, donation.calenderToString());
+        intent.putExtra(Donation.K_ID, donation.getId());
+        intent.putExtra(Donation.K_STATE, donation.getState().name());
+        intent.putExtra(Donation.K_CART, donation.getInCart());
+        intent.putExtra(Donation.K_DESCRIPTION, donation.getDescription());
+        intent.putExtra(Donation.K_CALENDAR, donation.calenderToString());
         setResult(RESULT_OK, intent);
         finish();
     }

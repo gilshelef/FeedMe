@@ -14,11 +14,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
+import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -143,7 +143,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             Log.i(TAG, "no permission for my position enable");
             return;
         }
-        //TODO why not showing?
+//        mDataSource = DataManager.get(getActivity()).getAll(getActivity());
         new DrawDonationTask().execute();
     }
 

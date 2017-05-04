@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.util.Constants;
@@ -25,8 +26,16 @@ import java.util.Locale;
 public class Donation implements Parcelable{
 
     private static final String TAG = Donation.class.getSimpleName();
+    public static final String K_ID = "id";
+    public static final String K_DONOR_ID = "donorId";
+    public static final String K_NON_PROFIT_ID = "nonProfitId";
+    public static final String K_DESCRIPTION = "description";
+    public static final String K_IMAGE = "imageUrl";
+    public static final String K_STATE = "state";
+    public static final String K_CART = "inCart";
+    public static final String K_CALENDAR = "calendar";
 
-    public enum State {AVAILABLE, SAVED, OWNED, DONOR, TAKEN, UNAVAILABLE}
+    public enum State {SAVED, OWNED, DONOR, AVAILABLE, TAKEN, UNAVAILABLE} //no use for UNAVAILABLE
 
     //donor's property
     @Exclude
@@ -44,6 +53,7 @@ public class Donation implements Parcelable{
 
     private String id;
     public String donorId;
+    public String nonProfitId;
     public String description;
     public String imageUrl;
     private State state;
@@ -53,11 +63,9 @@ public class Donation implements Parcelable{
     @Exclude
     public Calendar calendar;
 
-
     public Donation(){
         inCart = false;
     }
-
     public Donation(JSONObject obj) {
         inCart = false;
         try {
@@ -110,10 +118,14 @@ public class Donation implements Parcelable{
         return businessName;
     }
 
+    public String getCalendar() {
+        return calenderToString();
+    }
     public String getId() {
         return id;
     }
     public String getDonorId(){ return donorId; }
+    public String getNonProfitId(){ return nonProfitId; }
     public String calenderToString() {
         Locale locale = new Locale.Builder().setLanguage("he").build();
         SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT, locale);
@@ -141,7 +153,6 @@ public class Donation implements Parcelable{
     public State getState() {
         return state;
     }
-
     private String safeStringGet(JSONObject obj, String key) {
         if(obj.has(key))
             try {
@@ -171,6 +182,14 @@ public class Donation implements Parcelable{
     public boolean isSaved() {
         return state.equals(State.SAVED);
     }
+    @Exclude
+    public boolean isTaken() {
+        return state.equals(State.TAKEN);
+    }
+    @Exclude
+    public boolean isUnavailable() {
+        return state.equals(State.UNAVAILABLE);
+    }
 
     //setters
     public void setInCart(boolean val) {
@@ -189,8 +208,49 @@ public class Donation implements Parcelable{
         this.state = state;
     }
     public void setDonorId(String donorId) { this.donorId = donorId; }
-    public void setType(Type type) {this.type = type; }
+    public void setNonProfitId(String nonProfitId){ this.nonProfitId = nonProfitId; }
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
 
+    //donor's data
+    public void setType(Type type) {this.type = type; }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public void setPosition(LatLng position) {
+        this.position = position;
+    }
+    public void setBusinessName(String businessName) {
+        this.businessName = businessName;
+    }
+
+    public void update(Donation other) {
+        if(other == null)
+            return;
+        if (!getId().equals(other.getId())) {
+            Log.e(TAG, "got update for different donations");
+            return;
+        }
+
+        if (!getDonorId().equals(other.getDonorId())) {
+            Log.e(TAG, "got update for different donors");
+            return;
+        }
+
+        setDescription(other.getDescription());
+        setImageUrl(other.getImageUrl());
+        setState(other.getState());
+        setInCart(other.getInCart());
+        setCalendar(other.getCalendar());
+        AdapterManager.get().updateDataSourceAll();
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -204,7 +264,6 @@ public class Donation implements Parcelable{
     public int hashCode() {
         return id.hashCode();
     }
-
     public static final Parcelable.Creator<Donation> CREATOR = new Creator<Donation>() {
         public Donation createFromParcel(Parcel source) {
             Donation donation = new Donation();

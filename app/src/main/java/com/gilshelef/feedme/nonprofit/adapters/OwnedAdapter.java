@@ -6,13 +6,17 @@ import android.support.v7.app.AlertDialog;
 import android.view.View;
 import android.widget.Toast;
 
-import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
+import com.gilshelef.feedme.util.Constants;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by gilshe on 3/21/17.
@@ -41,7 +45,14 @@ public class OwnedAdapter extends RecycledBaseAdapter {
         builder.setMessage(R.string.dialog_return_donation);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                //TODO notify data base, service!
+                Map<String, Object> updates = new HashMap<>();
+                updates.put(Donation.K_STATE, Donation.State.AVAILABLE);
+                updates.put(Donation.K_NON_PROFIT_ID, null);
+                FirebaseDatabase.getInstance().getReference()
+                        .child(Constants.DB_DONATION)
+                        .child(donation.getId())
+                        .updateChildren(updates);
+
                 DataManager.get(mActivity).returnOwnedDonation(donation.getId());
                 Toast.makeText(mActivity, R.string.returned_donation_successfully, Toast.LENGTH_LONG).show();
                 ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
@@ -49,7 +60,7 @@ public class OwnedAdapter extends RecycledBaseAdapter {
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                DataManager.get(mActivity).ownedEvent(Arrays.asList(donation));
+                DataManager.get(mActivity).ownedEvent(Arrays.asList(donation.getId()));
                 ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
             }
         });

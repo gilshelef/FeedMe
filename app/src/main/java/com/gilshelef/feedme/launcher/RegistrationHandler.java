@@ -70,7 +70,6 @@ public class RegistrationHandler {
         return true;
     }
 
-
     public static boolean isEmpty(EditText field) {
         boolean empty = false;
         if(field.getText().toString().trim().equals("")){
@@ -114,8 +113,7 @@ public class RegistrationHandler {
             if(progress != null) progress.dismiss();
             if(!listed)
                 Toast.makeText(activity, RESULT_UNKNOWN_NON_PROFIT, Toast.LENGTH_LONG).show();
-            else
-                callback.onResult(listed);
+            callback.onResult(listed);
         }
     }
 //    private static class ResolveAddressTask extends AsyncTask<Void, Void, Boolean> {
@@ -167,7 +165,7 @@ public class RegistrationHandler {
 //        protected void onPostExecute(Boolean listed){
 //            if(progress != null) progress.dismiss();
 //            if(listed) {
-//                editor.putString(NonProfit.KEY_ID, uuid);
+//                editor.putString(NonProfit.K_ID, uuid);
 //                editor.apply();
 //                finish(RESULT_OK);
 //            }

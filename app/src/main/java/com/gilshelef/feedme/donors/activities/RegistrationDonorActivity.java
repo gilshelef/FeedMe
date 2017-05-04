@@ -50,7 +50,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_donor);
-        mDonorRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONOR_KEY);
+        mDonorRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONOR);
 
         mSpinner = (Spinner) findViewById(R.id.donation_type_spinner);
         List<Type> typesArray = TypeManager.get().getAll();
@@ -125,23 +125,23 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
 
         // to database
         String donorId = mDonorRef.push().getKey();
-        Log.d("BUG", "creating new donor with id: " + donorId);
+        Log.d(TAG, "creating new donor with id: " + donorId);
         donor.setId(donorId);
         mDonorRef.child(donorId).setValue(donor);
 
         // to shared prefs
         SharedPreferences prefs = getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
-        editor.putString(Donor.KEY_BUIS_NAME, mBusinessName.getText().toString());
-        editor.putString(Donor.KEY_FIRST_NAME, mContactFirstName.getText().toString());
-        editor.putString(Donor.KEY_LAST_NAME, mContactLastName.getText().toString());
-        editor.putString(Donor.KEY_PHONE, mContactPhone.getText().toString());
-        editor.putString(Donor.KEY_ADDRESS, mDonorAddress.getText().toString());
-        editor.putFloat(Donor.KEY_LAT, (float) mLatLng.latitude);
-        editor.putFloat(Donor.KEY_LNG, (float) mLatLng.longitude);
-        editor.putString(Donor.KEY_TYPE, donationTypeStr);
-        editor.putString(Donor.KEY_ID, donorId);
-        editor.putInt(Donor.KEY_DONATION_COUNT, 0);
+        editor.putString(Donor.K_BUSINESS, mBusinessName.getText().toString());
+        editor.putString(Donor.K_FIRST_NAME, mContactFirstName.getText().toString());
+        editor.putString(Donor.K_LAST_NAME, mContactLastName.getText().toString());
+        editor.putString(Donor.K_PHONE, mContactPhone.getText().toString());
+        editor.putString(Donor.K_ADDRESS, mDonorAddress.getText().toString());
+        editor.putFloat(Donor.K_LAT, (float) mLatLng.latitude);
+        editor.putFloat(Donor.K_LNG, (float) mLatLng.longitude);
+        editor.putString(Donor.K_TYPE, donationTypeStr);
+        editor.putString(Donor.K_ID, donorId);
+        editor.putInt(Donor.K_DONATION_COUNT, 0);
         editor.apply();
 
         finish(RESULT_OK);
