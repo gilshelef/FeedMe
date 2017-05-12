@@ -145,7 +145,7 @@ public class NonProfit {
         instance = null;
     }
 
-    public boolean isOwner(Donation donation) {
+    public synchronized boolean isOwner(Donation donation) {
         return donation.getNonProfitId() != null && donation.getNonProfitId().equals(getId());
     }
 }

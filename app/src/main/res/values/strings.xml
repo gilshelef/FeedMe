@@ -66,6 +66,7 @@
     <string name="time_to_pick" formatted="false">ניתן לאסוף עד %1$s</string>
     <string name="first_name">שם פרטי</string>
     <string name="last_name">שם משפחה</string>
-    <string name="edit_contact_deatils">ערוך פרטי התקשרות</string>
+    <string name="edit_contact_details">ערוך פרטי התקשרות</string>
+    <string name="mark_taken">לקחתי את התרומה</string>
 
 </resources>

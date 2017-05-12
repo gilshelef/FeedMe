@@ -30,6 +30,7 @@ public class Donation implements Parcelable{
     public static final String K_STATE = "state";
     public static final String K_CART = "inCart";
     public static final String K_CALENDAR = "calendar";
+    public static final String K_TAKEN = "taken";
 
     public enum State {SAVED, DONOR, OWNED, AVAILABLE} //no use for UNAVAILABLE
 

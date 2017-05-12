@@ -21,23 +21,23 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.gilshelef.feedme.util.OnInfoUpdateListener;
-import com.gilshelef.feedme.util.Constants;
-import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
-import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
-import com.gilshelef.feedme.nonprofit.fragments.ProfileNonProfitFragment;
 import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
 import com.gilshelef.feedme.nonprofit.fragments.CartFragment;
 import com.gilshelef.feedme.nonprofit.fragments.ListFragment;
 import com.gilshelef.feedme.nonprofit.fragments.MapFragment;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.nonprofit.fragments.OwnedFragment;
+import com.gilshelef.feedme.nonprofit.fragments.ProfileNonProfitFragment;
 import com.gilshelef.feedme.nonprofit.fragments.SaveFragment;
 import com.gilshelef.feedme.nonprofit.fragments.ToggleHomeBar;
+import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
@@ -219,20 +219,29 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         if (requestCode == Constants.DETAILS_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 //get data from result
+
                 String donationId = data.getStringExtra(Donation.K_ID);
                 Donation.State state = Donation.State.valueOf(data.getStringExtra(Donation.K_STATE));
-                boolean inCart = data.getBooleanExtra(Donation.K_CART, false);
+                boolean taken = data.getBooleanExtra(Donation.K_TAKEN, false);
 
-                // update save events
-                if (state == Donation.State.SAVED)
-                    DataManager.get(this).saveEvent(donationId);
-                else
-                    DataManager.get(this).unSaveEvent(donationId);
+                if(state.equals(Donation.State.OWNED)) {
+                    if (taken) DataManager.get(this).takenEvent(donationId);
+                }
 
-                //update cart events
-                if (inCart)
-                   DataManager.get(this).addToCartEvent(donationId);
-                else DataManager.get(this).removeFromCartEvent(donationId);
+                else { // id donation is not owned, i.e saved, available
+                    boolean inCart = data.getBooleanExtra(Donation.K_CART, false);
+
+                    // update save events
+                    if (state.equals(Donation.State.SAVED))
+                        DataManager.get(this).saveEvent(donationId);
+                    else
+                        DataManager.get(this).unSaveEvent(donationId);
+
+                    //update cart events
+                    if (inCart)
+                        DataManager.get(this).addToCartEvent(donationId);
+                    else DataManager.get(this).removeFromCartEvent(donationId);
+                }
 
                 updateViewCounters();
                 AdapterManager.get().updateDataSourceAll();

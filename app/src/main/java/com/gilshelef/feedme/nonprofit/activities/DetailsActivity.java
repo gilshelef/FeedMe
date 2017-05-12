@@ -16,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -68,20 +69,21 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         }
     };
 
-    Donation donation;
-    ImageButton exit;
-    LikeButton save;
-    ImageView thumbnail;
-    TextView business;
-    TextView description;
-    View contactBtn;
-    TextView contactInfo;
-    TextView timeInfo;
-    View timeBtn;
-    View addressBtn;
-    TextView addressInfo;
-    Button addToCartBtn;
-    ImageButton editDescription;
+    private Donation donation;
+    private ImageButton exit;
+    private LikeButton save;
+    private ImageView thumbnail;
+    private TextView business;
+    private TextView description;
+    private View contactBtn;
+    private TextView contactInfo;
+    private TextView timeInfo;
+    private View timeBtn;
+    private View addressBtn;
+    private TextView addressInfo;
+    private Button addToCartBtn;
+    private ImageButton editDescription;
+    private CheckBox takenCheckBox;
 
 
     @Override
@@ -122,6 +124,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         if(donation.isOwned() || donation.isDonor()) {
             save.setVisibility(View.GONE);
             addToCartBtn.setVisibility(View.GONE);
+            if(donation.isOwned()) findViewById(R.id.taken_container).setVisibility(View.VISIBLE);
         }
         else styleCartBtn();
 
@@ -154,6 +157,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         intent.putExtra(Donation.K_CART, donation.getInCart());
         intent.putExtra(Donation.K_DESCRIPTION, donation.getDescription());
         intent.putExtra(Donation.K_CALENDAR, donation.calenderToString());
+        intent.putExtra(Donation.K_TAKEN, takenCheckBox.isChecked());
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -172,16 +176,19 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         editDescription = (ImageButton) findViewById(R.id.edit_description);
 
         //contact
-        contactBtn = findViewById(R.id.details_contact);
+        contactBtn = findViewById(R.id.contact_container);
         contactInfo = (TextView) findViewById(R.id.details_contact_info);
 
         //time
         timeInfo = (TextView) findViewById(R.id.details_time_info);
-        timeBtn = findViewById(R.id.details_time);
+        timeBtn = findViewById(R.id.time_container);
 
         //address
-        addressBtn = findViewById(R.id.details_address);
+        addressBtn = findViewById(R.id.address_container);
         addressInfo = (TextView) findViewById(R.id.details_address_info);
+
+        //taken
+        takenCheckBox = (CheckBox) findViewById(R.id.mark_taken_checkbox);
 
         addToCartBtn = (Button) findViewById(R.id.details_add_to_cart);
 
