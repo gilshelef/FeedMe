@@ -9,7 +9,6 @@ import android.widget.Toast;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
-import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -55,13 +54,11 @@ public class OwnedAdapter extends RecycledBaseAdapter {
 
                 DataManager.get(mActivity).returnOwnedDonation(donation.getId());
                 Toast.makeText(mActivity, R.string.returned_donation_successfully, Toast.LENGTH_LONG).show();
-                ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 DataManager.get(mActivity).ownedEvent(Arrays.asList(donation.getId()));
-                ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
             }
         });
 

@@ -132,9 +132,9 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void onCameraEvent() {
-        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (takePictureIntent.resolveActivity(getPackageManager()) != null)
-            startActivityForResult(takePictureIntent, AddDonationFragment.REQUEST_IMAGE_CAPTURE);
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null)
+            startActivityForResult(intent, AddDonationFragment.REQUEST_IMAGE_CAPTURE);
     }
 
     @Override
@@ -168,14 +168,16 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
                 String description = data.getStringExtra(Donation.K_DESCRIPTION);
                 String calenderStr = data.getStringExtra(Donation.K_CALENDAR);
 
-                DonationsManager.get().update(donationId, description, calenderStr);
+                DonationsManager.get(this).update(donationId, description, calenderStr);
             }
         }
-        else if (requestCode == AddDonationFragment.REQUEST_IMAGE_CAPTURE)
+
+        else if (requestCode == AddDonationFragment.REQUEST_IMAGE_CAPTURE){
             mFragments.get(AddDonationFragment.TAG).onActivityResult(requestCode, resultCode, data);
-
-
+        }
     }
+
+
     @Override
     public void onBackPressed () {
     }

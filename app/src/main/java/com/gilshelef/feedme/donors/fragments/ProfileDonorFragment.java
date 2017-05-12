@@ -352,12 +352,11 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.d("BUG", "onItemSelected");
         String donationType = parent.getItemAtPosition(position).toString();
-        Donor.get(getActivity()).setTypeByString(getContext(), donationType);
-        mDonorRef.child("donationType")
-                .setValue(TypeManager.get().getType(donationType));
-        DonationsManager.get().updateProfile(getContext());
+        Donor donor = Donor.get(getActivity());
+        donor.setTypeByString(getContext(), donationType);
+        mDonorRef.child(Donor.K_TYPE).setValue(donor.getDonationType());
+        DonationsManager.get((OnCounterChangeListener) getActivity()).updateProfile(getContext());
         Toast.makeText(getActivity(), R.string.donation_type_changed_successfully, Toast.LENGTH_LONG).show();
     }
 
@@ -400,6 +399,8 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
                     mDonationRef.updateChildren(donationToRemove);
                     mDonorRef.removeValue();
+
+                    DonationsManager.get().removeImages(donationToRemove.keySet());
                     if(DonationsManager.get() != null)
                         DonationsManager.get().clear();
                 }

@@ -26,30 +26,32 @@ import java.util.Map;
 /**
  * Created by gilshe on 2/25/17.
  * class handles all data related issues
+ *
+ * Donation - Available, Saved, Taken, Owned
  */
 
 public class DataManager {
 
-    private Map<String, Donation> donations; // holding only available and saved items
-    private Map<String, Donation> ownedDonations;
+    private final Map<String, Donation> mDonations; // holding only available and saved items
+//    private Map<String, Donation> ownedDonations;
     private static DataManager instance;
-    private boolean initialized;
-    private final NonProfit nonProfit;
-    private OnCounterChangeListener listener;
+//    private boolean initialized;
+    private final NonProfit mNonProfit;
+    private OnCounterChangeListener mListener;
     private static String TAG = DataManager.class.getSimpleName();
 
     private DataManager(Context context){
-        donations = new LinkedHashMap<>();
-        ownedDonations = new LinkedHashMap<>();
-        initialized = false;
-        this.listener = (OnCounterChangeListener)context;
-        this.nonProfit = NonProfit.get(context);
+        mDonations = new LinkedHashMap<>();
+//        ownedDonations = new LinkedHashMap<>();
+//        initialized = false;
+        this.mListener = (OnCounterChangeListener)context;
+        this.mNonProfit = NonProfit.get(context);
         new FetchDataTask(new OnResult() {
             @Override
             public void onResult() {
-                initialized = true;
+//                initialized = true;
                 AdapterManager.get().updateDataSourceAll();
-                listener.updateViewCounters();
+                mListener.updateViewCounters();
             }
         }).execute();
     }
@@ -69,67 +71,15 @@ public class DataManager {
         return instance;
     }
 
-//    private void getDonationsFromFile(Context context){
-//        try {
-//            // Load data
-//            String jsonString = loadJsonFromAsset("donations.json", context);
-//            JSONObject json = new JSONObject(jsonString);
-//            JSONArray donations = json.getJSONArray("donations");
-//
-//            // Get Donation objects from data
-//            for(int i = 0; i < donations.length(); i++){
-//                JSONObject obj = donations.getJSONObject(i);
-//                Donation donation = new Donation(obj);
-//
-//                //TODO assuming donations from data base arrive as available/owned, saved donations locally
-//                String state = obj.getString("state");
-//                if(state.equals(AVAILABLE))
-//                    donation.setState(Donation.State.AVAILABLE);
-//                else donation.setState(Donation.State.SAVED);
-//
-//                String id = donation.getId();
-//                this.donations.put(id, donation);
-//            }
-//        } catch (JSONException e) {
-//            e.printStackTrace();
-//        }
-//    }
-//
-//    private static String loadJsonFromAsset(String filename, Context context) {
-//        String json;
-//
-//        try {
-//            InputStream is = context.getAssets().open(filename);
-//            int size = is.available();
-//            byte[] buffer = new byte[size];
-//            is.read(buffer);
-//            is.close();
-//            json = new String(buffer, "UTF-8");
-//        }
-//        catch (java.io.IOException ex) {
-//            ex.printStackTrace();
-//            return null;
-//        }
-//
-//        return json;
-//    }
-
     public List<Donation> getSaved(Context context) {
         final List<Donation> saved = new ArrayList<>();
 
-        OnResult callback = new OnResult(){
-            @Override
-            public void onResult() {
-                for(Donation d: donations.values())
-                    if(d.isSaved())
-                        saved.add(d);
-            }
-        };
+        synchronized (mDonations){
+            for(Donation d: mDonations.values())
+                if(d.isSaved())
+                    saved.add(d);
+        }
 
-        if(!initialized)
-            new FetchDataTask(callback).execute();
-
-        else callback.onResult();
         return saved;
 
     }
@@ -137,22 +87,18 @@ public class DataManager {
     public List<Donation> getAll(Context context) {
         final List<Donation> all = new ArrayList<>();
 
-        OnResult callback = new OnResult(){
-            @Override
-            public void onResult() {
-                all.addAll(donations.values());
-            }
-        };
-        if(!initialized)
-            new FetchDataTask(callback).execute();
+        synchronized (mDonations){
+            for(Donation d: mDonations.values())
+                if(d.isAvailable() || d.isSaved())
+                    all.add(d);
+        }
 
-        else callback.onResult();
         return all;
     }
 
     public List<Donation> getInCart() {
         final List<Donation> inCart = new ArrayList<>();
-        for(Donation d: donations.values())
+        for(Donation d: mDonations.values())
             if(d.getInCart())
                 inCart.add(d);
         return inCart;
@@ -160,53 +106,58 @@ public class DataManager {
 
     public List<Donation> getOwned() {
         final List<Donation> owned = new ArrayList<>();
-        owned.addAll(ownedDonations.values());
+
+        synchronized (mDonations){
+            for(Donation d: mDonations.values())
+                if(mNonProfit.isOwner(d))
+                    owned.add(d);
+        }
+
         return owned;
     }
 
     public void saveEvent(String donationId) {
-        if(!donations.containsKey(donationId))
+        if(!mDonations.containsKey(donationId))
             return;
-        Donation d = donations.get(donationId);
+        Donation d = mDonations.get(donationId);
         d.setState(Donation.State.SAVED);
     }
 
     public void unSaveEvent(String donationId) {
-        if(!donations.containsKey(donationId))
+        if(!mDonations.containsKey(donationId))
             return;
-        Donation d = donations.get(donationId);
+        Donation d = mDonations.get(donationId);
         d.setState(Donation.State.AVAILABLE);
     }
 
-    public int addToCartEvent(String donationId) {
-        if(!donations.containsKey(donationId))
-            return 0;
-        Donation donation = donations.get(donationId);
-        int added = donation.getInCart() ? 0: 1;
+    public void addToCartEvent(String donationId) {
+        if(!mDonations.containsKey(donationId))
+            return;
+        Donation donation = mDonations.get(donationId);
         donation.setInCart(true);
-        return added;
+
     }
 
-    public int removeFromCartEvent(String donationId) {
-        if(!donations.containsKey(donationId))
-            return 0;
-        Donation donation = donations.get(donationId);
-        int removed = donation.getInCart() ? -1 : 0;
+    public void removeFromCartEvent(String donationId) {
+        if(!mDonations.containsKey(donationId))
+            return;
+        Donation donation = mDonations.get(donationId);
         donation.setInCart(false);
-        return removed;
     }
 
     public void ownedEvent(List<String> ownedIds) {
         for(String id: ownedIds) {
-            Donation d = donations.get(id);
+            Donation d = mDonations.get(id);
             if(d == null)
                 continue;
+
             d.setState(Donation.State.OWNED);
-            ownedDonations.put(d.getId(), d);
+            d.setNonProfitId(mNonProfit.getId());
+            d.setInCart(false);
         }
 
-        donations.keySet().removeAll(ownedIds);
         AdapterManager.get().updateDataSourceAll();
+        mListener.updateViewCounters();
     }
 
     public static void applyFilter(Filter filter) {
@@ -214,15 +165,15 @@ public class DataManager {
     }
 
     public void returnOwnedDonation(String donationId) {
-        if(!ownedDonations.containsKey(donationId))
+        if(!mDonations.containsKey(donationId))
             return;
 
-        Donation donation = ownedDonations.get(donationId);
+        Donation donation = mDonations.get(donationId);
         donation.setState(Donation.State.AVAILABLE);
         donation.setInCart(false);
-        ownedDonations.remove(donationId);
-        donations.put(donationId, donation);
+        donation.setNonProfitId(null);
         AdapterManager.get().updateDataSourceAll();
+        mListener.updateViewCounters();
 
     }
 
@@ -230,102 +181,121 @@ public class DataManager {
         instance = null;
     }
 
-    private void removeDonation(String donationId) {
-        if(donations.containsKey(donationId))
-            donations.remove(donationId);
-        if(ownedDonations.containsKey(donationId))
-            ownedDonations.remove(donationId);
-    }
 
     private class FetchDataTask extends AsyncTask<Void, Void, Void> {
         private final OnResult mCallback;
+        private final DatabaseReference mDatabaseRef;
 
         FetchDataTask(OnResult callback) {
-            this.mCallback = callback;
+            mCallback = callback;
+            mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         }
 
         @Override
         protected Void doInBackground(Void... params) {
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                    .child(Constants.DB_DONATION);
 
-            ref.addChildEventListener(new ChildEventListener() {
+            mDatabaseRef.child(Constants.DB_DONATION)
+            .addChildEventListener(new ChildEventListener() {
                 @Override
                 public void onChildAdded(final DataSnapshot dataSnapshot, String prevChildKey) {
                     Log.d(TAG, "onChildAdded");
                     final Donation donation = dataSnapshot.getValue(Donation.class);
-                    donation.setCalendar(dataSnapshot.child(Donation.K_CALENDAR).getValue().toString());
 
-                    //if donation not available (taken or unavailable)
-                    if(!donation.isAvailable())
-                        return;
+                    //calendar is excluded
+//                    donation.setCalendar(dataSnapshot.child(Donation.K_CALENDAR).getValue().toString());//TODO check if calendar need change
 
-                    FirebaseDatabase.getInstance().getReference()
+                    //fetch donor's profile info
+                    mDatabaseRef
                             .child(Constants.DB_DONOR)
                             .child(donation.getDonorId())
                             .addValueEventListener(new ValueEventListener() {
                                 @Override
-                                public void onDataChange(DataSnapshot donor) {
+                                public void onDataChange(DataSnapshot dataSnapshot1) {
                                     Log.d(TAG, "onDataChange");
-                                    updateDonor(donation, donor);
+
+                                    Donor donor = dataSnapshot1.getValue(Donor.class); // TODO check for errors
+                                    Type donationType = TypeManager.get().getType(
+                                            dataSnapshot1.child(Donor.K_TYPE).child(Type.K_HEBREW).getValue().toString());
+                                    donor.setType(donationType);
+
+                                    DataSnapshot pos = dataSnapshot1.child(Donor.K_POSITION);
+                                    LatLng latLng = new LatLng(pos.child(Donor.K_LAT).getValue(Double.class),pos.child(Donor.K_LNG).getValue(Double.class));
+                                    donor.setPosition(latLng);
+                                    donor.setProfileInfo(donation);
+                                    newDonationEvent(donation);
                                 }
 
                                 @Override
                                 public void onCancelled(DatabaseError databaseError) {
                                 }
                             });
+
                 }
 
                 @Override
                 public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
                     Log.d(TAG, "onChildChanged");
-                    //donation has changed in the data base
-                    final String donationId = dataSnapshot.getKey();
+
                     final Donation newDonation = dataSnapshot.getValue(Donation.class);
+                    final Donation donation = getDonation(newDonation.getId());
 
-                    Donation donation;
-                    if(donations.containsKey(donationId))
-                        donation = donations.get(donationId);
-                    else donation = ownedDonations.get(donationId);
+                    if(!newDonation.getState().equals(donation.getState()))
+                        changeStateEvent(donation, newDonation);
 
-                    if(newDonation.isUnavailable()) // when donor removes donation
-                        removeDonation(donationId);
-                    if(newDonation.isTaken() && !nonProfit.isOwned(newDonation)) //another nonprofit took donation
-                        removeDonation(donationId);
-                    if(nonProfit.isOwned(newDonation)) // state in db is TAKEN
-                        newDonation.setState(Donation.State.OWNED);
-
-                    if(newDonation.isAvailable() && donation == null){ // donation has been removed
-                        FirebaseDatabase.getInstance().getReference()
-                                .child(Constants.DB_DONOR)
-                                .child(newDonation.getDonorId())
-                                .addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot donor) {
-                                        Log.d(TAG, "onDataChange");
-                                        updateDonor(newDonation, donor);
-                                        donations.put(newDonation.getId(), newDonation);
-                                        AdapterManager.get().updateDataSourceAll();
-                                        listener.updateViewCounters();
-                                    }
-
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                    }
-                                });
-                    }
-                    else if(donation != null) donation.update(newDonation);
-                    AdapterManager.get().updateDataSourceAll();
-                    listener.updateViewCounters();
+                    else donation.update(newDonation);
                 }
+
+//                @Override
+//                public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
+//                    Log.d(TAG, "onChildChanged");
+//
+//                    //donation has changed in the data base
+//                    final String donationId = dataSnapshot.getKey();
+//                    final Donation newDonation = dataSnapshot.getValue(Donation.class);
+//
+//                    Donation donation;
+//                    if(mDonations.containsKey(donationId))
+//                        donation = mDonations.get(donationId);
+//                    else donation = ownedDonations.get(donationId);
+//
+//                    //TODO
+//                    if(newDonation.isUnavailable()) // when donor removes donation
+//                        removeDonation(donationId);
+//                    if(newDonation.isTaken() && !mNonProfit.isOwner(newDonation)) //another nonprofit took donation
+//                        removeDonation(donationId);
+//                    if(mNonProfit.isOwner(newDonation)) // state in db is TAKEN
+//                        newDonation.setState(Donation.State.OWNED);
+//
+//                    if(newDonation.isAvailable() && donation == null){ // donation has been removed
+//                        FirebaseDatabase.getInstance().getReference()
+//                                .child(Constants.DB_DONOR)
+//                                .child(newDonation.getDonorId())
+//                                .addListenerForSingleValueEvent(new ValueEventListener() {
+//                                    @Override
+//                                    public void onDataChange(DataSnapshot dataSnapshot1) {
+//                                        Log.d(TAG, "onDataChange");
+//                                        updateDonor(newDonation, dataSnapshot1);
+//                                        mDonations.put(newDonation.getId(), newDonation);
+//                                        AdapterManager.get().updateDataSourceAll();
+//                                        mListener.updateViewCounters();
+//                                    }
+//
+//                                    @Override
+//                                    public void onCancelled(DatabaseError databaseError) {
+//                                    }
+//                                });
+//                    }
+//                    else if(donation != null) donation.update(newDonation);
+//                    AdapterManager.get().updateDataSourceAll();
+//                    mListener.updateViewCounters();
+//                }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {
                     Log.d(TAG, "onChildRemoved");
-                    //donations has been removed
+                    //mDonations has been removed
                     final String donationId = dataSnapshot.getKey();
-                    donations.remove(donationId);
-                    AdapterManager.get().updateDataSourceAll();
+                    removeDonation(donationId);
                 }
 
                 @Override
@@ -337,31 +307,31 @@ public class DataManager {
             return null;
         }
 
-        private void updateDonor(Donation donation, DataSnapshot donor) {
-            if(donor.getValue() == null)
-                return;
-
-            String hebrewType = donor.child(Donor.K_TYPE).child(Type.K_HEBREW).getValue().toString();
-            donation.setType(TypeManager.get().getType(hebrewType));
-            donation.setPhone(donor.child(Donor.K_PHONE).getValue().toString());
-            donation.setFirstName(donor.child(Donor.K_FIRST_NAME).getValue().toString());
-            donation.setLastName(donor.child(Donor.K_LAST_NAME).getValue().toString());
-
-            DataSnapshot pos = donor.child(Donor.K_POSITION);
-            double lat = Double.valueOf(pos.child(Donor.K_LAT).getValue().toString());
-            double lng = Double.valueOf(pos.child(Donor.K_LNG).getValue().toString());
-
-            donation.setPosition(new LatLng(lat, lng));
-            donation.setBusinessName(donor.child(Donor.K_BUSINESS).getValue().toString());
-
-            if(nonProfit.isOwned(donation)) {
-                donation.setState(Donation.State.OWNED);
-                ownedDonations.put(donation.getId(), donation);
-            }
-            else donations.put(donation.getId(), donation);
-            AdapterManager.get().updateDataSourceAll();
-            listener.updateViewCounters();
-        }
+//        private void updateDonor(Donation donation, DataSnapshot donor) {
+//            if(donor.getValue() == null)
+//                return;
+//
+//            String hebrewType = donor.child(Donor.K_TYPE).child(Type.K_HEBREW).getValue().toString();
+//            donation.setType(TypeManager.get().getType(hebrewType));
+//            donation.setPhone(donor.child(Donor.K_PHONE).getValue().toString());
+//            donation.setFirstName(donor.child(Donor.K_FIRST_NAME).getValue().toString());
+//            donation.setLastName(donor.child(Donor.K_LAST_NAME).getValue().toString());
+//
+//            DataSnapshot pos = donor.child(Donor.K_POSITION);
+//            double lat = Double.valueOf(pos.child(Donor.K_LAT).getValue().toString());
+//            double lng = Double.valueOf(pos.child(Donor.K_LNG).getValue().toString());
+//
+//            donation.setPosition(new LatLng(lat, lng));
+//            donation.setBusinessName(donor.child(Donor.K_BUSINESS).getValue().toString());
+//
+//            if(mNonProfit.isOwner(donation)) {
+//                donation.setState(Donation.State.OWNED);
+//                ownedDonations.put(donation.getId(), donation);
+//            }
+//            else mDonations.put(donation.getId(), donation);
+//            AdapterManager.get().updateDataSourceAll();
+//            mListener.updateViewCounters();
+//        }
 
         @Override
         protected void onPostExecute(Void v) {
@@ -369,4 +339,31 @@ public class DataManager {
                 mCallback.onResult();
         }
     }
+
+    private void changeStateEvent(Donation donation, Donation newDonation) {
+        //TODO
+    }
+
+    private Donation getDonation(String id) {
+        Donation donation = null;
+        if(mDonations.containsKey(id))
+            donation = mDonations.get(id);
+        return  donation;
+    }
+
+    private void newDonationEvent(Donation donation) {
+        mDonations.put(donation.getId(), donation);
+        AdapterManager.get().updateDataSourceAll();
+        mListener.updateViewCounters();
+
+    }
+
+    private void removeDonation(String id) {
+        if(mDonations.containsKey(id))
+            mDonations.remove(id);
+        AdapterManager.get().updateDataSourceAll();
+        mListener.updateViewCounters();
+    }
+
+
 }

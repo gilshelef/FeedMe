@@ -6,13 +6,9 @@ import android.util.Log;
 
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.types.Type;
-import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -35,7 +31,7 @@ public class Donation implements Parcelable{
     public static final String K_CART = "inCart";
     public static final String K_CALENDAR = "calendar";
 
-    public enum State {SAVED, OWNED, DONOR, AVAILABLE, TAKEN, UNAVAILABLE} //no use for UNAVAILABLE
+    public enum State {SAVED, DONOR, OWNED, AVAILABLE} //no use for UNAVAILABLE
 
     //donor's property
     @Exclude
@@ -43,19 +39,19 @@ public class Donation implements Parcelable{
     @Exclude
     public String phone;
     @Exclude
-    public String firstName;
+    private String firstName;
     @Exclude
-    public String lastName;
+    private String lastName;
     @Exclude
     public LatLng position;
     @Exclude
-    public String businessName;
+    private String businessName;
 
     private String id;
-    public String donorId;
-    public String nonProfitId;
-    public String description;
-    public String imageUrl;
+    private String donorId;
+    private String nonProfitId;
+    private String description;
+    private String imageUrl;
     private State state;
     private boolean inCart;
 
@@ -65,31 +61,6 @@ public class Donation implements Parcelable{
 
     public Donation(){
         inCart = false;
-    }
-    public Donation(JSONObject obj) {
-        inCart = false;
-        try {
-            phone = safeStringGet(obj, "phone");
-            firstName = safeStringGet(obj, "firstName");
-            lastName = safeStringGet(obj, "lastName");
-            id = safeStringGet(obj, "id");
-            type = TypeManager.get().getType(safeStringGet(obj, "type"));
-            description = safeStringGet(obj, "description");
-            imageUrl = safeStringGet(obj, "imageUrl");
-            businessName = safeStringGet(obj, "businessName");
-            position = new LatLng(obj.getDouble("latitude"), obj.getDouble("longitude"));
-
-            Locale locale = new Locale.Builder().setLanguage("he").build();
-            String calenderStr = safeStringGet(obj, "calender");
-            SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT, locale);
-            Date date = sdf.parse(calenderStr);// all done
-            calendar = sdf.getCalendar();
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        } catch (ParseException e) {
-            Log.e(TAG, e.getMessage());
-        }
     }
 
     //getters
@@ -153,15 +124,6 @@ public class Donation implements Parcelable{
     public State getState() {
         return state;
     }
-    private String safeStringGet(JSONObject obj, String key) {
-        if(obj.has(key))
-            try {
-                return obj.getString(key);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        return "";
-    }
 
 
     // state
@@ -182,14 +144,7 @@ public class Donation implements Parcelable{
     public boolean isSaved() {
         return state.equals(State.SAVED);
     }
-    @Exclude
-    public boolean isTaken() {
-        return state.equals(State.TAKEN);
-    }
-    @Exclude
-    public boolean isUnavailable() {
-        return state.equals(State.UNAVAILABLE);
-    }
+
 
     //setters
     public void setInCart(boolean val) {

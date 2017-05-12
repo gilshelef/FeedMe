@@ -160,10 +160,12 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
 
         @Override
         protected Void doInBackground(Void... params) {
+            final String nonProfitId = NonProfit.get(getActivity()).getId();
+
             DatabaseReference donationRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONATION);
             final DatabaseReference nonProfitRef = FirebaseDatabase.getInstance().getReference()
                     .child(Constants.DB_NON_PROFIT)
-                    .child(NonProfit.get(getContext()).getId())
+                    .child(nonProfitId)
                     .child(Constants.DB_DONATION);
 
             for (final Donation donation : mDataSource){
@@ -175,8 +177,8 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
                                 if (d == null || !d.isAvailable())
                                     return Transaction.abort();
                                 if(d.isAvailable()){
-                                    d.setState(Donation.State.TAKEN);
-                                    d.setNonProfitId(NonProfit.get(getActivity()).getId());
+                                    d.setState(Donation.State.OWNED);
+                                    d.setNonProfitId(nonProfitId);
                                     mutableData.setValue(d);
                                 }
                                 return Transaction.success(mutableData);
@@ -201,10 +203,8 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
         }
         
         private void onTransactionsComplete(){
-            //TODO make sure this runs on UI thread
             if(progress != null && progress.isShowing()) progress.dismiss();
             DataManager.get(getActivity()).ownedEvent(takenDonations);
-            ((OnCounterChangeListener)getActivity()).updateViewCounters();
         }
     }
 }

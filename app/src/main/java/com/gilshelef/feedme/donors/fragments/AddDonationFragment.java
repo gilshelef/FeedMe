@@ -3,8 +3,10 @@ package com.gilshelef.feedme.donors.fragments;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -25,9 +27,15 @@ import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
 import java.util.Locale;
 
@@ -40,6 +48,7 @@ import static android.app.Activity.RESULT_OK;
 public class AddDonationFragment extends Fragment implements TimePickerDialog.OnTimeSetListener{
     public static final String TAG = AddDonationFragment.class.getSimpleName();
     public static final int REQUEST_IMAGE_CAPTURE = 6;
+    private static final String IMAGES = "images";
 
     private EditText description;
     private Bitmap imageBitmap;
@@ -47,11 +56,14 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     private ImageView imageView;
     private Calendar calendar;
     private DatabaseReference mDatabase;
+    private StorageReference mStorageRef;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         mDatabase = FirebaseDatabase.getInstance().getReference();
+        mStorageRef = FirebaseStorage.getInstance().getReference();
+
     }
 
 
@@ -67,7 +79,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     @Override
     public void onViewCreated (View view, Bundle savedInstanceState){
         description = (EditText) view.findViewById(R.id.donation_description);
-        View.OnClickListener timeClick = new View.OnClickListener() {
+        View.OnClickListener timeListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FragmentManager fm = getActivity().getSupportFragmentManager();
@@ -77,21 +89,19 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
             }
         };
 
-        view.findViewById(R.id.pick_time_btn).setOnClickListener(timeClick);
-        view.findViewById(R.id.time_image).setOnClickListener(timeClick);
 
-        View.OnClickListener imageClick = new View.OnClickListener() {
+        View.OnClickListener imageListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((OnCameraEvent) getActivity()).onCameraEvent();
-//                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-//                if (takePictureIntent.resolveActivity(getActivity().getPackageManager()) != null)
-//                    startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
-
             }
         };
 
-        view.findViewById(R.id.add_image_btn).setOnClickListener(imageClick);
+        view.findViewById(R.id.pick_time_btn).setOnClickListener(timeListener);
+        view.findViewById(R.id.time_image).setOnClickListener(timeListener);
+
+        view.findViewById(R.id.add_image_btn).setOnClickListener(imageListener);
+        view.findViewById(R.id.add_image).setOnClickListener(imageListener);
 
         Button addDonation = (Button) view.findViewById(R.id.add_donation_btn);
         addDonation.setOnClickListener(new View.OnClickListener() {
@@ -107,12 +117,37 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK) {
+        if(resultCode == RESULT_OK && data != null) {
             Bundle extras = data.getExtras();
             imageBitmap = (Bitmap) extras.get("data");
             imageView.setVisibility(View.VISIBLE);
-            //TODO upload to db?
         }
+
+    }
+
+    private void uploadImageToStorage(String donationId, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener) {
+
+        if(imageBitmap == null) {
+            onSuccessListener.onSuccess(null);
+            return;
+        }
+
+
+        imageView.setDrawingCacheEnabled(true);
+        imageView.buildDrawingCache();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        imageBitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] data = baos.toByteArray();
+
+        StorageReference donationRef = mStorageRef.child(donationId);
+        UploadTask uploadTask = donationRef.putBytes(data);
+        uploadTask.addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                Toast.makeText(getContext(), "Error occurred while uploading image to storage, please try again later", Toast.LENGTH_LONG).show();
+                Log.e(TAG, exception.getMessage());
+            }
+        }).addOnSuccessListener(onSuccessListener);
 
     }
 
@@ -126,34 +161,38 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     }
 
     private class UploadDonationTask extends AsyncTask<Void, Void, Boolean> {
-        private Donation donation;
+        final Donor donor = Donor.get(getActivity());
+
 
         @Override
         protected Boolean doInBackground(Void... params) {
             try {
-                final Donor donor = Donor.get(getActivity());
+                final String donationId = mDatabase.child(Constants.DB_DONATION).push().getKey();
 
-                donation = new Donation();
-                donation.type = donor.getDonationType();
-                donation.phone = donor.getPhone();
-                donation.firstName = donor.getFirstName();
-                donation.lastName = donor.getLastName();
-                donation.position = donor.getPosition();
-                donation.businessName = donor.getBusinessName();
-                donation.description = description.getText().toString();
-                donation.imageUrl = "";
+                final Donation donation = new Donation();
+                donor.setProfileInfo(donation);
+                donation.setId(donationId);
+                donation.setDescription(description.getText().toString());
+
                 Locale locale = new Locale.Builder().setLanguage("he").build();
                 donation.calendar = calendar != null ? calendar : Calendar.getInstance(locale);
 
-                //set id
-                String donationId = mDatabase.child(Constants.DB_DONATION).push().getKey();
-                donation.setId(donationId);
-                donation.donorId = donor.getId();
-                donor.updateDonationCount(getContext(), 1);
+                donation.setImageUrl("");
+                uploadImageToStorage(donationId, new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        if(taskSnapshot != null && taskSnapshot.getDownloadUrl() != null) {
+                            Uri imageUri = taskSnapshot.getDownloadUrl();
+                            DonationsManager.get().updateImageUrl(donation, imageUri.toString());
+                            Log.d(TAG, "upload new image");
+                        }
+                    }
+                });
+
                 DonationsManager.get().newDonationEvent(donation);
-                //TODO handle image
                 return true;
             }
+
             catch (Exception e){
                 Log.e(TAG, e.getMessage());
                 return false;
@@ -163,6 +202,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
         @Override
         protected void onPostExecute(Boolean result) {
             if(result) {
+                donor.updateDonationCount(getContext(), 1);
                 ((OnCounterChangeListener)getActivity()).updateViewCounters();
                 Toast.makeText(getContext(), "תרומתך הועלתה בהצלחה", Toast.LENGTH_LONG).show();
             }
@@ -177,8 +217,8 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
         this.description.setText("");
         this.timeView.setVisibility(View.GONE);
         this.imageView.setVisibility(View.GONE);
+        this.imageBitmap = null;
     }
-
 
     public interface OnCameraEvent {
         void onCameraEvent();

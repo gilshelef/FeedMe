@@ -95,6 +95,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         if(!donation.getImageUrl().isEmpty())
             Picasso.with(getApplicationContext())
                     .load(donation.getImageUrl())
+                    .placeholder(donation.getType().defaultThumbnail())
                     .fit()
                     .error(donation.getType().defaultThumbnail())
                     .into(thumbnail);
@@ -305,41 +306,4 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         Intent intent = new Intent(Intent.ACTION_VIEW, uri);
         startActivity(intent);
     }
-
-//    @Override
-//    protected void onCreate(Bundle savedInstanceState) {
-//        super.onCreate(savedInstanceState);
-//        setContentView(R.layout.popup_main);
-//
-//        Donation donation = getIntent().getParcelableExtra(EXTRA_DONATION);
-//
-//        DisplayMetrics dm = new DisplayMetrics();
-//        getWindowManager().getDefaultDisplay().getMetrics(dm);
-//
-//        int width = dm.widthPixels;
-//        int height = dm.heightPixels;
-//
-//        getWindow().setLayout((int) (width*0.6), (int)(height*0.4));
-//        TextView tv = (TextView) findViewById(R.id.popup_type);
-//        ImageView im = (ImageView) findViewById(R.id.popup_image);
-//
-//        if(!donation.getImageUrl().isEmpty())
-//            Picasso.with(getApplicationContext())
-//                    .load(donation.getImageUrl())
-//                    .fit()
-//                    .error(donation.getDonationType().defaultThumbnail())
-//                    .into(im);
-//
-//        else
-//            Picasso.with(getApplicationContext())
-//                    .load(donation.getDonationType().defaultThumbnail())
-//                    .fit()
-//                    .into(im);
-//        tv.setText(donation.getDonationType().hebrew());
-//
-//
-//        //TODO when finish pass back the donation and flag if added to cart
-//    }
-
-
 }

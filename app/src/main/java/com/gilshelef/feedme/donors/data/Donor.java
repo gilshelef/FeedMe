@@ -5,12 +5,16 @@ import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.gilshelef.feedme.launcher.RegistrationActivity;
+import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
+import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.StringTokenizer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by gilshe on 3/26/17.
@@ -34,16 +38,20 @@ public class Donor {
 
     private static Donor instance;
     private String id;
+    @Exclude
     private LatLng position;
     private String businessName;
     private String address;
     private String phone;
+    @Exclude
     private Type donationType;
     private String firstName;
     private String lastName;
-    private int donationCount;
+    @Exclude
+    private AtomicInteger donationCount;
 
 
+    public Donor(){}
     public Donor(String id, String businessName, String address, String contactFName, String contactLName, String phone, LatLng position, Type donationType, int donationCount){
         this.id = id;
         this.businessName = businessName;
@@ -53,7 +61,7 @@ public class Donor {
         this.phone = phone;
         this.position = position;
         this.donationType = donationType;
-        this.donationCount = donationCount;
+        this.donationCount = new AtomicInteger(donationCount);
     }
 
     public static Donor get(){
@@ -71,7 +79,7 @@ public class Donor {
     }
 
     private static Donor build(Context context) {
-        Log.d("BUG", "build in Donor");
+        Log.d(TAG, "build in Donor");
 
         SharedPreferences sharedPref = context.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
         String id = sharedPref.getString(K_ID, "0");
@@ -114,16 +122,19 @@ public class Donor {
         return phone;
     }
 
+    @Exclude
     public LatLng getPosition() {
         return position;
     }
 
+    @Exclude
     public Type getDonationType() {
         return donationType;
     }
 
+    @Exclude
     public int getDonationCount() {
-        return donationCount;
+        return donationCount.get();
     }
 
 
@@ -139,9 +150,15 @@ public class Donor {
         this.position = latLng;
     }
 
+    @Exclude
     public void setTypeByString(Context context, String typeStr) {
         getEditor(context).putString(Donor.K_TYPE, typeStr).apply();
-        this.donationType  = TypeManager.get().getType(typeStr);
+        donationType  = TypeManager.get().getType(typeStr);
+    }
+
+    @Exclude
+    public void setType(Type type) {
+        donationType  = type;
     }
 
     public void setBusinessName(Context context, String newBusinessName) {
@@ -183,13 +200,36 @@ public class Donor {
     }
 
     public void updateDonationCount(Context context, int delta) {
-        Log.d(TAG, "add donation: " + delta);
-        this.donationCount += delta;
-        getEditor(context).putInt(Donor.K_DONATION_COUNT, donationCount).apply();
+        Log.d(TAG, "update donations count: " + delta);
+        donationCount.addAndGet(delta);
+        FirebaseDatabase.getInstance().getReference()
+                .child(Constants.DB_DONOR)
+                .child(getId())
+                .child(Donor.K_DONATION_COUNT)
+                .setValue(donationCount.get());
+        getEditor(context).putInt(Donor.K_DONATION_COUNT, donationCount.get()).apply();
     }
 
     public void clear() {
         instance = null;
     }
 
+    public boolean isOwner(Donation d) {
+        return d.getDonorId().equals(getId());
+    }
+
+    public void setProfileInfo(Donation donation) {
+        donation.setType(getDonationType());
+        donation.setPhone(getPhone());
+        donation.setFirstName(getFirstName());
+        donation.setLastName(getLastName());
+        donation.setPosition(getPosition());
+        donation.setBusinessName(getBusinessName());
+        donation.setDonorId(getId());
+
+    }
+
+    public void setPosition(LatLng position) {
+        this.position = position;
+    }
 }

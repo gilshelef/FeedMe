@@ -14,7 +14,6 @@ import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.OnUpdateCount;
-import com.google.firebase.database.DatabaseReference;
 
 import java.util.List;
 
@@ -24,7 +23,6 @@ import java.util.List;
 
 public class MyDonationsAdapter extends RecycledBaseAdapter {
 
-    DatabaseReference mDatabase;
 
     public MyDonationsAdapter(Activity activity, List<Donation> dataSource, OnUpdateCount listener) {
         super(activity, dataSource, listener);
@@ -72,7 +70,5 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
                 dialog.show();
             }
         });
-
-//        ((OnCounterChangeListener) mActivity).updateViewCounters();
     }
 }

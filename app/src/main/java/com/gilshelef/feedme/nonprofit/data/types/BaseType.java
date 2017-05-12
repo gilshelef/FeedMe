@@ -47,8 +47,7 @@ public abstract class BaseType implements Type {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        return onEqual(o);
+        return this == o || onEqual(o);
     }
 
 

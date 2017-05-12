@@ -7,8 +7,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.like.LikeButton;
 import com.makeramen.roundedimageview.RoundedTransformationBuilder;
 import com.squareup.picasso.Picasso;
