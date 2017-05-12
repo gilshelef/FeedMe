@@ -37,7 +37,7 @@ public class SaveAdapter extends RecycledBaseAdapter {
     @Override
     public void updateDataSource() {
         mDataSource.clear();
-        mDataSource.addAll(DataManager.get(mActivity).getSaved(mActivity));
+        mDataSource.addAll(DataManager.get(mActivity).getSaved());
     }
 
 }

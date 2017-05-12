@@ -120,7 +120,6 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         if(donation.isSaved())
             save.setLiked(true);
 
-        // TODO if owned add taken button and return button
         if(donation.isOwned() || donation.isDonor()) {
             save.setVisibility(View.GONE);
             addToCartBtn.setVisibility(View.GONE);

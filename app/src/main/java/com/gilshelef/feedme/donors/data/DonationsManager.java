@@ -86,7 +86,7 @@ public class DonationsManager {
 
         // add to donor's ref
         mDatabase
-                .child(Constants.DB_DONOR)
+                .child(Constants.DB_DONOR_DONATION)
                 .child(donor.getId())
                 .child(Constants.DB_DONATION)
                 .child(donationId)
@@ -110,7 +110,7 @@ public class DonationsManager {
 
         //remove from donor ref
         mDatabase
-                .child(Constants.DB_DONOR)
+                .child(Constants.DB_DONOR_DONATION)
                 .child(donor.getId())
                 .child(Constants.DB_DONATION)
                 .child(donation.getId())

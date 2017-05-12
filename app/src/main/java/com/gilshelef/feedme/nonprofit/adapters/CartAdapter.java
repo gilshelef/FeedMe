@@ -4,7 +4,6 @@ import android.app.Activity;
 
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
-import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.OnUpdateCount;
 
 import java.util.List;
@@ -38,7 +37,8 @@ public class CartAdapter extends RecycledBaseAdapter {
     protected void onItemDismiss(Donation donation) {
         DataManager.get(mActivity).removeFromCartEvent(donation.getId());
         ((OnUpdateCount) mListener).updateItemsCount();
-        ((OnCounterChangeListener) mActivity).updateViewCounters();
+
+
 
     }
 

@@ -101,8 +101,8 @@ public class NonProfitMainActivity extends AppCompatActivity implements
 
         //create fragments
         mFragments = new HashMap<>();
-        mFragments.put(MapFragment.TAG, new MapFragment());
         mFragments.put(ListFragment.TAG, new ListFragment());
+        mFragments.put(MapFragment.TAG, new MapFragment());
         mFragments.put(CartFragment.TAG, new CartFragment());
         mFragments.put(SaveFragment.TAG, new SaveFragment());
         mFragments.put(OwnedFragment.TAG, new OwnedFragment());
@@ -358,8 +358,8 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         @Override
         protected Void doInBackground(Void... params) {
             DataManager instance = DataManager.get(getApplicationContext());
-            countHome = instance.getAll(getApplicationContext()).size();
-            countSaved = instance.getSaved(getApplicationContext()).size();
+            countHome = instance.getAll().size();
+            countSaved = instance.getSaved().size();
             countMyDonations = instance.getOwned().size();
             countCart = instance.getInCart().size();
             return null;

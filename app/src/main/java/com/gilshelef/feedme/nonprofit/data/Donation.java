@@ -4,7 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
-import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.maps.model.LatLng;
@@ -205,7 +204,6 @@ public class Donation implements Parcelable{
         setState(other.getState());
         setInCart(other.getInCart());
         setCalendar(other.getCalendar());
-        AdapterManager.get().updateDataSourceAll();
     }
     @Override
     public boolean equals(Object o) {

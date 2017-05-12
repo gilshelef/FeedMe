@@ -203,7 +203,7 @@ public class Donor {
         Log.d(TAG, "update donations count: " + delta);
         donationCount.addAndGet(delta);
         FirebaseDatabase.getInstance().getReference()
-                .child(Constants.DB_DONOR)
+                .child(Constants.DB_DONOR_DONATION)
                 .child(getId())
                 .child(Donor.K_DONATION_COUNT)
                 .setValue(donationCount.get());

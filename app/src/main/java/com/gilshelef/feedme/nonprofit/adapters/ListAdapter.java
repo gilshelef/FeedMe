@@ -33,7 +33,7 @@ public class ListAdapter extends RecycledBaseAdapter {
     @Override
     public void updateDataSource() {
         mDataSource.clear();
-        mDataSource.addAll(DataManager.get(mActivity).getAll(mActivity));
+        mDataSource.addAll(DataManager.get(mActivity).getAll());
     }
 
 }

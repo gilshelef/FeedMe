@@ -32,7 +32,7 @@ public class ListFragment extends BaseFragment {
 
     @Override
     protected List<Donation> getDataSource() {
-        return DataManager.get(getActivity()).getAll(getActivity());
+        return DataManager.get(getActivity()).getAll();
     }
 
     @Override

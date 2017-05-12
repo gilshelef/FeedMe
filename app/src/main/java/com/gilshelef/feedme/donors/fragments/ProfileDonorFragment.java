@@ -57,15 +57,17 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     private TextView phone;
     private Spinner spinner;
     private TextView medalCount;
+    private static Donor mDonor;
     private static DatabaseReference mDonorRef;
 
 
     @Override
     public void onCreate(Bundle savedInstanceState){
+        mDonor = Donor.get(getActivity());
         super.onCreate(savedInstanceState);
         mDonorRef = FirebaseDatabase.getInstance().getReference()
                 .child(Constants.DB_DONOR)
-                .child(Donor.get(getActivity()).getId());
+                .child(mDonor.getId());
     }
 
     @Override
@@ -387,6 +389,11 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
         @Override
         protected Void doInBackground(Void... params) {
+            final DatabaseReference donorDonationRef = FirebaseDatabase.getInstance().getReference()
+                    .child(Constants.DB_DONOR_DONATION)
+                    .child(mDonor.getId())
+                    .child(Constants.DB_DONATION);
+
 
             ValueEventListener listener = new ValueEventListener() {
                 @Override
@@ -399,6 +406,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
                     mDonationRef.updateChildren(donationToRemove);
                     mDonorRef.removeValue();
+                    donorDonationRef.removeValue();
 
                     DonationsManager.get().removeImages(donationToRemove.keySet());
                     if(DonationsManager.get() != null)
@@ -409,8 +417,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                 public void onCancelled(DatabaseError databaseError) {}
             };
 
-            mDonorRef.child(Constants.DB_DONATION)
-                    .addListenerForSingleValueEvent(listener);
+            donorDonationRef.addListenerForSingleValueEvent(listener);
 
             SharedPreferences prefs = mContext.getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
             prefs.edit().putBoolean(RegistrationActivity.DONOR, false).apply();

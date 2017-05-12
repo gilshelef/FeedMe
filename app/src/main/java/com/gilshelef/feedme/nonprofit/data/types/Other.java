@@ -9,6 +9,8 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 public class Other extends BaseType{
 
+    public static final String TAG = "אחר";
+
     @Override
     void setColor() {
         color = BitmapDescriptorFactory.HUE_AZURE;

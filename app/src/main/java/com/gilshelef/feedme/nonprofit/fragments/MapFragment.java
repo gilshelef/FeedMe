@@ -15,6 +15,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.nonprofit.adapters.Adaptable;
+import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
@@ -34,6 +36,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -44,7 +47,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by gilshe on 2/23/17.
  */
 
-public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
+public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, Adaptable {
 
     private static final Object CURRENT_POSITION = "position";
     public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
@@ -73,7 +76,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         }
 
         mMapView.getMapAsync(this);
-        mDataSource = DataManager.get(getActivity()).getAll(getActivity());
+        mDataSource = DataManager.get(getActivity()).getAll();
+        AdapterManager.get().setAdapter(this);
         return rootView;
     }
 
@@ -124,9 +128,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     private void setUpMap() {
         Log.d(TAG, "setUpMap");
+        mDataSource = DataManager.get(getActivity()).getAll();
+
         mMap.setOnMarkerClickListener(this);
-        NonProfit association = NonProfit.get(getActivity());
-        displayMark(association.getPosition(), association.getName());
+        NonProfit nonProfit = NonProfit.get(getActivity());
+        displayMark(nonProfit.getPosition(), nonProfit.getName());
 
         if (ActivityCompat.checkSelfPermission(getActivity(),
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
@@ -143,7 +149,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             Log.i(TAG, "no permission for my position enable");
             return;
         }
-//        mDataSource = DataManager.get(getActivity()).getAll(getActivity());
         new DrawDonationTask().execute();
     }
 
@@ -205,6 +210,23 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         return false;
     }
 
+    @Override
+    public void updateDataSource() {
+        Log.d(TAG,"updateDataSource");
+        mDataSource.clear();
+        mDataSource.addAll(DataManager.get(getActivity()).getAll());
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        new DrawDonationTask().execute();
+    }
+
+    @Override
+    public String getName() {
+        return TAG;
+    }
+
     public interface OnSearchListener {
         void onSearch();
     }
@@ -216,7 +238,8 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
         @Override
         protected Void doInBackground(Void... params) {
             optionToTag = new HashMap<>();
-            for (Donation d : mDataSource) {
+            List<Donation> toDraw = new LinkedList<>(mDataSource);
+            for (Donation d : toDraw) {
                 MarkerOptions options = new MarkerOptions();
                 options.position(d.getPosition());
                 options.title(d.getType().hebrew());

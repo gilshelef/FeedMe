@@ -36,7 +36,7 @@ public class SaveFragment extends BaseFragment{
 
     @Override
     protected List<Donation> getDataSource() {
-        return DataManager.get(getActivity()).getSaved(getActivity());
+        return DataManager.get(getActivity()).getSaved();
     }
 
     @Override
