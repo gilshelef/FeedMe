@@ -1,8 +1,10 @@
 package com.gilshelef.feedme.donors.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -28,6 +30,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -52,6 +55,8 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_donor);
+        loadPreference();
+
         mDonorRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONOR);
 
         mSpinner = (Spinner) findViewById(R.id.donation_type_spinner);
@@ -73,6 +78,21 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
         Button submit = (Button) findViewById(R.id.submit_btn);
         submit.setOnClickListener(this);
 
+    }
+
+    private String loadPreference() {
+        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
+        String language = shp.getString("Language","he");
+        Locale myLocale = new Locale(language);
+
+        Configuration config = new Configuration();
+        config.setLocale(myLocale);
+        //manually set layout direction to a LTR location
+        config.setLayoutDirection(new Locale("en"));
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        String locale = getResources().getConfiguration().locale.getDisplayName();
+        Log.d(TAG, locale);
+        return locale;
     }
 
     private void finish(int resultCode) {

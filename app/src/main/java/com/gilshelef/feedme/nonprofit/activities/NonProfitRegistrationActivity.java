@@ -1,8 +1,10 @@
 package com.gilshelef.feedme.nonprofit.activities;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -18,6 +20,8 @@ import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Locale;
 
 
 /**
@@ -38,6 +42,7 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_non_profit);
+        loadPreference();
 
         mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT);
 
@@ -80,7 +85,19 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
         }
     }
 
+    private String loadPreference() {
+        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
+        String language = shp.getString("Language","he");
+        Locale myLocale = new Locale(language);
 
+        Configuration config = new Configuration();
+        config.setLocale(myLocale);
+        //manually set layout direction to a LTR location
+        config.setLayoutDirection(new Locale("en"));
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        String locale = getResources().getConfiguration().locale.getDisplayName();
+        return locale;
+    }
     private boolean validateForm() {
         return  !RegistrationHandler.isEmpty(mNonProfitName) &&
                 !RegistrationHandler.isEmpty(mNonProfitAddress) &&

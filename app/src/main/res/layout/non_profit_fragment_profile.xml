@@ -167,6 +167,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:paddingBottom="8dp"
+        android:layout_marginBottom="30dp"
         android:elevation="8dp"
         android:layout_marginTop="24dp"
         card_view:cardCornerRadius="4dp">

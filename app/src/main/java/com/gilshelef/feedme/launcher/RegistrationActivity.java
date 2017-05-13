@@ -5,10 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.donors.activities.DonorMainActivity;
@@ -24,9 +22,6 @@ public class RegistrationActivity extends AppCompatActivity {
     public static final String NON_PROFIT = "nonProfit";
     public static final String DONOR = "donor";
     public static final String PREFS = "prefs";
-
-    private float x1,x2;
-    static final int MIN_DISTANCE = 150;
 
 
     @Override
@@ -95,25 +90,5 @@ public class RegistrationActivity extends AppCompatActivity {
         sharedPref.edit().putBoolean(key, true).apply(); // mark as listed
     }
 
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                x1 = event.getX();
-                break;
-            case MotionEvent.ACTION_UP:
-                x2 = event.getX();
-                float deltaX = x2 - x1;
-                if (Math.abs(deltaX) > MIN_DISTANCE) {
-                    Toast.makeText(this, "left2right swipe", Toast.LENGTH_SHORT).show ();
-                }
-                else {
-                    // consider as something else - a screen tap for example
-                }
-                break;
-        }
-        return super.onTouchEvent(event);
-    }
 
 }

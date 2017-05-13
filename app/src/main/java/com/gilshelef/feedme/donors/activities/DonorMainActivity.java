@@ -1,6 +1,9 @@
 package com.gilshelef.feedme.donors.activities;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.IdRes;
@@ -34,6 +37,7 @@ import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -54,6 +58,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donors);
 
+        loadPreference();
         //initialize activity's data
         TypeManager.get();
         final Donor donor = Donor.get(this);
@@ -130,6 +135,20 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         fragmentTransaction.commit();
     }
 
+    private String loadPreference() {
+        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
+        String language = shp.getString("Language","he");
+        Locale myLocale = new Locale(language);
+
+        Configuration config = new Configuration();
+        config.setLocale(myLocale);
+        //manually set layout direction to a LTR location
+        config.setLayoutDirection(new Locale("en"));
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        String locale = getResources().getConfiguration().locale.getDisplayName();
+        Log.d(TAG, locale);
+        return locale;
+    }
     @Override
     public void onCameraEvent() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);

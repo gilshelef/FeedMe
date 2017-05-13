@@ -1,6 +1,9 @@
 package com.gilshelef.feedme.nonprofit.activities;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -43,6 +46,7 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static android.widget.Toast.LENGTH_SHORT;
@@ -71,7 +75,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.non_profit_activity_main);
-
+        loadPreference();
         View main = findViewById(R.id.main);
 
         //initialize app's data
@@ -347,6 +351,22 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         NonProfit.clear();
         DataManager.clear();
     }
+
+    private String loadPreference() {
+        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
+        String language = shp.getString("Language","he");
+        Locale myLocale = new Locale(language);
+
+        Configuration config = new Configuration();
+        config.setLocale(myLocale);
+        //manually set layout direction to a LTR location
+        config.setLayoutDirection(new Locale("en"));
+        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
+        String locale = getResources().getConfiguration().locale.getDisplayName();
+        Log.d(TAG, locale);
+        return locale;
+    }
+
 
     private class NavigationViewCounterTask extends AsyncTask<Void, Void, Void>{
 
