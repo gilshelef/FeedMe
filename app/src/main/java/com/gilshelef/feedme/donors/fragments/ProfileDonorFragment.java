@@ -211,7 +211,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                                 phone.setText(newPhone);
                                 DonationsManager.get().updateProfile(getContext());
                                 updateDataBase("phone", newPhone);
-                                Toast.makeText(getActivity(), R.string.conatct_phone_changed_successfully, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), R.string.contact_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
                     }

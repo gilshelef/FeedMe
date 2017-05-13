@@ -26,7 +26,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by gilshe on 3/21/17.
@@ -111,6 +113,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
 
     private void writeNewDonor() {
         String donationTypeStr = mSpinner.getSelectedItem().toString();
+        Type donationType = TypeManager.get().getType(donationTypeStr);
         Donor donor = new Donor(
                 "",
                 mBusinessName.getText().toString(),
@@ -119,7 +122,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
                 mContactLastName.getText().toString(),
                 mContactPhone.getText().toString(),
                 mLatLng,
-                TypeManager.get().getType(donationTypeStr),
+                donationType,
                 0 // initial donationCount
         );
 
@@ -128,6 +131,12 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
         Log.d(TAG, "creating new donor with id: " + donorId);
         donor.setId(donorId);
         mDonorRef.child(donorId).setValue(donor);
+        Map<String, Object> updates = new HashMap<>();
+        updates.put(Donor.K_POSITION, mLatLng);
+        updates.put(Donor.K_TYPE, donationType);
+        mDonorRef.child(donorId)
+                .updateChildren(updates);
+
 
         // to shared prefs
         SharedPreferences prefs = getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);

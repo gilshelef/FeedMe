@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.adapters.CartAdapter;
@@ -190,10 +191,25 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
                                     Donation current = dataSnapshot.getValue(Donation.class);
                                     takenDonations.add(current.getId());
                                     nonProfitRef.child(current.getId()).setValue(true);
+                                    notify(R.string.owned_donations);
+                                }else {
+                                    notify(R.string.missed_donation);
+
                                 }
+
                                 
                                 if(counter.incrementAndGet() == counterBarrier)
                                     onTransactionsComplete();
+                            }
+
+                            private void notify(int msgId) {
+                                final String msg = getActivity().getString(msgId);
+                                getActivity().runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Toast.makeText(getContext(), msg,Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                             }
                         });
             }
@@ -201,7 +217,7 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
             //TODO notify service that manages time of donations
             return null;
         }
-        
+
         private void onTransactionsComplete(){
             if(progress != null && progress.isShowing()) progress.dismiss();
             DataManager.get(getActivity()).ownedEvent(takenDonations);

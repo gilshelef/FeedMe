@@ -202,7 +202,6 @@ public class Donation implements Parcelable{
         setDescription(other.getDescription());
         setImageUrl(other.getImageUrl());
         setState(other.getState());
-        setInCart(other.getInCart());
         setCalendar(other.getCalendar());
     }
     @Override

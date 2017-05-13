@@ -216,7 +216,7 @@ public class ProfileNonProfitFragment extends Fragment {
                                 mNonProfit.setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
                                 updateDataBase("phone", newPhone);
-                                Toast.makeText(getActivity(), R.string.conatct_phone_changed_successfully, Toast.LENGTH_LONG).show();
+                                Toast.makeText(getActivity(), R.string.contact_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
 

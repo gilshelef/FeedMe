@@ -221,7 +221,7 @@ public class DataManager {
                                 public void onDataChange(DataSnapshot dataSnapshot1) {
                                     Log.d(TAG, "onDataChange");
 
-                                    Donor donor = dataSnapshot1.getValue(Donor.class); // TODO check for errors
+                                    Donor donor = dataSnapshot1.getValue(Donor.class);
 
                                     if(donor == null) // donor removed registration
                                         return;
@@ -256,54 +256,14 @@ public class DataManager {
                     final Donation donation = getDonation(newDonation.getId());
 
                     donation.update(newDonation);
+
+                    if(!donation.isAvailable() && !mNonProfit.isOwner(donation))
+                        donation.setInCart(false);
+
                     AdapterManager.get().updateDataSourceAll();
                     mListener.updateViewCounters();
                 }
 
-//                @Override
-//                public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-//                    Log.d(TAG, "onChildChanged");
-//
-//                    //donation has changed in the data base
-//                    final String donationId = dataSnapshot.getKey();
-//                    final Donation newDonation = dataSnapshot.getValue(Donation.class);
-//
-//                    Donation donation;
-//                    if(mDonations.containsKey(donationId))
-//                        donation = mDonations.get(donationId);
-//                    else donation = ownedDonations.get(donationId);
-//
-//                    //TODO
-//                    if(newDonation.isUnavailable()) // when donor removes donation
-//                        removeDonation(donationId);
-//                    if(newDonation.isTaken() && !mNonProfit.isOwner(newDonation)) //another nonprofit took donation
-//                        removeDonation(donationId);
-//                    if(mNonProfit.isOwner(newDonation)) // state in db is TAKEN
-//                        newDonation.setState(Donation.State.OWNED);
-//
-//                    if(newDonation.isAvailable() && donation == null){ // donation has been removed
-//                        FirebaseDatabase.getInstance().getReference()
-//                                .child(Constants.DB_DONOR)
-//                                .child(newDonation.getDonorId())
-//                                .addListenerForSingleValueEvent(new ValueEventListener() {
-//                                    @Override
-//                                    public void onDataChange(DataSnapshot dataSnapshot1) {
-//                                        Log.d(TAG, "onDataChange");
-//                                        updateDonor(newDonation, dataSnapshot1);
-//                                        mDonations.put(newDonation.getId(), newDonation);
-//                                        AdapterManager.get().updateDataSourceAll();
-//                                        mListener.updateViewCounters();
-//                                    }
-//
-//                                    @Override
-//                                    public void onCancelled(DatabaseError databaseError) {
-//                                    }
-//                                });
-//                    }
-//                    else if(donation != null) donation.update(newDonation);
-//                    AdapterManager.get().updateDataSourceAll();
-//                    mListener.updateViewCounters();
-//                }
 
                 @Override
                 public void onChildRemoved(DataSnapshot dataSnapshot) {

@@ -12,7 +12,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -118,8 +117,6 @@ public class DonationsManager {
 
         //delete image from storage
         removeImage(donation.getId());
-
-        //TODO remove from non_profit that owns donation
     }
 
     public void removeImages(Set<String> donationToRemove) {
@@ -212,10 +209,8 @@ public class DonationsManager {
         @Override
         protected Void doInBackground(Void... params) {
 
-            Query myDonations = mDatabase
-                    .child(Constants.DB_DONATION);
-
-            myDonations.addListenerForSingleValueEvent(getDonationsFromDataBase);
+            mDatabase.child(Constants.DB_DONATION)
+                    .addListenerForSingleValueEvent(getDonationsFromDataBase);
             return null;
         }
     }
