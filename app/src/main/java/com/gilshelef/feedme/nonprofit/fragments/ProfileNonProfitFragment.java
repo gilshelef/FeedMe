@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,13 +23,18 @@ import android.widget.Toast;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
+import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * Created by gilshe on 3/2/17.
@@ -124,16 +130,77 @@ public class ProfileNonProfitFragment extends Fragment {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         SharedPreferences prefs = getContext().getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
-                        SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean(RegistrationActivity.NON_PROFIT, false);
-                        editor.apply();
+                        prefs.edit().putBoolean(RegistrationActivity.NON_PROFIT, false).apply();
 
-                        mNonProfitRef.removeValue();
-                        mNonProfit.clear();
+                        updateDataBase();
 
                         Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                         Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
                         startActivity(intent);
+                    }
+
+                    private void updateDataBase() {
+                        final DatabaseReference donationRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONATION);
+
+                        mNonProfitRef.child(Constants.DB_DONATION).addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                Log.d(TAG, "finished update on all donations");
+                                Log.d(TAG, "removing nonProfit: " + mNonProfit.getId() + "from database");
+                                mNonProfitRef.removeValue();
+                                NonProfit.clear();
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
+                        mNonProfitRef.child(Constants.DB_DONATION).addChildEventListener(new ChildEventListener() {
+                            @Override
+                            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                                final String donationId = dataSnapshot.getKey();
+
+                                donationRef.child(donationId).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        //if donation exists, change state to available
+                                        Donation donation = dataSnapshot.getValue(Donation.class);
+                                        if (donation == null)
+                                            return;
+
+                                        donationRef.child(donationId)
+                                                .child(Donation.K_STATE)
+                                                .setValue(Donation.State.AVAILABLE);
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+
+                            @Override
+                            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                            }
+
+                            @Override
+                            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
+                            }
+                        });
                     }
                 });
 
@@ -146,6 +213,8 @@ public class ProfileNonProfitFragment extends Fragment {
 
         alertDialog.show();
     }
+
+
 
     private void createNonProfitDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
