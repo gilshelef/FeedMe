@@ -20,7 +20,7 @@ import java.util.List;
 
 public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<ItemViewHolder> implements Adaptable, ItemTouchHelperAdapter {
     public final String TAG = this.getClass().getSimpleName();
-    protected List<Donation> mDataSource;
+    protected final List<Donation> mDataSource;
     protected Activity mActivity;
     protected OnActionEvent mListener;
 

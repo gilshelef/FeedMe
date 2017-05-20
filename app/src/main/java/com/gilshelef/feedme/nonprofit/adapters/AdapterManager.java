@@ -43,7 +43,7 @@ public class AdapterManager {
         }
     }
 
-    public void setAdapter(Adaptable adapter) {
+    public void registerAdapter(Adaptable adapter) {
         adapters.put(adapter.getName(), adapter);
     }
 

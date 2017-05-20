@@ -170,6 +170,8 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                         new RemoveDonorTask(new OnResult() {
                             @Override
                             public void onResult() {
+                                Donor.clear();
+                                DonationsManager.clear();
                                 Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                                 startActivity(intent);
                             }
@@ -409,8 +411,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                     donorDonationRef.removeValue();
 
                     DonationsManager.get().removeImages(donationToRemove.keySet());
-                    if(DonationsManager.get() != null)
-                        DonationsManager.get().clear();
+                    mCallback.onResult();
                 }
 
                 @Override
@@ -426,10 +427,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
         @Override
         protected void onPostExecute(Void p){
-            if(Donor.get() != null)
-                Donor.get().clear();
             Toast.makeText(mContext, R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
-            mCallback.onResult();
         }
     }
 

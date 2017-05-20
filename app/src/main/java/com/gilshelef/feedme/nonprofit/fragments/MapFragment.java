@@ -77,7 +77,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
         mMapView.getMapAsync(this);
         mDataSource = DataManager.get(getActivity()).getAll();
-        AdapterManager.get().setAdapter(this);
+        AdapterManager.get().registerAdapter(this);
         return rootView;
     }
 

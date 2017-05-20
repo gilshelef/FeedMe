@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
+import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
@@ -149,6 +150,7 @@ public class ProfileNonProfitFragment extends Fragment {
                                 Log.d(TAG, "removing nonProfit: " + mNonProfit.getId() + "from database");
                                 mNonProfitRef.removeValue();
                                 NonProfit.clear();
+                                DataManager.clear();
                             }
 
                             @Override

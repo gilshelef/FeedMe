@@ -210,8 +210,10 @@ public class Donor {
         getEditor(context).putInt(Donor.K_DONATION_COUNT, donationCount.get()).apply();
     }
 
-    public void clear() {
-        instance = null;
+    public static void clear() {
+        synchronized (Donor.class) {
+            instance = null;
+        }
     }
 
     public boolean isOwner(Donation d) {

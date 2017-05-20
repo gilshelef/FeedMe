@@ -39,8 +39,8 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
         mAdapter = getAdapter();
         mRecyclerView.setAdapter(mAdapter);
 
-        //set adapter in manager
-        AdapterManager.get().setAdapter(mAdapter);
+        //register adapter with manager
+        AdapterManager.get().registerAdapter(mAdapter);
 
         //draw divider line between list items
         Drawable dividerDrawable = ContextCompat.getDrawable(getActivity(), R.drawable.divider);
