@@ -39,6 +39,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -165,17 +166,15 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
 
-                        final Donor donor = Donor.get(getActivity());
-                        Log.d(TAG, "remove donor: " + donor.getId());
-                        new RemoveDonorTask(new OnResult() {
+
+                        Log.d(TAG, "remove donor: " + mDonor.getId());
+                        new RemoveDonorTask(getContext(), new OnResult() {
                             @Override
                             public void onResult() {
-                                Donor.clear();
-                                DonationsManager.clear();
                                 Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                                 startActivity(intent);
                             }
-                        }, getContext()).execute();
+                        }).execute();
                     }
                 });
 
@@ -383,7 +382,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         private final Context mContext;
         private OnResult mCallback;
 
-        private RemoveDonorTask(OnResult callback, Context context) {
+        private RemoveDonorTask(Context context, OnResult callback) {
             this.mContext = context;
             this.mCallback = callback;
         }
@@ -402,16 +401,24 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     DatabaseReference mDonationRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONATION);
 
-                    Map<String, Object> donationToRemove = new HashMap<>();
+                    final Map<String, Object> donationToRemove = new HashMap<>();
                     for (DataSnapshot donationId : dataSnapshot.getChildren())
-                            donationToRemove.put(donationId.getKey(), null); // removeDonation
+                            donationToRemove.put(donationId.getKey(), null); // remove /donation/donorId
 
-                    mDonationRef.updateChildren(donationToRemove);
-                    mDonorRef.removeValue();
-                    donorDonationRef.removeValue();
+                    mDonationRef.updateChildren(donationToRemove, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            mDonorRef.removeValue(); // remove /donor
+                            donorDonationRef.removeValue(); // remove /donor_donation
 
-                    DonationsManager.get().removeImages(donationToRemove.keySet());
-                    mCallback.onResult();
+                            DonationsManager.get().removeImages(donationToRemove.keySet());
+                            FirebaseMessaging.getInstance().unsubscribeFromTopic(mDonor.getId());
+                            Donor.clear();
+                            DonationsManager.clear();
+                            mCallback.onResult();
+                        }
+                    });
+
                 }
 
                 @Override

@@ -38,8 +38,8 @@ public class DonationsManager {
 
     private DonationsManager(OnCounterChangeListener listener){
         mDonations = new LinkedHashMap<>();
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         mListener = listener;
+        mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
 
         new FetchDataTask().execute();
@@ -151,8 +151,10 @@ public class DonationsManager {
 
     }
 
-    public void clear() {
-        instance = null;
+    public static void clear() {
+        synchronized (DonationsManager.class) {
+            instance = null;
+        }
     }
 
     public void updateProfile(Context context) {
@@ -176,7 +178,12 @@ public class DonationsManager {
         AdapterManager.get().updateDataSourceAll();
 
     }
-
+    private void updateDataSource(Map<String, Donation> newData) {
+        synchronized (mDonations){
+            mDonations.clear();
+            mDonations.putAll(newData);
+        }
+    }
 
     private class FetchDataTask extends AsyncTask<Void, Void, Void> {
 
@@ -215,10 +222,4 @@ public class DonationsManager {
         }
     }
 
-    private void updateDataSource(Map<String, Donation> newData) {
-        synchronized (mDonations){
-            mDonations.clear();
-            mDonations.putAll(newData);
-        }
-    }
 }
