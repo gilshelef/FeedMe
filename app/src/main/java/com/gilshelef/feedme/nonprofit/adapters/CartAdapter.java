@@ -23,6 +23,11 @@ public class CartAdapter extends RecycledBaseAdapter {
 
     @Override
     public void updateDataSource() {
+//        List<Donation> newDonation = DataManager.get(mActivity).getInCart();
+//        synchronized (mDataSource) {
+//            mDataSource.clear();
+//            mDataSource.addAll(newDonation);
+//        }
         mDataSource.clear();
         mDataSource.addAll(DataManager.get(mActivity).getInCart());
         ((OnUpdateCount)mListener).updateItemsCount();
