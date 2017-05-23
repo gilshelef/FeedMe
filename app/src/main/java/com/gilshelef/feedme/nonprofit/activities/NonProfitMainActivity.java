@@ -44,6 +44,7 @@ import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -77,6 +78,8 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         setContentView(R.layout.non_profit_activity_main);
         loadPreference();
         View main = findViewById(R.id.main);
+
+        FirebaseMessaging.getInstance().subscribeToTopic("New_Donations");
 
         //initialize app's data
         NonProfit.get(this);

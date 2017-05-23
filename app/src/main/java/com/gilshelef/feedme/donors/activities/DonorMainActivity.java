@@ -35,6 +35,7 @@ import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -103,6 +104,9 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         onContactChange(donor.getContactInfo());
 
         Log.d(TAG, "onCreate");
+        FirebaseMessaging.getInstance().subscribeToTopic("New_Donations"); // TODO erase this subscription
+        FirebaseMessaging.getInstance().subscribeToTopic(donor.getId());
+
     }
 
 
