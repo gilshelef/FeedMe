@@ -22,4 +22,6 @@ public class Constants {
     public static final String DB_DONATION = "donation";
     public static final String DB_DONOR_DONATION = "donor_donation";
 
+    //donor add new donation
+    public static final int DEFAULT_DELTA_TIME = 2;
 }

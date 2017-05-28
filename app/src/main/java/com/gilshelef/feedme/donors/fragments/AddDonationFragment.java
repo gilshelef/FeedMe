@@ -27,6 +27,7 @@ import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Logger;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -37,6 +38,7 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Locale;
 
 import static android.app.Activity.RESULT_OK;
@@ -48,7 +50,7 @@ import static android.app.Activity.RESULT_OK;
 public class AddDonationFragment extends Fragment implements TimePickerDialog.OnTimeSetListener{
     public static final String TAG = AddDonationFragment.class.getSimpleName();
     public static final int REQUEST_IMAGE_CAPTURE = 6;
-    private static final String IMAGES = "images";
+
 
     private EditText description;
     private Bitmap imageBitmap;
@@ -57,13 +59,14 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     private Calendar calendar;
     private DatabaseReference mDatabase;
     private StorageReference mStorageRef;
+    private Logger mLogger;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
-
+        mLogger = Logger.get(getContext());
     }
 
 
@@ -173,9 +176,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
                 donor.setProfileInfo(donation);
                 donation.setId(donationId);
                 donation.setDescription(description.getText().toString());
-
-                Locale locale = new Locale.Builder().setLanguage("he").build();
-                donation.calendar = calendar != null ? calendar : Calendar.getInstance(locale);
+                donation.calendar = calendar != null ? calendar : getDefaultCalendar();
 
                 donation.setImageUrl("");
                 uploadImageToStorage(donationId, new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -190,6 +191,8 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
                 });
 
                 DonationsManager.get().newDonationEvent(donation);
+                mLogger.newDonation(donationId);
+
                 return true;
             }
 
@@ -210,6 +213,15 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
                 Toast.makeText(getContext(), "תקלה ארעה בזמן העלת התרומה, נא נסה שנית בעוד מספר דקות", Toast.LENGTH_LONG).show();
 
             clearAll();
+        }
+
+        private Calendar getDefaultCalendar() {
+
+            Locale locale = new Locale.Builder().setLanguage("he").build();
+            Calendar cal = Calendar.getInstance(locale); // creates calendar
+            cal.setTime(new Date()); // sets calendar time/date
+            cal.add(Calendar.HOUR_OF_DAY, Constants.DEFAULT_DELTA_TIME); // adds two hours as default
+            return cal;
         }
     }
 
