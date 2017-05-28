@@ -40,6 +40,7 @@ import com.gilshelef.feedme.nonprofit.fragments.ProfileNonProfitFragment;
 import com.gilshelef.feedme.nonprofit.fragments.SaveFragment;
 import com.gilshelef.feedme.nonprofit.fragments.ToggleHomeBar;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -232,7 +233,10 @@ public class NonProfitMainActivity extends AppCompatActivity implements
                 boolean taken = data.getBooleanExtra(Donation.K_TAKEN, false);
 
                 if(state.equals(Donation.State.OWNED)) {
-                    if (taken) DataManager.get(this).takenEvent(donationId);
+                    if (taken){
+                        DataManager.get(this).takenEvent(donationId);
+                        Logger.get(this).takeDonation(donationId);
+                    }
                 }
 
                 else { // id donation is not owned, i.e saved, available
@@ -387,6 +391,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
             countCart = instance.getInCart().size();
             return null;
         }
+
         @Override
         protected void onPostExecute(Void result) {
             setMenuCounter(R.id.nav_home, countHome);

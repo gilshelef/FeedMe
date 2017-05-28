@@ -13,6 +13,7 @@ import com.gilshelef.feedme.nonprofit.adapters.ItemViewHolder;
 import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
+import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnUpdateCount;
 
 import java.util.List;
@@ -51,7 +52,8 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Donor.get(mActivity).updateDonationCount(mActivity, -1);
-                DonationsManager.get().returnDonation(donation);
+                DonationsManager.get().returnDonation(donation.getId());
+                Logger.get(mActivity).returnDonation(donation.getId());
                 Toast.makeText(mActivity, R.string.remove_donation_successfully, Toast.LENGTH_LONG).show();
                 ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
             }

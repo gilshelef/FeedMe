@@ -28,6 +28,7 @@ import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
@@ -36,6 +37,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 /**
  * Created by gilshe on 3/2/17.
@@ -50,6 +52,7 @@ public class ProfileNonProfitFragment extends Fragment {
     TextView phone;
     Button removeRegistration;
     NonProfit mNonProfit;
+    private Logger mLogger;
 
 
     @Override
@@ -58,6 +61,7 @@ public class ProfileNonProfitFragment extends Fragment {
         setHasOptionsMenu(true);
         mNonProfit = NonProfit.get(getActivity());
         mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT).child(mNonProfit.getId());
+        mLogger = Logger.get(getContext());
     }
 
     @Override
@@ -149,6 +153,8 @@ public class ProfileNonProfitFragment extends Fragment {
                                 Log.d(TAG, "finished update on all donations");
                                 Log.d(TAG, "removing nonProfit: " + mNonProfit.getId() + "from database");
                                 mNonProfitRef.removeValue();
+                                FirebaseMessaging.getInstance().unsubscribeFromTopic("New_Donations");
+                                mLogger.removeRegistration(Logger.EVENT.NON_PROFIT, mNonProfit.getId());
                                 NonProfit.clear();
                                 DataManager.clear();
                             }

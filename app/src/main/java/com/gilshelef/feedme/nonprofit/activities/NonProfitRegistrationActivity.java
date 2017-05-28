@@ -17,6 +17,7 @@ import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Logger;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -36,6 +37,7 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
     private EditText mContactName;
     private EditText mContactPhone;
     private LatLng mLatLng;
+    private Logger mLogger;
 
 
     @Override
@@ -55,6 +57,8 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
 
         // Click listeners
         submitBtn.setOnClickListener(this);
+
+        mLogger = Logger.get(getApplicationContext());
     }
 
 
@@ -137,6 +141,8 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
         editor.putFloat(NonProfit.KEY_LNG, (float) mLatLng.longitude);
         editor.putString(NonProfit.KEY_ID, nonProfitId);
         editor.apply();
+
+        mLogger.signUp(Logger.EVENT.NON_PROFIT, nonProfitId);
         finish(RESULT_OK);
 
     }

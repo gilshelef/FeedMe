@@ -34,6 +34,7 @@ import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -64,6 +65,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         TypeManager.get();
         final Donor donor = Donor.get(this);
         DonationsManager.get(this);
+        Logger.get(this);
 
         View main = findViewById(R.id.main);
 
@@ -104,7 +106,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         onContactChange(donor.getContactInfo());
 
         Log.d(TAG, "onCreate");
-        FirebaseMessaging.getInstance().subscribeToTopic("New_Donations"); // TODO erase this subscription
+
         FirebaseMessaging.getInstance().subscribeToTopic(donor.getId());
 
     }

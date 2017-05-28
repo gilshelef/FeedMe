@@ -32,6 +32,7 @@ import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
@@ -60,6 +61,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     private TextView medalCount;
     private static Donor mDonor;
     private static DatabaseReference mDonorRef;
+    private static Logger mLogger;
 
 
     @Override
@@ -69,6 +71,8 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         mDonorRef = FirebaseDatabase.getInstance().getReference()
                 .child(Constants.DB_DONOR)
                 .child(mDonor.getId());
+
+        mLogger = Logger.get(getContext());
     }
 
     @Override
@@ -413,6 +417,8 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
                             DonationsManager.get().removeImages(donationToRemove.keySet());
                             FirebaseMessaging.getInstance().unsubscribeFromTopic(mDonor.getId());
+                            mLogger.removeRegistration(Logger.EVENT.DONOR, mDonor.getId());
+
                             Donor.clear();
                             DonationsManager.clear();
                             mCallback.onResult();

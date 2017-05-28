@@ -134,9 +134,12 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
         snackbar.show();
     }
 
-    // task that notify data base that current non profit wants to take these donations.
-    // the task return only the donation that were in-fact taken and marked with nonprofit's id.
-    // add each donation taken to non-profit's data base reference in order to display in app (owned fragment)
+
+    /**
+     *  task that notify data base that current non profit wants to take these donations.
+     * the task return only the donation that were in-fact taken and marked with nonprofit's id.
+     * add each donation taken to non-profit's data base reference in order to display in app (owned fragment)
+     */
     private class TakeDonationsTask extends AsyncTask<Void, Void, Void> {
         private ProgressDialog progress;
         private List<String> takenDonations;
@@ -191,6 +194,7 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
                                     Donation current = dataSnapshot.getValue(Donation.class);
                                     takenDonations.add(current.getId());
                                     nonProfitRef.child(current.getId()).setValue(true);
+                                    mLogger.ownDonation(current.getId());
                                     notify(R.string.owned_donations);
                                 }else {
                                     notify(R.string.missed_donation);

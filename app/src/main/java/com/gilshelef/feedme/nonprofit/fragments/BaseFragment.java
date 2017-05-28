@@ -17,6 +17,7 @@ import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.nonprofit.adapters.SimpleItemTouchHelperCallback;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
+import com.gilshelef.feedme.util.Logger;
 
 import java.util.List;
 
@@ -29,6 +30,7 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
     protected List<Donation> mDataSource;
     protected RecyclerView mRecyclerView;
     protected RecycledBaseAdapter mAdapter;
+    protected Logger mLogger;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -47,6 +49,7 @@ public abstract class BaseFragment extends Fragment implements RecycledBaseAdapt
         RecyclerView.ItemDecoration dividerItemDecoration = new DividerItemDecoration(dividerDrawable);
         mRecyclerView.addItemDecoration(dividerItemDecoration);
 
+        mLogger = Logger.get(getContext());
         return rootView;
     }
 
