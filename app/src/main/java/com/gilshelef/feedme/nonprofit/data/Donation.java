@@ -31,7 +31,7 @@ public class Donation implements Parcelable{
     public static final String K_CALENDAR = "calendar";
     public static final String K_TAKEN = "taken";
 
-    public enum State {SAVED, DONOR, OWNED, AVAILABLE} //no use for UNAVAILABLE
+    public enum State {SAVED, DONOR, OWNED, AVAILABLE, TAKEN} //no use for UNAVAILABLE
 
     //donor's property
     @Exclude
@@ -127,7 +127,7 @@ public class Donation implements Parcelable{
 
 
     // state
-    public boolean getInCart() {
+    public synchronized boolean getInCart() {
         return inCart;
     }
     @Exclude
@@ -137,17 +137,16 @@ public class Donation implements Parcelable{
     @Exclude
     public boolean isOwned() {return state == State.OWNED;}
     @Exclude
-    public boolean isAvailable() {
+    public synchronized boolean isAvailable() {
         return state.equals(State.AVAILABLE);
     }
     @Exclude
-    public boolean isSaved() {
+    public synchronized boolean isSaved() {
         return state.equals(State.SAVED);
     }
 
-
     //setters
-    public void setInCart(boolean val) {
+    public synchronized void setInCart(boolean val) {
         inCart = val;
     }
     public void setDescription(String description) {
@@ -159,7 +158,7 @@ public class Donation implements Parcelable{
     public void setId(String id) {
         this.id = id;
     }
-    public void setState(State state) {
+    public synchronized void setState(State state) {
         this.state = state;
     }
     public void setDonorId(String donorId) { this.donorId = donorId; }
