@@ -68,7 +68,7 @@
     <string name="last_name">שם משפחה</string>
     <string name="edit_contact_details">ערוך פרטי התקשרות</string>
     <string name="mark_taken">לקחתי את התרומה</string>
-    <string name="owned_donations">התרומה\ות שלך :)</string>
+    <string name="owned_donations">התרומות שלך :)</string>
     <string name="missed_donation">מצטערים, מישהו כבר לקחת תרומה זו</string>
 
 </resources>
