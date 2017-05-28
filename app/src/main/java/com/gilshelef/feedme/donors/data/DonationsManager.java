@@ -8,6 +8,7 @@ import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -89,22 +90,22 @@ public class DonationsManager {
                 .child(donor.getId())
                 .child(Constants.DB_DONATION)
                 .child(donationId)
-                .setValue(true);
-
+                .setValue(Donation.State.AVAILABLE);
 
         donation.setState(Donation.State.DONOR); // local state only
         mDonations.put(donationId, donation);
 
+
+
     }
 
-
-    public void returnDonation(final Donation donation) {
-        mDonations.remove(donation.getId());
+    public void returnDonation(final String donationId) {
+        mDonations.remove(donationId);
         final Donor donor = Donor.get();
 
         mDatabase
                 .child(Constants.DB_DONATION)
-                .child(donation.getId())
+                .child(donationId)
                 .removeValue();
 
         //remove from donor ref
@@ -112,11 +113,11 @@ public class DonationsManager {
                 .child(Constants.DB_DONOR_DONATION)
                 .child(donor.getId())
                 .child(Constants.DB_DONATION)
-                .child(donation.getId())
+                .child(donationId)
                 .removeValue();
 
         //delete image from storage
-        removeImage(donation.getId());
+        removeImage(donationId);
     }
 
     public void removeImages(Set<String> donationToRemove) {
@@ -186,12 +187,12 @@ public class DonationsManager {
     }
 
     private class FetchDataTask extends AsyncTask<Void, Void, Void> {
+        final Donor donor = Donor.get();
 
         private ValueEventListener getDonationsFromDataBase = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d(TAG, "onDataChange");
-                final Donor donor = Donor.get();
                 Map<String, Donation> myDonations = new HashMap<>();
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     try {
@@ -218,6 +219,45 @@ public class DonationsManager {
 
             mDatabase.child(Constants.DB_DONATION)
                     .addListenerForSingleValueEvent(getDonationsFromDataBase);
+
+            mDatabase.child(Constants.DB_DONOR_DONATION)
+                    .child(donor.getId())
+                    .child(Constants.DB_DONATION)
+                    .addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            Log.d(TAG, "new donation");
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                            String donationId = dataSnapshot.getKey();
+                            Donation.State state = Donation.State.valueOf(dataSnapshot.getValue().toString());
+
+                            Log.d(TAG, "donation : " + donationId + "changed to: " + state);
+                            if(state.equals(Donation.State.TAKEN)) {
+
+                                returnDonation(donationId);
+                                mListener.updateViewCounters();
+                                AdapterManager.get().updateDataSourceAll();
+                                //TODO notify user
+                            }
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
             return null;
         }
     }
