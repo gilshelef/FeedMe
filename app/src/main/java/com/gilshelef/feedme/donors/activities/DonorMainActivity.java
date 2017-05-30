@@ -33,7 +33,6 @@ import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
-import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -186,7 +185,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.DETAILS_REQUEST_CODE) {
+        if (requestCode == DetailsActivity.DETAILS_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 //get data from result
                 String donationId = data.getStringExtra(Donation.K_ID);
@@ -215,9 +214,9 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         intent.putExtras(mBundle);
         if(v != null) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, v, "profile");
-            startActivityForResult(intent, Constants.DETAILS_REQUEST_CODE, options.toBundle());
+            startActivityForResult(intent, DetailsActivity.DETAILS_REQUEST_CODE, options.toBundle());
         }
-        else startActivityForResult(intent, Constants.DETAILS_REQUEST_CODE);
+        else startActivityForResult(intent, DetailsActivity.DETAILS_REQUEST_CODE);
     }
 
 }

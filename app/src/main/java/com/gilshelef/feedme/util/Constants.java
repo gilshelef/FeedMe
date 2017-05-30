@@ -11,8 +11,10 @@ public class Constants {
 
     public static final String TEL_PREFIX = "tel:";
 
-    // details activity
-    public static final int DETAILS_REQUEST_CODE = 2;
+    // request activity
+    public static final int REQUEST_1 = 1;
+    public static final int REQUEST_2 = 2;
+    public static final int REQUEST_3 = 3;
 
     public static final String DATE_FORMAT = "HH:mm dd.MM.yyyy";
 
@@ -27,4 +29,6 @@ public class Constants {
     public static final int DEFAULT_DELTA_TIME = 2;
     public static final String DEFAULT_EMAIL = "feedme.donating.app@gmail.com";
     public static final String DB_EMAILS = "emails";
+
+
 }

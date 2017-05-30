@@ -50,7 +50,7 @@ import static android.app.Activity.RESULT_OK;
 public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener, Adaptable {
 
     private static final Object CURRENT_POSITION = "position";
-    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 2;
+    public static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = Constants.REQUEST_1;
     private GoogleMap mMap;
     private MapView mMapView;
     public static final String TAG = MapFragment.class.getSimpleName();

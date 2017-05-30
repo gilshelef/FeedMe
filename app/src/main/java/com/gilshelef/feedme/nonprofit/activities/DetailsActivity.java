@@ -47,6 +47,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
     private static final String TAG = DetailsActivity.class.getSimpleName();
     public static final String EXTRA_DONATION = "donation";
     private static final String UNNAMED_ROAD = "Unnamed Road";
+    public static final int DETAILS_REQUEST_CODE = Constants.REQUEST_2;
     private final View.OnClickListener exitListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {

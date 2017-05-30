@@ -39,7 +39,6 @@ import com.gilshelef.feedme.nonprofit.fragments.OwnedFragment;
 import com.gilshelef.feedme.nonprofit.fragments.ProfileNonProfitFragment;
 import com.gilshelef.feedme.nonprofit.fragments.SaveFragment;
 import com.gilshelef.feedme.nonprofit.fragments.ToggleHomeBar;
-import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
@@ -224,7 +223,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == Constants.DETAILS_REQUEST_CODE) {
+        if (requestCode == DetailsActivity.DETAILS_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 //get data from result
 
@@ -271,9 +270,9 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         intent.putExtras(mBundle);
         if(v != null) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, v, "profile");
-            startActivityForResult(intent, Constants.DETAILS_REQUEST_CODE, options.toBundle());
+            startActivityForResult(intent, DetailsActivity.DETAILS_REQUEST_CODE, options.toBundle());
         }
-        else startActivityForResult(intent, Constants.DETAILS_REQUEST_CODE);
+        else startActivityForResult(intent, DetailsActivity.DETAILS_REQUEST_CODE);
     }
 
     @Override

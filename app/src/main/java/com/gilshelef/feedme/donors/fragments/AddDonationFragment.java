@@ -49,7 +49,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class AddDonationFragment extends Fragment implements TimePickerDialog.OnTimeSetListener{
     public static final String TAG = AddDonationFragment.class.getSimpleName();
-    public static final int REQUEST_IMAGE_CAPTURE = 6;
+    public static final int REQUEST_IMAGE_CAPTURE = Constants.REQUEST_3;
 
 
     private EditText description;
