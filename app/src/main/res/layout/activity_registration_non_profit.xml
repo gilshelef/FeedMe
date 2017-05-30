@@ -19,6 +19,7 @@
         android:textSize="40sp"
         android:typeface="serif" />
 
+    <!--name-->
     <EditText
         android:id="@+id/non_profit_name"
         android:layout_width="fill_parent"
@@ -28,30 +29,91 @@
         android:layout_marginBottom="10dp"
         android:hint="@string/non_profit_name" />
 
-    <EditText
-        android:id="@+id/non_profit_address"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_marginTop="10dp"
-        android:backgroundTint="@color/colorPrimaryDark"
-        android:hint="@string/non_profit_address" />
 
-    <EditText
-        android:id="@+id/contact_name"
+    <!--address-->
+    <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/address_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/address_header"/>
+
+        <EditText
+            android:id="@+id/non_profit_address"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/address_header"
+            android:backgroundTint="@color/colorPrimaryDark"
+            android:hint="@string/non_profit_address" />
+
+    </RelativeLayout>
+
+    <!--contact name-->
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp">
+
+        <TextView
+            android:id="@+id/contact_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentTop="true"
+            android:text="@string/contact_name"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/contact_header"
+            android:orientation="horizontal"
+            android:weightSum="100">
+
+            <EditText
+                android:id="@+id/non_profit_lname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:hint="@string/last_name" />
+
+            <EditText
+                android:id="@+id/non_profit_fname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="50"
+                android:backgroundTint="@color/colorPrimaryDark"
+                android:hint="@string/first_name" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <!--contact id-->
+    <EditText
+        android:id="@+id/contact_id"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
         android:backgroundTint="@color/colorPrimaryDark"
-        android:hint="@string/contact_name" />
+        android:hint="@string/contact_id"
+        android:inputType="phone"/>
 
+    <!--phone-->
     <EditText
         android:id="@+id/contact_phone"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
         android:backgroundTint="@color/colorPrimaryDark"
         android:hint="@string/contact_phone"
         android:inputType="phone" />
