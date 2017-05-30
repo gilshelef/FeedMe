@@ -21,7 +21,10 @@ public class Constants {
     public static final String DB_DONOR = "donor";
     public static final String DB_DONATION = "donation";
     public static final String DB_DONOR_DONATION = "donor_donation";
+    public static final String DB_NON_PROFIT_LISTED = "listed_non_profit";
 
     //donor add new donation
     public static final int DEFAULT_DELTA_TIME = 2;
+    public static final String DEFAULT_EMAIL = "feedme.donating.app@gmail.com";
+    public static final String DB_EMAILS = "emails";
 }
