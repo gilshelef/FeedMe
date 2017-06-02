@@ -100,7 +100,6 @@ public class DonationsManager {
     }
 
     public void returnDonation(final String donationId) {
-        mDonations.remove(donationId);
         final Donor donor = Donor.get();
 
         mDatabase
@@ -120,6 +119,7 @@ public class DonationsManager {
         Set<String> set = new HashSet<>();
         set.add(donationId);
         removeImages(set);
+        mDonations.remove(donationId);
     }
 
     public void removeImages(Set<String> donationToRemove) {
