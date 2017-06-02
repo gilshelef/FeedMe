@@ -30,9 +30,9 @@
 
     <string name="add_donation">New donation</string>
     <string name="business_address">כתובת בית העסק</string>
-    <string name="contact_phone">טלפון איש קשר</string>
+    <string name="contact_phone">מספר טלפון</string>
     <string name="remove_registration">הסר רישום</string>
-    <string name="non_profit_address">כתובת עמותה</string>
+    <string name="address_hint">עיר רחוב ומספר</string>
     <string name="non_profit_name">שם העמותה</string>
     <string name="contact_name">שם איש קשר</string>
     <string name="register">הרשם</string>
@@ -70,5 +70,25 @@
     <string name="mark_taken">לקחתי את התרומה</string>
     <string name="owned_donations">התרומות שלך :)</string>
     <string name="missed_donation">מצטערים, מישהו כבר לקחת תרומה זו</string>
+    <string name="email_authorization_sent">אימייל לארגונך נשלח על מנת לאשר אותך.</string>
+    <string name="ok">@android:string/ok</string>
+    <string name="email_authorization_fail">האימייל של העמותה שלך %s לא נמצא במאגר הנתונים שלנו. אנא וודא כי השם שהכנסת נכון. </string>
+    <string name="contact_id">ת.ז</string>
+    <string name="error_id">אנא הכנס מספר ת.ז שוב</string>
+    <string name="street">רחוב</string>
+    <string name="address_number">מספר</string>
+    <string name="city">עיר</string>
+    <string name="sorry">סליחה</string>
+    <string name="unauthorize_message">מצטרים, אירגונך עדיין לא אישר אותך במייל.</string>
+    <string name="address_header">כתובת העמותה</string>
+    <string name="input">הכנס</string>
+    <string name="edit_non_profit_name">ערוך שם עמותה</string>
+    <string name="edit_phone">ערוך מספר טלפון</string>
+    <string name="edit_contact_name">ערוך את שם איש הקשר</string>
+    <string name="edit_bussiness_name">ערוך את שם בית העסק</string>
+    <string name="resend_email_authorization">לשלוח אימייל נוסף לאישורך?</string>
+    <string name="authrization_confimed">קיבלנו אישור מאירגונך :)</string>
+    <string name="authrization_confimed_msg">כעת האפליקציה פתוחה לכל השימושים</string>
+    <string name="non_profit_id_hint">מספר העמותה כפי שמופיע ברשם העמותות</string>
 
 </resources>
