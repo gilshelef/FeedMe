@@ -144,7 +144,8 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
                 !RegistrationHandler.isEmpty(mContactFirstName) &&
                 !RegistrationHandler.isEmpty(mContactLastName) &&
                 !RegistrationHandler.isEmpty(mContactId) &&
-                !RegistrationHandler.isEmpty(mContactPhone);
+                !RegistrationHandler.isEmpty(mContactPhone) &&
+                !RegistrationHandler.isEmpty(mNonProfitNumber);
 
     }
 
