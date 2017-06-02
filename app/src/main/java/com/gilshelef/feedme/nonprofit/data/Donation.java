@@ -31,7 +31,7 @@ public class Donation implements Parcelable{
     public static final String K_CALENDAR = "calendar";
     public static final String K_TAKEN = "taken";
 
-    public enum State {SAVED, DONOR, OWNED, AVAILABLE, TAKEN} //no use for UNAVAILABLE
+    public enum State {SAVED, OWNED, AVAILABLE, TAKEN}
 
     //donor's property
     @Exclude
@@ -124,16 +124,16 @@ public class Donation implements Parcelable{
     public State getState() {
         return state;
     }
+    public boolean hasImage() {
+        return !imageUrl.isEmpty();
+    }
 
 
     // state
     public synchronized boolean getInCart() {
         return inCart;
     }
-    @Exclude
-    public boolean isDonor() {
-        return state == State.DONOR;
-    }
+
     @Exclude
     public boolean isOwned() {return state == State.OWNED;}
     @Exclude

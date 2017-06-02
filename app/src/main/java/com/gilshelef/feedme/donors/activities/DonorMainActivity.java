@@ -211,6 +211,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         Intent intent = new Intent(getApplicationContext(), DetailsActivity.class);
         Bundle mBundle = new Bundle();
         mBundle.putParcelable(DetailsActivity.EXTRA_DONATION, donation);
+        mBundle.putBoolean(DetailsActivity.EXTRA_IS_DONOR, true);
         intent.putExtras(mBundle);
         if(v != null) {
             ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(this, v, "profile");

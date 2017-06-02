@@ -19,6 +19,7 @@ import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -92,7 +93,6 @@ public class DonationsManager {
                 .child(donationId)
                 .setValue(Donation.State.AVAILABLE);
 
-        donation.setState(Donation.State.DONOR); // local state only
         mDonations.put(donationId, donation);
 
 
@@ -117,16 +117,22 @@ public class DonationsManager {
                 .removeValue();
 
         //delete image from storage
-        removeImage(donationId);
+        Set<String> set = new HashSet<>();
+        set.add(donationId);
+        removeImages(set);
     }
 
     public void removeImages(Set<String> donationToRemove) {
-        for(String name: donationToRemove)
-            removeImage(name);
+        for(String donationId: donationToRemove){
+            Donation donation = mDonations.get(donationId);
+            if(donation != null && donation.hasImage())
+                removeImage(donationId);
+        }
+
     }
 
-    private void removeImage(String name) {
-        mStorageRef.child(name).delete();
+    private void removeImage(String donationId) {
+        mStorageRef.child(donationId).delete();
     }
 
     public void update(final String donationId, final String description, final String calenderStr) {
