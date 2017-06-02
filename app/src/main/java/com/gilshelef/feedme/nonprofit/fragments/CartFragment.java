@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.OnUpdateCount;
+import com.gilshelef.feedme.util.Util;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -106,7 +108,24 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
 
     @Override
     public void onClick(View v) {
+        NonProfit nonProfit = NonProfit.get(getContext());
+        if(!nonProfit.isAuthorized())
+            alertUnauthorized();
+        else showSnackbar();
+    }
 
+    private void alertUnauthorized() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage(R.string.unauthorize_message);
+        builder.setPositiveButton(R.string.ok, null);
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.sorry));
+        builder.setCustomTitle(title);
+        if(!getActivity().isFinishing())
+            builder.show();
+
+    }
+
+    private void showSnackbar() {
         Snackbar snackbar = Snackbar
                 .make(mCoordinator, "Taking Donations", Snackbar.LENGTH_LONG)
                 .setAction("UNDO", new View.OnClickListener() {
@@ -201,7 +220,7 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
 
                                 }
 
-                                
+
                                 if(counter.incrementAndGet() == counterBarrier)
                                     onTransactionsComplete();
                             }

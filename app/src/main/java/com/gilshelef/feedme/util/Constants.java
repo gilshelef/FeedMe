@@ -10,6 +10,8 @@ public class Constants {
     public static final int PERMISSIONS_REQUEST_LOCATION = 1;
 
     public static final String TEL_PREFIX = "tel:";
+    public static final String HEBREW = "he";
+
 
     // request activity
     public static final int REQUEST_1 = 1;
@@ -30,5 +32,11 @@ public class Constants {
     public static final String DEFAULT_EMAIL = "feedme.donating.app@gmail.com";
     public static final String DB_EMAILS = "emails";
 
+
+    //title padding in alert dialog
+    public static final int PADDING_LEFT = 60;
+    public static final int PADDING_TOP = 40;
+    public static final int PADDING_RIGHT = 60;
+    public static final int PADDING_BOTTOM = 10;
 
 }

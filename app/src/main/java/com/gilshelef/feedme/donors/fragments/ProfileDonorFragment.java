@@ -17,7 +17,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,6 +33,7 @@ import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
+import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -162,15 +162,14 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     }
 
     private void removeRegistration() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(getString(R.string.remove_registration));
-        alertDialog.setMessage(R.string.remove_registration_confirmation);
-
-        alertDialog.setPositiveButton(R.string.yes,
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.remove_registration));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_error_black_24dp, 0, 0, 0);
+        builder.setCustomTitle(title);
+        builder.setMessage(R.string.remove_registration_confirmation);
+        builder.setPositiveButton(R.string.yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-
-
                         Log.d(TAG, "remove donor: " + mDonor.getId());
                         new RemoveDonorTask(getContext(), new OnResult() {
                             @Override
@@ -182,31 +181,27 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                     }
                 });
 
-        alertDialog.setNegativeButton(R.string.cancel,
+        builder.setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
     private void createPhoneDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(R.string.phone);
-        alertDialog.setMessage(R.string.enter_phone);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.edit_phone));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_call_black_24dp, 0, 0, 0);
+        builder.setCustomTitle(title);
 
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
+        final EditText input = Util.buildInputView(getContext(), "");
         input.setInputType(InputType.TYPE_CLASS_PHONE);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_call_black_24dp);
+        builder.setView(input);
 
-        alertDialog.setPositiveButton(R.string.update,
+        builder.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String newPhone = input.getText().toString();
@@ -215,85 +210,88 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                                 Donor.get(getActivity()).setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
                                 DonationsManager.get().updateProfile(getContext());
-                                updateDataBase("phone", newPhone);
+                                updateDataBase(Donor.K_PHONE, newPhone);
                                 Toast.makeText(getActivity(), R.string.contact_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
                     }
                 });
 
-        alertDialog.setNegativeButton(R.string.cancel,
+        builder.setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
     private void createContactDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(getString(R.string.contact_name));
-        alertDialog.setMessage(R.string.enter_contact_name);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(),getString(R.string.edit_contact_name));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_person_black_24dp, 0, 0, 0);
+        builder.setCustomTitle(title);
 
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_person_black_24dp);
+        String hint = String.format("%s וגם %s", getString(R.string.first_name), getString(R.string.last_name));
+        final EditText input = Util.buildInputView(getContext(), hint);
+        builder.setView(input);
 
-        alertDialog.setPositiveButton(R.string.update,
+        builder.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
                         if (!RegistrationHandler.isEmpty(input)) {
-                            Donor.get(getActivity()).setContactInfo(getContext(), newContact);
-                            contactName.setText(newContact);
-                            ((OnInfoUpdateListener)getActivity()).onContactChange(newContact); // update drawer view
-                            updateDataBase("contact", newContact);
-                            DonationsManager.get().updateProfile(getContext());
-                            Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
-                        }
+                            String[] names = newContact.split(" +");
+                            if(names.length == 2) {
+                                Donor.get(getActivity()).setContactInfo(getContext(), newContact);
+                                contactName.setText(newContact);
+                                ((OnInfoUpdateListener) getActivity()).onContactChange(newContact); // update drawer view
 
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put(Donor.K_FIRST_NAME, names[0]);
+                                updates.put(Donor.K_LAST_NAME, names[1]);
+                                mDonorRef.updateChildren(updates);
+
+                                DonationsManager.get().updateProfile(getContext());
+                                Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
+                            }
+                            else{
+                                Toast.makeText(getActivity(), "הכנס שם פרטי וגם שם משפחה", Toast.LENGTH_LONG).show();
+                            }
+                        }
                     }
                 });
 
-        alertDialog.setNegativeButton(R.string.cancel,
+        builder.setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
     private void createAddressDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(R.string.address);
-        alertDialog.setMessage(R.string.enter_address);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.enter_address));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_room_black_24dp, 0, 0, 0);
+        builder.setCustomTitle(title);
 
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_room_black_24dp);
+        final EditText input = Util.buildInputView(getContext(), getString(R.string.address_hint));
+        builder.setView(input);
 
-        alertDialog.setPositiveButton(R.string.update,
+        builder.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (!RegistrationHandler.isEmpty(input)) {
                             String newAddress = input.getText().toString();
                             LatLng latLng = RegistrationHandler.getLocationFromAddress(getContext(), input);
                             if(latLng != null){
-                                updateDataBase("address", newAddress);
-                                mDonorRef.child("position").child("latitude").setValue(latLng.latitude);
-                                mDonorRef.child("position").child("longitude").setValue(latLng.longitude);
+                                updateDataBase(Donor.K_ADDRESS, newAddress);
+                                mDonorRef.child(Donor.K_POSITION).child(Donor.K_LAT).setValue(latLng.latitude);
+                                mDonorRef.child(Donor.K_POSITION).child(Donor.K_LNG).setValue(latLng.longitude);
 
                                 Donor.get(getActivity()).setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
@@ -304,30 +302,28 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                     }
                 });
 
-        alertDialog.setNegativeButton(getString(R.string.cancel),
+        builder.setNegativeButton(getString(R.string.cancel),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
     private void createBusinessDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(R.string.business_name);
-        alertDialog.setMessage(R.string.enter_business_name);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_work_black_24dp);
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.edit_bussiness_name));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_work_black_24dp, 0, 0, 0);
 
-        alertDialog.setPositiveButton(R.string.update,
+        builder.setCustomTitle(title);
+
+        final EditText input = Util.buildInputView(getContext(), getString(R.string.business_name));
+        builder.setView(input);
+
+        builder.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String newBusinessName = input.getText().toString();
@@ -335,21 +331,21 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                             Donor.get(getActivity()).setBusinessName(getContext(), newBusinessName);
                             businessName.setText(newBusinessName);
                             ((OnInfoUpdateListener)getActivity()).onBusinessChange(newBusinessName);
-                            updateDataBase("businessName", newBusinessName);
+                            updateDataBase(Donor.K_BUSINESS, newBusinessName);
                             DonationsManager.get().updateProfile(getContext());
                             Toast.makeText(getActivity(), R.string.business_name_changed_successfully, Toast.LENGTH_LONG).show();
                         }
                     }
                 });
 
-        alertDialog.setNegativeButton(getString(R.string.cancel),
+        builder.setNegativeButton(getString(R.string.cancel),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
 
     }
 

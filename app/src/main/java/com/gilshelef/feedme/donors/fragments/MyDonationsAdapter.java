@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
@@ -15,6 +16,7 @@ import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnUpdateCount;
+import com.gilshelef.feedme.util.Util;
 
 import java.util.List;
 
@@ -48,7 +50,8 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
     @Override
     protected void onItemDismiss(final Donation donation) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mActivity);
-        builder.setTitle(R.string.remove_donation);
+        TextView title = Util.buildTitleView(mActivity, mActivity.getString(R.string.remove_donation));
+        builder.setCustomTitle(title);
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Donor.get(mActivity).updateDonationCount(mActivity, -1);

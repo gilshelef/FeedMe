@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,10 +25,10 @@ import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
-import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
+import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -92,14 +91,14 @@ public class ProfileNonProfitFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        nonProfitName.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                createNonProfitDialog();
-            }
-
-
-        });
+//        nonProfitName.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                createNonProfitDialog();
+//            }
+//
+//
+//        });
         address.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -127,11 +126,13 @@ public class ProfileNonProfitFragment extends Fragment {
     }
 
     private void removeRegistration() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(getString(R.string.remove_registration));
-        alertDialog.setMessage(R.string.remove_registration_confirmation);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.remove_registration));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_error_black_24dp, 0, 0, 0);
+        builder.setCustomTitle(title);
+        builder.setMessage(R.string.remove_registration_confirmation);
 
-        alertDialog.setPositiveButton(R.string.yes,
+        builder.setPositiveButton(R.string.yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         SharedPreferences prefs = getContext().getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
@@ -212,79 +213,28 @@ public class ProfileNonProfitFragment extends Fragment {
                     }
                 });
 
-        alertDialog.setNegativeButton(R.string.cancel,
+        builder.setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
-
-
-    private void createNonProfitDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle("שם עמותה");
-        alertDialog.setMessage("הכנס שם של עמותה");
-
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-
-        alertDialog.setPositiveButton("עדכן",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        final String newNonProfitName = input.getText().toString();
-                        if (!RegistrationHandler.isEmpty(input)) {
-                            OnBooleanResult callBack = new OnBooleanResult() {
-                                @Override
-                                public void onResult(boolean listed) {
-                                    if(listed){
-                                        nonProfitName.setText(newNonProfitName);
-                                        mNonProfit.setName(getActivity(), newNonProfitName);
-                                        ((OnInfoUpdateListener)getActivity()).onBusinessChange(newNonProfitName);
-                                        updateDataBase("name", newNonProfitName);
-                                        Toast.makeText(getActivity(), "שם עמותה שונה בהצלחה", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                            };
-                            new RegistrationHandler.CheckForNonProfitListingTask(getActivity(), newNonProfitName, callBack).execute();
-                        }
-                    }
-                });
-
-        alertDialog.setNegativeButton("בטל",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-        alertDialog.show();
-
-
-    }
 
     private void createPhoneDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(R.string.phone);
-        alertDialog.setMessage(R.string.enter_phone);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.edit_phone));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_call_black_24dp, 0, 0, 0);
+        builder.setCustomTitle(title);
 
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
+        final EditText input = Util.buildInputView(getContext(), "");
         input.setInputType(InputType.TYPE_CLASS_PHONE);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_call_black_24dp);
+        builder.setView(input);
 
-        alertDialog.setPositiveButton(R.string.update,
+        builder.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String newPhone = input.getText().toString();
@@ -300,30 +250,28 @@ public class ProfileNonProfitFragment extends Fragment {
                     }
                 });
 
-        alertDialog.setNegativeButton(R.string.cancel,
+        builder.setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
     private void createContactDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(getString(R.string.contact_name));
-        alertDialog.setMessage(R.string.enter_contact_name);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(),getString(R.string.edit_contact_name));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_person_black_24dp, 0, 0, 0);
+        builder.setCustomTitle(title);
 
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_person_black_24dp);
+        String hint = String.format("%s וגם %s", getString(R.string.first_name), getString(R.string.last_name));
+        final EditText input = Util.buildInputView(getContext(), hint);
+        builder.setView(input);
 
-        alertDialog.setPositiveButton(R.string.update,
+
+        builder.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         String newContact = input.getText().toString();
@@ -333,36 +281,30 @@ public class ProfileNonProfitFragment extends Fragment {
                             updateDataBase("contact", newContact);
                             ((OnInfoUpdateListener)getActivity()).onContactChange(newContact);
                             Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
-
                         }
-
                     }
                 });
 
-        alertDialog.setNegativeButton(R.string.cancel,
+        builder.setNegativeButton(R.string.cancel,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
     private void createAddressDialog() {
-        AlertDialog.Builder alertDialog = new AlertDialog.Builder(getActivity());
-        alertDialog.setTitle(R.string.address);
-        alertDialog.setMessage(R.string.enter_address);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        TextView title = Util.buildTitleView(getContext(), getString(R.string.enter_address));
+        title.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_room_black_24dp, 0, 0, 0);
 
-        final EditText input = new EditText(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT);
-        input.setLayoutParams(lp);
-        alertDialog.setView(input);
-        alertDialog.setIcon(R.drawable.ic_room_black_24dp);
+        builder.setCustomTitle(title);
+        final EditText input = Util.buildInputView(getContext(), getString(R.string.address_hint));
+        builder.setView(input);
 
-        alertDialog.setPositiveButton(R.string.update,
+        builder.setPositiveButton(R.string.update,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         if (!RegistrationHandler.isEmpty(input)) {
@@ -381,14 +323,14 @@ public class ProfileNonProfitFragment extends Fragment {
                     }
                 });
 
-        alertDialog.setNegativeButton(getString(R.string.cancel),
+        builder.setNegativeButton(getString(R.string.cancel),
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
                         dialog.cancel();
                     }
                 });
 
-        alertDialog.show();
+        builder.show();
     }
 
     private void updateDataBase(String key, String value) {

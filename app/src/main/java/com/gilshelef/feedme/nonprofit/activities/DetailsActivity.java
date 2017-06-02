@@ -20,7 +20,6 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -29,6 +28,7 @@ import com.gilshelef.feedme.donors.fragments.TimePickerFragment;
 import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.maps.model.LatLng;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
@@ -46,6 +46,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
 
     private static final String TAG = DetailsActivity.class.getSimpleName();
     public static final String EXTRA_DONATION = "donation";
+    public static final String EXTRA_IS_DONOR = "donor_activity";
     private static final String UNNAMED_ROAD = "Unnamed Road";
     public static final int DETAILS_REQUEST_CODE = Constants.REQUEST_2;
     private final View.OnClickListener exitListener = new View.OnClickListener() {
@@ -91,7 +92,9 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_deatils);
-        donation = getIntent().getParcelableExtra(EXTRA_DONATION);
+        Intent intent = getIntent();
+        donation = intent.getParcelableExtra(EXTRA_DONATION);
+        boolean isDonor = intent.getBooleanExtra(EXTRA_IS_DONOR, false);
         extractContainers();
 
         //thumbnail
@@ -121,14 +124,14 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         if(donation.isSaved())
             save.setLiked(true);
 
-        if(donation.isOwned() || donation.isDonor()) {
+        if(donation.isOwned() || isDonor) {
             save.setVisibility(View.GONE);
             addToCartBtn.setVisibility(View.GONE);
             if(donation.isOwned()) findViewById(R.id.taken_container).setVisibility(View.VISIBLE);
         }
         else styleCartBtn();
 
-        if(donation.isDonor()) {
+        if(isDonor) {
             editDescription.setVisibility(View.VISIBLE);
             editDescription.setOnClickListener(descriptionListener);
             timeBtn.setOnClickListener(timeListener);
@@ -210,7 +213,6 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
 
     private class ListenerTask extends AsyncTask<Void, Void, String>{
 
-
         @Override
         protected String doInBackground(Void... params) {
             exit.setOnClickListener(exitListener);
@@ -229,7 +231,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
 
             Geocoder geocoder;
             List<Address> addresses;
-            Locale aLocale = new Locale.Builder().setLanguage("he").build();
+            Locale aLocale = new Locale.Builder().setLanguage(Constants.HEBREW).build();
             geocoder = new Geocoder(getApplicationContext(), aLocale);
             LatLng latlng = donation.getPosition();
             String addressDetails = "";
@@ -274,17 +276,14 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
     private final View.OnClickListener descriptionListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            AlertDialog.Builder alertDialog = new AlertDialog.Builder(DetailsActivity.this);
-            alertDialog.setTitle(getString(R.string.donation_description));
+            AlertDialog.Builder builder = new AlertDialog.Builder(DetailsActivity.this);
+            TextView title = Util.buildTitleView(DetailsActivity.this, getString(R.string.donation_description));
+            builder.setCustomTitle(title);
 
-            final EditText input = new EditText(DetailsActivity.this);
-            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            input.setLayoutParams(lp);
-            alertDialog.setView(input);
+            final EditText input = Util.buildInputView(DetailsActivity.this, getString(R.string.description_hint));
+            builder.setView(input);
 
-            alertDialog.setPositiveButton(R.string.update,
+            builder.setPositiveButton(R.string.update,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             String newDescription = input.getText().toString();
@@ -295,14 +294,14 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
                         }
                     });
 
-            alertDialog.setNegativeButton(R.string.cancel,
+            builder.setNegativeButton(R.string.cancel,
                     new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.cancel();
                         }
                     });
 
-            alertDialog.show();
+            builder.show();
         }
     };
 
