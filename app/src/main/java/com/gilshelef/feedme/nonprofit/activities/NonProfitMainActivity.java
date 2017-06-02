@@ -50,8 +50,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static android.widget.Toast.LENGTH_SHORT;
-
 /**
  * Created by gilshe on 3/13/17.
  */
@@ -218,7 +216,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
     }
 
     private void moveToFilters() {
-        Toast.makeText(getApplicationContext(), "Sorry, filters are not implemented yet", LENGTH_SHORT).show();
+//        Toast.makeText(getApplicationContext(), "Sorry, filters are not implemented yet", LENGTH_SHORT).show();
     }
 
     @Override
