@@ -95,48 +95,16 @@
 
         </RelativeLayout>
 
-        <!--<RelativeLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="bottom|end">-->
-
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center"-->
-                <!--android:layout_centerInParent="true"-->
-                <!--android:text="TAKE"-->
-                <!--android:textStyle="bold"-->
-                <!--android:textColor="@android:color/white"-->
-                <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
-
-            <!--<android.support.design.widget.FloatingActionButton-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:id="@+id/cart_checkout"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:src="@android:color/transparent"-->
-                <!--android:background="@color/colorAccent"-->
-                <!--android:visibility="visible"-->
-                <!--android:layout_margin="16dp"-->
-                <!--app:fabSize="normal"-->
-                <!--app:layout_behavior="com.gilshelef.feedme.nonprofit.fragments.ScrollAwareFABBehavior"/>-->
-
-
-
-        <!--</RelativeLayout>-->
-        <!--</android.support.design.widget.CoordinatorLayout>-->
-
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/cart_checkout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_checkout_white_24dp"
-            android:background="@color/colorAccent"
+            app:srcCompat="@drawable/ic_checkout_white_24dp"
+            app:backgroundTint="@color/colorAccent"
             android:visibility="visible"
             app:layout_behavior="com.gilshelef.feedme.nonprofit.fragments.ScrollAwareFABBehavior"
-            app:elevation="6dp"
             app:fabSize="normal" />
 
     </android.support.design.widget.CoordinatorLayout>
