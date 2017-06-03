@@ -58,6 +58,7 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
                 DonationsManager.get().returnDonation(donation.getId());
                 Logger.get(mActivity).returnDonation(donation.getId());
                 Toast.makeText(mActivity, R.string.remove_donation_successfully, Toast.LENGTH_LONG).show();
+                Util.unScheduleAlarm(mActivity, donation.getId());
                 ((OnCounterChangeListener) mActivity).updateViewCounters(); // owned and home
             }
         });

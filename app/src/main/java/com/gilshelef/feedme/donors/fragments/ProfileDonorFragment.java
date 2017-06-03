@@ -392,9 +392,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         protected Void doInBackground(Void... params) {
             final DatabaseReference donorDonationRef = FirebaseDatabase.getInstance().getReference()
                     .child(Constants.DB_DONOR_DONATION)
-                    .child(mDonor.getId())
-                    .child(Constants.DB_DONATION);
-
+                    .child(mDonor.getId());
 
             ValueEventListener listener = new ValueEventListener() {
                 @Override
@@ -402,14 +400,17 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                     DatabaseReference mDonationRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONATION);
 
                     final Map<String, Object> donationToRemove = new HashMap<>();
-                    for (DataSnapshot donationId : dataSnapshot.getChildren())
-                            donationToRemove.put(donationId.getKey(), null); // remove /donation/donorId
+                    for (DataSnapshot child : dataSnapshot.getChildren()) {
+                        String donationId = child.getKey();
+                        donationToRemove.put(donationId, null); // remove /donation/donorId
+                        Util.unScheduleAlarm(mContext, donationId); //unscheduled alarm
+                    }
 
                     mDonationRef.updateChildren(donationToRemove, new DatabaseReference.CompletionListener() {
                         @Override
                         public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
                             mDonorRef.removeValue(); // remove /donor
-                            donorDonationRef.removeValue(); // remove /donor_donation
+                            donorDonationRef.removeValue(); //remove /donor_donation
 
                             DonationsManager.get().removeImages(donationToRemove.keySet());
                             FirebaseMessaging.getInstance().unsubscribeFromTopic(mDonor.getId());
@@ -427,7 +428,10 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                 public void onCancelled(DatabaseError databaseError) {}
             };
 
-            donorDonationRef.addListenerForSingleValueEvent(listener);
+             donorDonationRef
+                     .child(Constants.DB_DONATION)
+                     .addListenerForSingleValueEvent(listener);
+
 
             SharedPreferences prefs = mContext.getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
             prefs.edit().putBoolean(RegistrationActivity.DONOR, false).apply();

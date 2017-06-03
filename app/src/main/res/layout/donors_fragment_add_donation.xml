@@ -58,6 +58,7 @@
         android:layout_height="1dp"
         android:background="@color/divider" />
 
+    <!--time-->
     <RelativeLayout
         android:id="@+id/pick_time_btn"
         android:layout_width="match_parent"

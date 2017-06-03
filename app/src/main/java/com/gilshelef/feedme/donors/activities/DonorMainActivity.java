@@ -29,6 +29,7 @@ import com.gilshelef.feedme.donors.fragments.AddDonationFragment;
 import com.gilshelef.feedme.donors.fragments.MyDonationsFragment;
 import com.gilshelef.feedme.donors.fragments.ProfileDonorFragment;
 import com.gilshelef.feedme.nonprofit.activities.DetailsActivity;
+import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
@@ -48,6 +49,8 @@ import java.util.Map;
 public class DonorMainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, AddDonationFragment.OnCameraEvent, OnCounterChangeListener, OnInfoUpdateListener, BaseFragment.OnDetailsListener {
 
     private static final String TAG = DonorMainActivity.class.getSimpleName();
+    public static final String ACTION_REMOVE_DONATION = "actionRemoveDonation";
+    public static final String ACTION_UPDATE_TIME = "actionUpdateTime";
     private Toolbar mAppToolBar;
     private NavigationView navigationView;
     private Map<String, Fragment> mFragments;
@@ -96,9 +99,17 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         onNavigationItemSelected(navigationView.getMenu().findItem(R.id.nav_add_donation));
         navigationView.setCheckedItem(R.id.nav_add_donation);
 
+        //handle time related actions
+        String action = getIntent().getAction();
+        if(action != null)
+            handleAction(action);
+
         //welcome
-        String welcomeText = getString(R.string.Hello) + " " + Donor.get(this).getContactInfo();
-        Toast.makeText(getApplicationContext(), welcomeText, Toast.LENGTH_LONG).show();
+        else {
+            String welcomeText = getString(R.string.Hello) + " " + Donor.get(this).getContactInfo();
+            Toast.makeText(getApplicationContext(), welcomeText, Toast.LENGTH_SHORT).show();
+        }
+
         updateViewCounters();
 
         onBusinessChange(donor.getBusinessName());
@@ -107,6 +118,33 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         Log.d(TAG, "onCreate");
 
         FirebaseMessaging.getInstance().subscribeToTopic(donor.getId());
+    }
+
+    private void handleAction(String action) {
+        Bundle bundle = getIntent().getExtras();
+        String donationId = bundle.getString(Donation.K_ID);
+        if(donationId == null)
+            return;
+
+        DonationsManager instance = DonationsManager.get(this);
+        if(!instance.hasDonation(donationId))
+            return;
+
+        Log.d("TIME", action);
+
+        if(action.equals(ACTION_REMOVE_DONATION)) {
+            Donor.get(this).updateDonationCount(this, -1);
+            instance.returnDonation(donationId);
+            Toast.makeText(this, "תרומתך ירדה מהמאגר", Toast.LENGTH_LONG).show();
+        }
+
+        else if(action.equals(ACTION_UPDATE_TIME)){
+            String calendarStr = bundle.getString(Donation.K_CALENDAR);
+            instance.updateDonationInformation(this, donationId, DonationsManager.NO_UPDATE, calendarStr);
+            Toast.makeText(this, "זמן התרומה עודכן", Toast.LENGTH_LONG).show();
+        }
+
+        AdapterManager.get().updateDataSourceAll();
 
     }
 
@@ -192,7 +230,8 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
                 String description = data.getStringExtra(Donation.K_DESCRIPTION);
                 String calenderStr = data.getStringExtra(Donation.K_CALENDAR);
 
-                DonationsManager.get(this).update(donationId, description, calenderStr);
+                DonationsManager.get().updateDonationInformation(this, donationId, description, calenderStr);
+                AdapterManager.get().updateDataSourceAll();
             }
         }
 
@@ -201,9 +240,8 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         }
     }
 
-
     @Override
-    public void onBackPressed () {
+    public void onBackPressed() {
     }
 
     @Override

@@ -8,6 +8,7 @@ import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.Util;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,6 +33,7 @@ import java.util.Set;
 public class DonationsManager {
 
     private static final String TAG = DonationsManager.class.getSimpleName();
+    public static final String NO_UPDATE = "noUpdate";
     private final Map<String, Donation> mDonations;
     private static DonationsManager instance;
     private final StorageReference mStorageRef;
@@ -58,7 +60,9 @@ public class DonationsManager {
     }
 
     public static DonationsManager get() {
-        return instance;
+        synchronized (DonationsManager.class) {
+            return instance;
+        }
     }
 
     private static DonationsManager build(OnCounterChangeListener listener) {
@@ -135,27 +139,47 @@ public class DonationsManager {
         mStorageRef.child(donationId).delete();
     }
 
-    public void update(final String donationId, final String description, final String calenderStr) {
+    public void updateDonationInformation(Context context, final String donationId, String description, String calenderStr) {
         final Donation donation = mDonations.get(donationId);
-
-        if(donation.getDescription().equals(description) &&
-                donation.getCalendar().equals(calenderStr))
+        if(donation == null)
             return;
 
-        donation.setDescription(description);
-        donation.setCalendar(calenderStr);
+        //if no change no need for updateDonationInformation
+        description = checkForUpdate(donation.getDescription(), description);
+        calenderStr = checkForUpdate(donation.getCalendar(), calenderStr);
+        if(description.equals(NO_UPDATE) && calenderStr.equals(NO_UPDATE))
+            return;
 
+        //update locally
+        updateDonationInfoLocal(donation, description, calenderStr);
+
+        //create update map - update database
+        updateDonationInfoDatabase(donationId, description, calenderStr);
+
+        if(!calenderStr.equals(NO_UPDATE)) //reschedule alarm
+            Util.scheduleAlarm(context, donation);
+
+    }
+
+    private String checkForUpdate(String old, String update) {
+        return old.equals(update) || update.equals(NO_UPDATE) ? NO_UPDATE : update;
+    }
+
+    private void updateDonationInfoLocal(Donation donation, String description, String calenderStr) {
+        if(!description.equals(NO_UPDATE)) donation.setDescription(description);
+        if(!calenderStr.equals(NO_UPDATE)) donation.setCalendar(calenderStr);
+    }
+
+    private void updateDonationInfoDatabase(String donationId, String description, String calenderStr) {
         Map<String, Object> updates = new HashMap<>();
-        updates.put(Donation.K_DESCRIPTION, description);
-        updates.put(Donation.K_CALENDAR, calenderStr);
+        if(!description.equals(NO_UPDATE)) updates.put(Donation.K_DESCRIPTION, description);
+        if(!calenderStr.equals(NO_UPDATE)) updates.put(Donation.K_CALENDAR, calenderStr);
 
         DatabaseReference donationRef = mDatabase
                 .child(Constants.DB_DONATION)
                 .child(donationId);
 
         donationRef.updateChildren(updates);
-        AdapterManager.get().updateDataSourceAll();
-
     }
 
     public static void clear() {
@@ -190,6 +214,14 @@ public class DonationsManager {
             mDonations.clear();
             mDonations.putAll(newData);
         }
+    }
+
+    public Donation getDonation(String donationId) {
+        return mDonations.get(donationId);
+    }
+
+    public boolean hasDonation(String donationId) {
+        return getDonation(donationId) != null;
     }
 
     private class FetchDataTask extends AsyncTask<Void, Void, Void> {
@@ -242,7 +274,6 @@ public class DonationsManager {
 
                             Log.d(TAG, "donation : " + donationId + "changed to: " + state);
                             if(state.equals(Donation.State.TAKEN)) {
-
                                 returnDonation(donationId);
                                 mListener.updateViewCounters();
                                 AdapterManager.get().updateDataSourceAll();

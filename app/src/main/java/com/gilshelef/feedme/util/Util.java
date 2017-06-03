@@ -18,13 +18,13 @@ import com.gilshelef.feedme.nonprofit.data.Donation;
 
 import java.util.Calendar;
 
-import static com.gilshelef.feedme.donors.fragments.AddDonationFragment.TAG;
-
 /**
  * Created by gilshe on 5/31/17.
  */
 
 public class Util {
+
+    private static AlarmManager mAlarmManager;
 
     public static TextView buildTitleView(Context context, String text){
         TextView title = new TextView(context);
@@ -67,15 +67,43 @@ public class Util {
     }
 
     public static void scheduleAlarm(Context context, Donation donation) {
+        if(donation == null)
+            return;
+
+        Intent activate = new Intent(context, AlarmReceiver.class);
         Calendar calendar = donation.calendar;
-        calendar.add(Calendar.MINUTE, 1);
-        Log.d(TAG, "scheduled alarm to: " + calendar.getTime());
-        Intent activate = new Intent(context, Alarm.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, 0, activate, 0);
+        activate.setAction(AlarmReceiver.ACTION);
         activate.putExtra(Donation.K_ID, donation.getId());
-        AlarmManager alarms = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+
+        int alertId = donation.getId().hashCode();
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(context, alertId, activate, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarms = getAlarmManager(context);
         alarms.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), alarmIntent);
+
+        Log.d("TIME", "scheduled alarm to: " + calendar.getTime() + " with id: " + alertId);
+
+    }
+
+    private static AlarmManager getAlarmManager(Context context) {
+        synchronized (Util.class) {
+            if (mAlarmManager == null)
+                mAlarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        }
+        return mAlarmManager;
     }
 
 
+    public static void unScheduleAlarm(Context context, String donationId) {
+        Intent intent = new Intent(context, AlarmReceiver.class);
+        intent.setAction(AlarmReceiver.ACTION);
+        intent.putExtra(Donation.K_ID, donationId);
+
+        int alertId = donationId.hashCode();
+        boolean alarmUp = (PendingIntent.getBroadcast(context, alertId, intent, PendingIntent.FLAG_NO_CREATE) != null);
+
+        PendingIntent deleteIntent = PendingIntent.getBroadcast(context, alertId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        AlarmManager alarms = getAlarmManager(context);
+        alarms.cancel(deleteIntent);
+        Log.d("TIME", "cancel alarm with id " + alertId + " alarm is up? " + alarmUp);
+    }
 }

@@ -28,6 +28,7 @@ import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.Logger;
+import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DatabaseReference;
@@ -80,7 +81,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     }
 
     @Override
-    public void onViewCreated (View view, Bundle savedInstanceState){
+    public void onViewCreated(View view, Bundle savedInstanceState){
         description = (EditText) view.findViewById(R.id.donation_description);
         View.OnClickListener timeListener = new View.OnClickListener() {
             @Override
@@ -192,7 +193,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
 
                 DonationsManager.get().newDonationEvent(donation);
                 mLogger.newDonation(donationId);
-
+                Util.scheduleAlarm(getActivity(), donation);
                 return true;
             }
 

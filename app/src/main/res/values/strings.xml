@@ -90,5 +90,7 @@
     <string name="authrization_confimed">קיבלנו אישור מאירגונך :)</string>
     <string name="authrization_confimed_msg">כעת האפליקציה פתוחה לכל השימושים</string>
     <string name="non_profit_id_hint">מספר העמותה כפי שמופיע ברשם העמותות</string>
+    <string name="donation_expired_title">שים לב, תוקף התרומה שלך עומד לפוג</string>
+    <string name="donation_expired_msg">אתה יכול לעדכן את זמן האיסוף \nאו שהתרומה תרד מהאוויר.</string>
 
 </resources>
