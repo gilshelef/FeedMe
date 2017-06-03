@@ -160,7 +160,12 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
         this.calendar = Calendar.getInstance();
         calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
         calendar.set(Calendar.MINUTE, minute);
-        this.timeView.setText(hourOfDay + ":" + minute);
+
+        String minuteStr = String.valueOf(minute);
+        if(minute < 10){
+            minuteStr = "0" + minute;
+        }
+        this.timeView.setText(hourOfDay + ":" + minuteStr);
         this.timeView.setVisibility(View.VISIBLE);
     }
 
