@@ -4,8 +4,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityOptionsCompat;
@@ -34,6 +34,7 @@ import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
+import com.gilshelef.feedme.util.ImagePicker;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -194,9 +195,7 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
     }
     @Override
     public void onCameraEvent() {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        if (intent.resolveActivity(getPackageManager()) != null)
-            startActivityForResult(intent, AddDonationFragment.REQUEST_IMAGE_CAPTURE);
+        ImagePicker.pickImage(this);
     }
 
     @Override
@@ -236,7 +235,8 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         }
 
         else if (requestCode == AddDonationFragment.REQUEST_IMAGE_CAPTURE){
-            mFragments.get(AddDonationFragment.TAG).onActivityResult(requestCode, resultCode, data);
+            Bitmap bitmap = ImagePicker.getImageFromResult(this, resultCode, data);
+            ((OnImageResult) mFragments.get(AddDonationFragment.TAG)).onImageResult(bitmap);
         }
     }
 

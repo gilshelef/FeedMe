@@ -22,11 +22,13 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.gilshelef.feedme.R;
+import com.gilshelef.feedme.donors.activities.OnImageResult;
 import com.gilshelef.feedme.donors.data.DonationsManager;
 import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
+import com.gilshelef.feedme.util.ImagePicker;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -48,7 +50,7 @@ import static android.app.Activity.RESULT_OK;
  * Created by gilshe on 3/27/17.
  */
 
-public class AddDonationFragment extends Fragment implements TimePickerDialog.OnTimeSetListener{
+public class AddDonationFragment extends Fragment implements TimePickerDialog.OnTimeSetListener, OnImageResult {
     public static final String TAG = AddDonationFragment.class.getSimpleName();
     public static final int REQUEST_IMAGE_CAPTURE = Constants.REQUEST_3;
 
@@ -122,11 +124,9 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(resultCode == RESULT_OK && data != null) {
-            Bundle extras = data.getExtras();
-            imageBitmap = (Bitmap) extras.get("data");
+            imageBitmap = ImagePicker.getImageFromResult(getActivity(), resultCode, data);
             imageView.setVisibility(View.VISIBLE);
         }
-
     }
 
     private void uploadImageToStorage(String donationId, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener) {
@@ -168,6 +168,13 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
         this.timeView.setText(hourOfDay + ":" + minuteStr);
         this.timeView.setVisibility(View.VISIBLE);
     }
+
+    @Override
+    public void onImageResult(Bitmap bitmap) {
+        imageBitmap = bitmap;
+        imageView.setVisibility(View.VISIBLE);
+    }
+
 
     private class UploadDonationTask extends AsyncTask<Void, Void, Boolean> {
         final Donor donor = Donor.get(getActivity());

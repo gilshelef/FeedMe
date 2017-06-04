@@ -92,5 +92,6 @@
     <string name="non_profit_id_hint">מספר העמותה כפי שמופיע ברשם העמותות</string>
     <string name="donation_expired_title">שים לב, תוקף התרומה שלך עומד לפוג</string>
     <string name="donation_expired_msg">אתה יכול לעדכן את זמן האיסוף \nאו שהתרומה תרד מהאוויר.</string>
+    <string name="pick_image_intent_text">בחר אפליקציה:</string>
 
 </resources>
