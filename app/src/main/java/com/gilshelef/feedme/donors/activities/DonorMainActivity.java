@@ -236,7 +236,8 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
 
         else if (requestCode == AddDonationFragment.REQUEST_IMAGE_CAPTURE){
             Bitmap bitmap = ImagePicker.getImageFromResult(this, resultCode, data);
-            ((OnImageResult) mFragments.get(AddDonationFragment.TAG)).onImageResult(bitmap);
+            if(bitmap != null)
+                ((OnImageResult) mFragments.get(AddDonationFragment.TAG)).onImageResult(bitmap);
         }
     }
 
