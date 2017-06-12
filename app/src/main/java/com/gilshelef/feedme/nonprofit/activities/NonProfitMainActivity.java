@@ -1,9 +1,6 @@
 package com.gilshelef.feedme.nonprofit.activities;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -16,7 +13,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,6 +20,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
@@ -41,14 +38,16 @@ import com.gilshelef.feedme.nonprofit.fragments.SaveFragment;
 import com.gilshelef.feedme.nonprofit.fragments.ToggleHomeBar;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
+import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by gilshe on 3/13/17.
@@ -74,14 +73,16 @@ public class NonProfitMainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.non_profit_activity_main);
-        loadPreference();
+        Fabric.with(this, new Crashlytics());
+
+        Util.loadPreference(this);
         View main = findViewById(R.id.main);
 
         FirebaseMessaging.getInstance().subscribeToTopic("New_Donations");
 
         //initialize app's data
-        NonProfit.get(this);
         DataManager.get(this);
+        NonProfit.get(this);
         TypeManager.get();
 
         // set toolbar
@@ -143,7 +144,6 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         String welcomeText = getString(R.string.Hello) + " " + NonProfit.get(this).getName();
         Toast.makeText(getApplicationContext(), welcomeText, Toast.LENGTH_LONG).show();
 
-        Log.d(TAG, "onCreate");
     }
 
     private void setButtonStyle(Button selected, Button unselected) {
@@ -191,8 +191,9 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if(shoppingCartNumber < 0)
-                    Log.e(TAG, "ERROR!! number of items in bag is = " + shoppingCartNumber);
+//                if(shoppingCartNumber < 0) {
+//                    Log.e(TAG, "ERROR!! number of items in bag is = " + shoppingCartNumber);
+//                }
                 if (shoppingCartNumber <= 0)
                     shoppingCartUI.setVisibility(View.INVISIBLE);
                 else {
@@ -356,21 +357,6 @@ public class NonProfitMainActivity extends AppCompatActivity implements
         DataManager.clear();
     }
 
-    private String loadPreference() {
-        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
-        String language = shp.getString("Language","he");
-        Locale myLocale = new Locale(language);
-
-        Configuration config = new Configuration();
-        config.setLocale(myLocale);
-        //manually set layout direction to a LTR location
-        config.setLayoutDirection(new Locale("en"));
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-        String locale = getResources().getConfiguration().locale.getDisplayName();
-        Log.d(TAG, locale);
-        return locale;
-    }
-
 
     private class NavigationViewCounterTask extends AsyncTask<Void, Void, Void>{
 
@@ -381,7 +367,7 @@ public class NonProfitMainActivity extends AppCompatActivity implements
 
         @Override
         protected Void doInBackground(Void... params) {
-            DataManager instance = DataManager.get(getApplicationContext());
+            DataManager instance = DataManager.get(NonProfitMainActivity.this);
             countHome = instance.getAll().size();
             countSaved = instance.getSaved().size();
             countMyDonations = instance.getOwned().size();

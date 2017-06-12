@@ -8,11 +8,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.crashlytics.android.Crashlytics;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.donors.activities.DonorMainActivity;
 import com.gilshelef.feedme.donors.activities.RegistrationDonorActivity;
 import com.gilshelef.feedme.nonprofit.activities.NonProfitMainActivity;
 import com.gilshelef.feedme.nonprofit.activities.NonProfitRegistrationActivity;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by gilshe on 3/21/17.
@@ -27,6 +29,7 @@ public class RegistrationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
 
         SharedPreferences sharedPref = getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         boolean registeredAsNonProfit = sharedPref.getBoolean(NON_PROFIT, false);

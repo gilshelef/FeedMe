@@ -1,9 +1,6 @@
 package com.gilshelef.feedme.donors.activities;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
@@ -16,12 +13,12 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.donors.data.DonationsManager;
 import com.gilshelef.feedme.donors.data.Donor;
@@ -37,11 +34,12 @@ import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.ImagePicker;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.gilshelef.feedme.util.Util;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by gilshe on 3/26/17.
@@ -62,8 +60,10 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_donors);
+        Fabric.with(this, new Crashlytics());
 
-        loadPreference();
+        Util.loadPreference(this);
+
         //initialize activity's data
         TypeManager.get();
         final Donor donor = Donor.get(this);
@@ -116,22 +116,18 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         onBusinessChange(donor.getBusinessName());
         onContactChange(donor.getContactInfo());
 
-        Log.d(TAG, "onCreate");
-
-        FirebaseMessaging.getInstance().subscribeToTopic(donor.getId());
     }
 
     private void handleAction(String action) {
         Bundle bundle = getIntent().getExtras();
         String donationId = bundle.getString(Donation.K_ID);
-        if(donationId == null)
-            return;
+        if(donationId == null) return;
 
         DonationsManager instance = DonationsManager.get(this);
         if(!instance.hasDonation(donationId))
             return;
 
-        Log.d("TIME", action);
+//        Log.d("TIME", action);
 
         if(action.equals(ACTION_REMOVE_DONATION)) {
             Donor.get(this).updateDonationCount(this, -1);
@@ -179,20 +175,6 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         fragmentTransaction.commit();
     }
 
-    private String loadPreference() {
-        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
-        String language = shp.getString("Language","he");
-        Locale myLocale = new Locale(language);
-
-        Configuration config = new Configuration();
-        config.setLocale(myLocale);
-        //manually set layout direction to a LTR location
-        config.setLayoutDirection(new Locale("en"));
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-        String locale = getResources().getConfiguration().locale.getDisplayName();
-        Log.d(TAG, locale);
-        return locale;
-    }
     @Override
     public void onCameraEvent() {
         ImagePicker.pickImage(this);
@@ -229,15 +211,17 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
                 String description = data.getStringExtra(Donation.K_DESCRIPTION);
                 String calenderStr = data.getStringExtra(Donation.K_CALENDAR);
 
-                DonationsManager.get().updateDonationInformation(this, donationId, description, calenderStr);
+                DonationsManager.get(this).updateDonationInformation(this, donationId, description, calenderStr);
                 AdapterManager.get().updateDataSourceAll();
             }
         }
 
-        else if (requestCode == AddDonationFragment.REQUEST_IMAGE_CAPTURE){
-            Bitmap bitmap = ImagePicker.getImageFromResult(this, resultCode, data);
-            if(bitmap != null)
-                ((OnImageResult) mFragments.get(AddDonationFragment.TAG)).onImageResult(bitmap);
+        else if (requestCode == ImagePicker.PICK_IMAGE_REQUEST_CODE){
+            if(resultCode != RESULT_CANCELED) {
+                Bitmap bitmap = ImagePicker.getImageFromResult(this, requestCode, resultCode, data);
+                if (bitmap != null)
+                    ((OnImageResult) mFragments.get(AddDonationFragment.TAG)).onImageResult(bitmap);
+            }
         }
     }
 
