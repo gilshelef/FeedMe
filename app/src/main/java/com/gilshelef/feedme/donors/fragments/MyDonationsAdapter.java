@@ -26,15 +26,22 @@ import java.util.List;
 
 public class MyDonationsAdapter extends RecycledBaseAdapter {
 
+    private final OnCounterChangeListener onCounterListener;
 
     public MyDonationsAdapter(Activity activity, List<Donation> dataSource, OnUpdateCount listener) {
         super(activity, dataSource, listener);
+        this.onCounterListener = (OnCounterChangeListener) activity;
     }
 
     @Override
     public void updateDataSource() {
         mDataSource.clear();
-        mDataSource.addAll(DonationsManager.get().getAll());
+        mDataSource.addAll(DonationsManager.get(onCounterListener).getAll());
+    }
+
+    @Override
+    protected boolean isDonorAdapter() {
+        return true;
     }
 
     @Override
@@ -55,7 +62,7 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
         builder.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 Donor.get(mActivity).updateDonationCount(mActivity, -1);
-                DonationsManager.get().returnDonation(donation.getId());
+                DonationsManager.get(onCounterListener).returnDonation(donation.getId());
                 Logger.get(mActivity).returnDonation(donation.getId());
                 Toast.makeText(mActivity, R.string.remove_donation_successfully, Toast.LENGTH_LONG).show();
                 Util.unScheduleAlarm(mActivity, donation.getId());

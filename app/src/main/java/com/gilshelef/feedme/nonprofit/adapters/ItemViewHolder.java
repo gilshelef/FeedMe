@@ -42,9 +42,8 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
         this.save = (LikeButton) view.findViewById(R.id.save_button);
     }
 
-    void bind(Activity activity, Donation donation) {
+    void bind(Activity activity, Donation donation, boolean isDonorAdapter) {
         mDonation = donation;
-        loadSave();
 
         //image
         if(!mDonation.getImageUrl().isEmpty())
@@ -61,10 +60,13 @@ public class ItemViewHolder extends RecyclerView.ViewHolder {
         type.setText(donation.getType().hebrew());
         description.setText(donation.getDescription());
 
-        //distance
-        double distance = NonProfit.get(activity).calcDistance(mDonation.getPosition());
-        String text = String.format(activity.getResources().getString(R.string.distance), distance);
-        this.distance.setText(text);
+        //distance  + liked
+        if(!isDonorAdapter) {
+            loadSave();
+            double distance = NonProfit.get(activity).calcDistance(mDonation.getPosition());
+            String text = String.format(activity.getResources().getString(R.string.distance), distance);
+            this.distance.setText(text);
+        }
     }
 
     private void loadSave() {

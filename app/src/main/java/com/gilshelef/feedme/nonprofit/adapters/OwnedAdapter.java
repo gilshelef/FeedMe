@@ -26,6 +26,11 @@ public class OwnedAdapter extends RecycledBaseAdapter {
     }
 
     @Override
+    protected boolean isDonorAdapter() {
+        return false;
+    }
+
+    @Override
     public void onBindViewHolder(final ItemViewHolder holder, final int position) {
         super.onBindViewHolder(holder, position);
     }

@@ -34,6 +34,11 @@ public class CartAdapter extends RecycledBaseAdapter {
     }
 
     @Override
+    protected boolean isDonorAdapter() {
+        return false;
+    }
+
+    @Override
     protected void styleListItem(ItemViewHolder itemView, Donation donation) {
 
     }

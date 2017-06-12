@@ -21,6 +21,11 @@ public class SaveAdapter extends RecycledBaseAdapter {
     }
 
     @Override
+    protected boolean isDonorAdapter() {
+        return false;
+    }
+
+    @Override
     protected void styleListItem(ItemViewHolder holder, Donation donation) {
         if(donation.getInCart())
             super.setSelected(holder);

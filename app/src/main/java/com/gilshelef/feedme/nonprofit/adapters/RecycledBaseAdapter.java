@@ -30,6 +30,8 @@ public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<ItemView
         this.mListener = listener;
     }
 
+    protected abstract boolean isDonorAdapter();
+
     @Override
     public ItemViewHolder onCreateViewHolder(ViewGroup viewGroup, int position) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.list_row, null);
@@ -39,7 +41,7 @@ public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<ItemView
     @Override
     public void onBindViewHolder(final ItemViewHolder holder, final int position) {
         final Donation donation = mDataSource.get(position);
-        holder.bind(mActivity,donation);
+        holder.bind(mActivity, donation, isDonorAdapter());
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
