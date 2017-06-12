@@ -1,16 +1,13 @@
 package com.gilshelef.feedme.nonprofit.activities;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,7 +29,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 
 
@@ -58,12 +54,11 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
     private ProgressDialog mProgress;
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_non_profit);
-        loadPreference();
+        Util.loadPreference(this);
 
         mNonProfitRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_NON_PROFIT);
 
@@ -106,9 +101,14 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
                 return;
 
             //checking position
+            mProgress = Util.buildProgressDialog(this);
+            mProgress.show();
             mLatLng = RegistrationHandler.getLocationFromAddress(this, mNonProfitAddress);
-            if(mLatLng == null)
+            if(mLatLng == null) {
+                if(mProgress.isShowing())
+                    mProgress.dismiss();
                 return;
+            }
 
             //send authorization email to non-profit
             new SendAuthorizationEmailTask(this).execute();
@@ -122,20 +122,6 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
             return false;
         }
         return true;
-    }
-
-    private String loadPreference() {
-        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
-        String language = shp.getString("Language","he");
-        Locale myLocale = new Locale(language);
-
-        Configuration config = new Configuration();
-        config.setLocale(myLocale);
-        //manually set layout direction to a LTR location
-        config.setLayoutDirection(new Locale("en"));
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-        String locale = getResources().getConfiguration().locale.getDisplayName();
-        return locale;
     }
 
     private boolean validateForm() {
@@ -173,7 +159,9 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
                 mNonProfitName.getText().toString(),
                 contactName,
                 mContactPhone.getText().toString(),
-                mNonProfitAddress.getText().toString(), false);
+                mNonProfitAddress.getText().toString(),
+                false
+        );
 
         //to database
         mNonProfitRef.child(mNonProfitId).setValue(nonProfit);
@@ -209,12 +197,6 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
         }
 
         @Override
-        protected void onPreExecute(){
-            mProgress = Util.buildProgressDialog(NonProfitRegistrationActivity.this);
-            mProgress.show();
-        }
-
-        @Override
         protected Void doInBackground(Void... params) {
             final String nonProfitNumber = mNonProfitNumber.getText().toString();
             final OnResult getEmailCallback = new OnResult() {
@@ -228,7 +210,6 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
             ValueEventListener getNonProfitEmail = new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d(TAG, "SendAuthorizationEmailTask: onDataChange");
                     for(DataSnapshot child: dataSnapshot.getChildren()){
                         String id = child.getKey();
                         if(id.equals(nonProfitNumber)) {
@@ -252,8 +233,8 @@ public class NonProfitRegistrationActivity extends AppCompatActivity implements 
 
         private void sendEmail() {
 
-            email = Constants.DEFAULT_EMAIL;
-            //TODO: remove line above
+//            email = Constants.DEFAULT_EMAIL;
+//            //TODO: remove line above
 
 
             //generate email information

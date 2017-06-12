@@ -1,13 +1,11 @@
 package com.gilshelef.feedme.donors.activities;
 
-import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,14 +22,13 @@ import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.nonprofit.data.types.TypeManager;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.Logger;
+import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -56,7 +53,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_donor);
-        loadPreference();
+        Util.loadPreference(this);
 
         mDonorRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONOR);
 
@@ -81,20 +78,6 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
 
     }
 
-    private String loadPreference() {
-        SharedPreferences shp = getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
-        String language = shp.getString("Language","he");
-        Locale myLocale = new Locale(language);
-
-        Configuration config = new Configuration();
-        config.setLocale(myLocale);
-        //manually set layout direction to a LTR location
-        config.setLayoutDirection(new Locale("en"));
-        getResources().updateConfiguration(config, getResources().getDisplayMetrics());
-        String locale = getResources().getConfiguration().locale.getDisplayName();
-        Log.d(TAG, locale);
-        return locale;
-    }
 
     private void finish(int resultCode) {
         Intent intent = new Intent();
@@ -118,16 +101,23 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
         if(i == R.id.submit_btn) {
             if(!validateForm())
                 return;
+
             // checking phone
             if(!RegistrationHandler.checkPhone(getApplicationContext(), mContactPhone.getText().toString()))
                 return;
 
             //checking position
-            mLatLng = RegistrationHandler.getLocationFromAddress(getApplicationContext(), mDonorAddress);
-            if(mLatLng == null)
+            ProgressDialog progress = Util.buildProgressDialog(this);
+            progress.show();
+            mLatLng = RegistrationHandler.getLocationFromAddress(this, mDonorAddress);
+            if(mLatLng == null) {
+                progress.dismiss();
                 return;
+            }
 
             writeNewDonor();
+            if(progress.isShowing())
+                progress.dismiss();
         }
     }
 
@@ -135,8 +125,10 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
     private void writeNewDonor() {
         String donationTypeStr = mSpinner.getSelectedItem().toString();
         Type donationType = TypeManager.get().getType(donationTypeStr);
+        String donorId = mDonorRef.push().getKey();
+
         Donor donor = new Donor(
-                "",
+                donorId,
                 mBusinessName.getText().toString(),
                 mDonorAddress.getText().toString(),
                 mContactFirstName.getText().toString(),
@@ -148,15 +140,8 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
         );
 
         // to database
-        String donorId = mDonorRef.push().getKey();
-        Log.d(TAG, "creating new donor with id: " + donorId);
-        donor.setId(donorId);
-        mDonorRef.child(donorId).setValue(donor);
-        Map<String, Object> updates = new HashMap<>();
-        updates.put(Donor.K_POSITION, mLatLng);
-        updates.put(Donor.K_TYPE, donationType);
-        mDonorRef.child(donorId)
-                .updateChildren(updates);
+        Map<String, Object> donorValues = donor.toMap();
+        mDonorRef.child(donorId).updateChildren(donorValues);
 
 
         // to shared prefs
@@ -174,7 +159,7 @@ public class RegistrationDonorActivity extends AppCompatActivity implements Adap
         editor.putInt(Donor.K_DONATION_COUNT, 0);
         editor.apply();
 
-        Logger.get(getApplicationContext()).signUp(Logger.EVENT.DONOR, donorId);
+        Logger.get(this).signUp(Logger.EVENT.DONOR, donorId);
         finish(RESULT_OK);
     }
 

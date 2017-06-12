@@ -2,7 +2,6 @@ package com.gilshelef.feedme.donors.data;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.gilshelef.feedme.launcher.RegistrationActivity;
 import com.gilshelef.feedme.nonprofit.data.Donation;
@@ -12,7 +11,10 @@ import com.gilshelef.feedme.util.Constants;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.database.Exclude;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.messaging.FirebaseMessaging;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -52,6 +54,7 @@ public class Donor {
 
 
     public Donor(){}
+
     public Donor(String id, String businessName, String address, String contactFName, String contactLName, String phone, LatLng position, Type donationType, int donationCount){
         this.id = id;
         this.businessName = businessName;
@@ -62,10 +65,14 @@ public class Donor {
         this.position = position;
         this.donationType = donationType;
         this.donationCount = new AtomicInteger(donationCount);
+        FirebaseMessaging.getInstance().subscribeToTopic(id);
+
     }
 
     public static Donor get(){
-        return instance;
+        synchronized (Donor.class) {
+            return instance;
+        }
     }
 
     public static Donor get(Context context) {
@@ -79,8 +86,6 @@ public class Donor {
     }
 
     private static Donor build(Context context) {
-        Log.d(TAG, "build in Donor");
-
         SharedPreferences sharedPref = context.getSharedPreferences(RegistrationActivity.DONOR, Context.MODE_PRIVATE);
         String id = sharedPref.getString(K_ID, "0");
         String businessName = sharedPref.getString(K_BUSINESS, "");
@@ -200,7 +205,6 @@ public class Donor {
     }
 
     public void updateDonationCount(Context context, int delta) {
-        Log.d(TAG, "update donations count: " + delta);
         donationCount.addAndGet(delta);
         FirebaseDatabase.getInstance().getReference()
                 .child(Constants.DB_DONOR_DONATION)
@@ -233,5 +237,23 @@ public class Donor {
 
     public void setPosition(LatLng position) {
         this.position = position;
+    }
+
+    public Map<String, Object> toMap() {
+        Map<String, Object> result = new HashMap<>();
+        result.put(Donor.K_BUSINESS, businessName);
+        result.put(Donor.K_ADDRESS, address);
+        result.put(Donor.K_FIRST_NAME, firstName);
+        result.put(Donor.K_LAST_NAME, lastName);
+        result.put(Donor.K_PHONE, phone);
+
+        Map<String, Object> pos = new HashMap<>();
+        pos.put(Donor.K_LAT, position.latitude);
+        pos.put(Donor.K_LNG, position.longitude);
+        result.put(Donor.K_POSITION, pos);
+
+        result.put(Donor.K_TYPE, donationType.toMap());
+        result.put(Donor.K_ID, id);
+        return result;
     }
 }

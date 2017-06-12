@@ -1,5 +1,8 @@
 package com.gilshelef.feedme.nonprofit.data.types;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by gilshe on 3/10/17.
  */
@@ -57,6 +60,16 @@ public abstract class BaseType implements Type {
     }
 
     protected abstract boolean onEqual(Object o);
+
+    @Override
+    public Map<String,Object> toMap(){
+        Map<String,Object> result = new HashMap<>();
+        result.put(Type.K_COLOR, color);
+        result.put(Type.K_THUMBNAIL, defaultThumbnail);
+        result.put(Type.K_HEBREW, hebrewName);
+        result.put(Type.K_NAME, name);
+        return result;
+    }
 
     public void build() {
         setName();
