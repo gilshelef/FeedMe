@@ -13,7 +13,6 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -95,8 +94,70 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         Intent intent = getIntent();
         donation = intent.getParcelableExtra(EXTRA_DONATION);
         boolean isDonor = intent.getBooleanExtra(EXTRA_IS_DONOR, false);
-        extractContainers();
+        Util.loadPreference(this);
 
+        extractContainers();
+        uploadImage();
+        setUIText();
+
+        //style base on donation state
+        if(donation.isSaved() && !isDonor)
+            save.setLiked(true);
+
+        if(donation.isOwned() || isDonor) {
+            save.setVisibility(View.GONE);
+            addToCartBtn.setVisibility(View.GONE);
+            if(donation.isOwned() && !isDonor){ // show taken button
+                findViewById(R.id.taken_container).setVisibility(View.VISIBLE);
+            }
+        }
+        else styleCartBtn();
+
+
+        if(isDonor) {
+            editDescription.setVisibility(View.VISIBLE);
+            editDescription.setOnClickListener(descriptionListener);
+            timeBtn.setOnClickListener(timeListener);
+        }
+        else {
+            contactBtn.setOnClickListener(callListener); // call donor option
+            save.setOnLikeListener(new OnLikeListener() {
+                @Override
+                public void liked(LikeButton likeButton) {
+                    donation.setState(Donation.State.SAVED);
+                }
+
+                @Override
+                public void unLiked(LikeButton likeButton) {
+                    donation.setState(Donation.State.AVAILABLE);
+                }
+            }); // save button only for non profits
+            addToCartBtn.setOnClickListener(addToCartListener); // add to cart
+            addressBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    launchNavigationApp();
+                }
+            });
+        }
+
+        exit.setOnClickListener(exitListener);
+        new ResolveAddressTask().execute();
+    }
+
+    private void setUIText() {
+        //text
+        business.setText(donation.getBusinessName());
+        description.setText(donation.getDescription());
+
+        //contact
+        String contactStr = donation.getContactInfo() + " " + donation.getPhone();
+        contactInfo.setText(contactStr);
+        String text = String.format(getString(R.string.time_to_pick), donation.calenderToString());
+        timeInfo.setText(text);
+    }
+
+    private void uploadImage() {
         //thumbnail
         if(!donation.getImageUrl().isEmpty())
             Picasso.with(getApplicationContext())
@@ -110,35 +171,6 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
                     .load(donation.getType().defaultThumbnail())
                     .fit()
                     .into(thumbnail);
-
-        //text
-        business.setText(donation.getBusinessName());
-        description.setText(donation.getDescription());
-
-        //contact
-        String contactStr = donation.getContactInfo() + " " + donation.getPhone();
-        contactInfo.setText(contactStr);
-        String text = String.format(getString(R.string.time_to_pick), donation.calenderToString());
-        timeInfo.setText(text);
-
-        if(donation.isSaved())
-            save.setLiked(true);
-
-        if(donation.isOwned() || isDonor) {
-            save.setVisibility(View.GONE);
-            addToCartBtn.setVisibility(View.GONE);
-            if(donation.isOwned()) findViewById(R.id.taken_container).setVisibility(View.VISIBLE);
-        }
-        else styleCartBtn();
-
-        if(isDonor) {
-            editDescription.setVisibility(View.VISIBLE);
-            editDescription.setOnClickListener(descriptionListener);
-            timeBtn.setOnClickListener(timeListener);
-        }
-        else contactBtn.setOnClickListener(callListener);
-
-        new ListenerTask().execute();
     }
 
     private void styleCartBtn() {
@@ -198,7 +230,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
     }
 
     @Override
-    public void onBackPressed () {
+    public void onBackPressed() {
         sendDataAndFinish();
     }
 
@@ -211,24 +243,10 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         timeInfo.setText(donation.calenderToString());
     }
 
-    private class ListenerTask extends AsyncTask<Void, Void, String>{
+    private class ResolveAddressTask extends AsyncTask<Void, Void, String>{
 
         @Override
         protected String doInBackground(Void... params) {
-            exit.setOnClickListener(exitListener);
-            save.setOnLikeListener(new OnLikeListener() {
-                @Override
-                public void liked(LikeButton likeButton) {
-                    donation.setState(Donation.State.SAVED);
-                }
-
-                @Override
-                public void unLiked(LikeButton likeButton) {
-                    donation.setState(Donation.State.AVAILABLE);
-                }
-            });
-            addToCartBtn.setOnClickListener(addToCartListener);
-
             Geocoder geocoder;
             List<Address> addresses;
             Locale aLocale = new Locale.Builder().setLanguage(Constants.HEBREW).build();
@@ -244,16 +262,9 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
                     addressDetails = address + ", ";
                 addressDetails += city + ", " + country;
             } catch (IOException e) {
-                Log.e(TAG, e.getMessage());
-                //TODO
+//                Log.e(TAG, e.getMessage());
             }
 
-            addressBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    launchNavigationApp();
-                }
-            });
             return addressDetails;
         }
 

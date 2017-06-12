@@ -1,11 +1,15 @@
 package com.gilshelef.feedme.util;
 
+import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Gravity;
@@ -17,6 +21,7 @@ import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 
 import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Created by gilshe on 5/31/17.
@@ -106,4 +111,22 @@ public class Util {
         alarms.cancel(deleteIntent);
         Log.d("TIME", "cancel alarm with id " + alertId + " alarm is up? " + alarmUp);
     }
+
+    public static String loadPreference(Context context) {
+        SharedPreferences shp = context.getSharedPreferences("CommonPrefs", Activity.MODE_PRIVATE);
+        String language = shp.getString("Language","he");
+        Locale myLocale = new Locale(language);
+
+        Configuration config = new Configuration();
+        config.setLocale(myLocale);
+
+        //manually set layout direction to a LTR location
+        config.setLayoutDirection(new Locale("en"));
+
+        Resources resources = context.getResources();
+        resources.updateConfiguration(config, resources.getDisplayMetrics());
+        String locale = resources.getConfiguration().locale.getDisplayName();
+        return locale;
+    }
+
 }
