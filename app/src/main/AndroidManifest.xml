@@ -73,10 +73,16 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBPAHMrXH-TVe09QLxbC4w44nBcxNYZexs"/>
+            android:value="@string/google_maps_key" />
+
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
             android:resource="@color/colorAccent" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="a1cd3fa79ef2f1db960d93c33af7c0fae6f3a650" />
+
     </application>
 
 </manifest>

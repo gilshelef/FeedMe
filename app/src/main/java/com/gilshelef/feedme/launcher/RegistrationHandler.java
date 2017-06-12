@@ -1,17 +1,12 @@
 package com.gilshelef.feedme.launcher;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.location.Address;
 import android.location.Geocoder;
-import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.gilshelef.feedme.R;
-import com.gilshelef.feedme.nonprofit.data.OnBooleanResult;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.IOException;
@@ -54,20 +49,10 @@ public class RegistrationHandler {
             Address location = address.get(0);
             latLng = new LatLng(location.getLatitude(), location.getLongitude());
         } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
+//            Log.e(TAG, e.getMessage());
             input.setError("נראה שיש בעיות בחיבור לאינטרנט, נא נסה שנית מאוחר יותר");
         }
         return latLng;
-    }
-
-    public static boolean isNonProfitListed(String nonProfitName){
-        //TODO check with DB for non profit name
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-        return true;
     }
 
     public static boolean isEmpty(EditText field) {
@@ -80,42 +65,7 @@ public class RegistrationHandler {
         return empty;
     }
 
-    public static class CheckForNonProfitListingTask extends AsyncTask<Void, Void, Boolean> {
-        private final OnBooleanResult callback;
-        private ProgressDialog progress;
-        private String nonProfitName;
-        private Activity activity;
 
-        public CheckForNonProfitListingTask(Activity activity, String nonProfitName, OnBooleanResult callback) {
-            this.nonProfitName = nonProfitName;
-            this.activity = activity;
-            this.callback = callback;
-        }
-
-        @Override
-        protected void onPreExecute(){
-            progress = new ProgressDialog(activity);
-            progress.setTitle(activity.getString(R.string.please_wait));
-            progress.setMessage("מאמתים את שם העמותה מול רשם העמותות");
-            progress.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            progress.setIndeterminate(true);
-            progress.setCanceledOnTouchOutside(false);
-            progress.show();
-        }
-
-        @Override
-        protected Boolean doInBackground(Void... params) {
-            return isNonProfitListed(nonProfitName);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean listed){
-            if(progress != null) progress.dismiss();
-            if(!listed)
-                Toast.makeText(activity, RESULT_UNKNOWN_NON_PROFIT, Toast.LENGTH_LONG).show();
-            callback.onResult(listed);
-        }
-    }
 //    private static class ResolveAddressTask extends AsyncTask<Void, Void, Boolean> {
 //        private final String strAddress;
 //        private final EditText inputView;
