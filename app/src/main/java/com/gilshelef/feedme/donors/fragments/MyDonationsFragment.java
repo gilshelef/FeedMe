@@ -10,6 +10,7 @@ import com.gilshelef.feedme.donors.data.DonationsManager;
 import com.gilshelef.feedme.nonprofit.adapters.RecycledBaseAdapter;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.BaseFragment;
+import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.OnUpdateCount;
 
 import java.util.List;
@@ -20,10 +21,12 @@ import java.util.List;
 
 public class MyDonationsFragment extends BaseFragment implements OnUpdateCount {
     public static final String TAG = MyDonationsFragment.class.getSimpleName();
+    private OnCounterChangeListener mListener;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mListener = (OnCounterChangeListener) getActivity();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
@@ -35,7 +38,7 @@ public class MyDonationsFragment extends BaseFragment implements OnUpdateCount {
 
     @Override
     protected List<Donation> getDataSource() {
-        return DonationsManager.get().getAll();
+        return DonationsManager.get(mListener).getAll();
     }
 
     @Override
