@@ -1,5 +1,6 @@
 package com.gilshelef.feedme.nonprofit.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,7 +9,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -25,6 +25,7 @@ import com.gilshelef.feedme.launcher.RegistrationHandler;
 import com.gilshelef.feedme.nonprofit.data.DataManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.data.NonProfit;
+import com.gilshelef.feedme.nonprofit.data.OnResult;
 import com.gilshelef.feedme.util.Constants;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.OnInfoUpdateListener;
@@ -91,14 +92,7 @@ public class ProfileNonProfitFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-//        nonProfitName.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                createNonProfitDialog();
-//            }
-//
-//
-//        });
+
         address.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,29 +129,41 @@ public class ProfileNonProfitFragment extends Fragment {
         builder.setPositiveButton(R.string.yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
+
+                        final ProgressDialog progress = Util.buildProgressDialog(getContext());
+                        progress.show();
+
                         SharedPreferences prefs = getContext().getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
                         prefs.edit().putBoolean(RegistrationActivity.NON_PROFIT, false).apply();
 
-                        updateDataBase();
+                        updateDataBase(new OnResult() {
+                            @Override
+                            public void onResult() {
+                                if(progress.isShowing())
+                                    progress.dismiss();
 
-                        Intent intent = new Intent(getActivity(), RegistrationActivity.class);
-                        Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
-                        startActivity(intent);
+                                Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
+                                Intent intent = new Intent(getActivity(), RegistrationActivity.class);
+                                startActivity(intent);
+                                getActivity().finish();
+                            }
+                        });
+
+
                     }
 
-                    private void updateDataBase() {
+                    private void updateDataBase(final OnResult callback) {
                         final DatabaseReference donationRef = FirebaseDatabase.getInstance().getReference().child(Constants.DB_DONATION);
 
                         mNonProfitRef.child(Constants.DB_DONATION).addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                Log.d(TAG, "finished update on all donations");
-                                Log.d(TAG, "removing nonProfit: " + mNonProfit.getId() + "from database");
                                 mNonProfitRef.removeValue();
                                 FirebaseMessaging.getInstance().unsubscribeFromTopic("New_Donations");
                                 mLogger.removeRegistration(Logger.EVENT.NON_PROFIT, mNonProfit.getId());
                                 NonProfit.clear();
                                 DataManager.clear();
+                                callback.onResult();
                             }
 
                             @Override

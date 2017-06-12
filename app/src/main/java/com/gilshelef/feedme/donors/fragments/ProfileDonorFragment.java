@@ -1,5 +1,6 @@
 package com.gilshelef.feedme.donors.fragments;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,7 +10,6 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,6 +62,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     private static Donor mDonor;
     private static DatabaseReference mDonorRef;
     private static Logger mLogger;
+    private OnCounterChangeListener mListener;
 
 
     @Override
@@ -73,12 +74,11 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                 .child(mDonor.getId());
 
         mLogger = Logger.get(getContext());
+        mListener = (OnCounterChangeListener) getActivity();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        Log.d(TAG, "onCreateView");
-
         View rootView = inflater.inflate(R.layout.donors_fragment_profile, container, false);
 
         //views
@@ -114,7 +114,6 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void onViewCreated (View view, Bundle savedInstanceState){
 
-        Log.d(TAG, "onViewCreated");
         businessName.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -170,12 +169,13 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         builder.setPositiveButton(R.string.yes,
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        Log.d(TAG, "remove donor: " + mDonor.getId());
-                        new RemoveDonorTask(getContext(), new OnResult() {
+                        new RemoveDonorTask(mListener, getContext(), new OnResult() {
                             @Override
                             public void onResult() {
+                                Toast.makeText(getContext(), R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
                                 Intent intent = new Intent(getActivity(), RegistrationActivity.class);
                                 startActivity(intent);
+                                getActivity().finish();
                             }
                         }).execute();
                     }
@@ -209,7 +209,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                             if(RegistrationHandler.checkPhone(getContext(), newPhone)) {
                                 Donor.get(getActivity()).setPhone(getContext(), newPhone);
                                 phone.setText(newPhone);
-                                DonationsManager.get().updateProfile(getContext());
+                                DonationsManager.get(mListener).updateProfile(getContext());
                                 updateDataBase(Donor.K_PHONE, newPhone);
                                 Toast.makeText(getActivity(), R.string.contact_phone_changed_successfully, Toast.LENGTH_LONG).show();
                             }
@@ -253,7 +253,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                                 updates.put(Donor.K_LAST_NAME, names[1]);
                                 mDonorRef.updateChildren(updates);
 
-                                DonationsManager.get().updateProfile(getContext());
+                                DonationsManager.get(mListener).updateProfile(getContext());
                                 Toast.makeText(getActivity(), R.string.contact_changed_successfully, Toast.LENGTH_LONG).show();
                             }
                             else{
@@ -295,7 +295,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
                                 Donor.get(getActivity()).setAddress(getContext(), latLng, newAddress);
                                 address.setText(newAddress);
-                                DonationsManager.get().updateProfile(getContext());
+                                DonationsManager.get(mListener).updateProfile(getContext());
                                 Toast.makeText(getActivity(), R.string.address_changes_successfully, Toast.LENGTH_LONG).show();
                             }
                         }
@@ -332,7 +332,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                             businessName.setText(newBusinessName);
                             ((OnInfoUpdateListener)getActivity()).onBusinessChange(newBusinessName);
                             updateDataBase(Donor.K_BUSINESS, newBusinessName);
-                            DonationsManager.get().updateProfile(getContext());
+                            DonationsManager.get(mListener).updateProfile(getContext());
                             Toast.makeText(getActivity(), R.string.business_name_changed_successfully, Toast.LENGTH_LONG).show();
                         }
                     }
@@ -371,7 +371,7 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     @Override
     public void updateViewCounters() {
         final Donor donor = Donor.get(getActivity());
-        Log.d(TAG, "donation Count: " + donor.getDonationCount());
+//        Log.d(TAG, "donation Count: " + donor.getDonationCount());
         if(medalCount != null)
             medalCount.setText(String.valueOf(donor.getDonationCount()));
     }
@@ -380,13 +380,23 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     private static class RemoveDonorTask extends AsyncTask<Void, Void, Void>{
 
         private final Context mContext;
+        private final OnCounterChangeListener mListener;
         private OnResult mCallback;
+        private ProgressDialog mProgress;
 
-        private RemoveDonorTask(Context context, OnResult callback) {
+
+        private RemoveDonorTask(OnCounterChangeListener listener, Context context, OnResult callback) {
             this.mContext = context;
             this.mCallback = callback;
+            this.mListener = listener;
         }
 
+        @Override
+        protected void onPreExecute(){
+            mProgress = Util.buildProgressDialog(mContext);
+            mProgress.show();
+
+        }
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -412,12 +422,16 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
                             mDonorRef.removeValue(); // remove /donor
                             donorDonationRef.removeValue(); //remove /donor_donation
 
-                            DonationsManager.get().removeImages(donationToRemove.keySet());
+                            DonationsManager.get(mListener).removeImages(donationToRemove.keySet());
                             FirebaseMessaging.getInstance().unsubscribeFromTopic(mDonor.getId());
                             mLogger.removeRegistration(Logger.EVENT.DONOR, mDonor.getId());
 
                             Donor.clear();
                             DonationsManager.clear();
+
+                            if(mProgress != null && mProgress.isShowing())
+                                mProgress.dismiss();
+
                             mCallback.onResult();
                         }
                     });
@@ -436,11 +450,6 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
             SharedPreferences prefs = mContext.getSharedPreferences(RegistrationActivity.PREFS, Context.MODE_PRIVATE);
             prefs.edit().putBoolean(RegistrationActivity.DONOR, false).apply();
             return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void p){
-            Toast.makeText(mContext, R.string.remove_registration_successfully, Toast.LENGTH_LONG).show();
         }
     }
 
