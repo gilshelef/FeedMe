@@ -1,7 +1,5 @@
 package com.gilshelef.feedme.nonprofit.adapters;
 
-import android.util.Log;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -36,7 +34,6 @@ public class AdapterManager {
     }
 
     public void updateDataSourceAll() {
-        Log.d(TAG, "update data source: " + updateCounter.incrementAndGet());
         for(Adaptable a: adapters.values()) {
             a.updateDataSource();
             a.notifyDataSetChanged();
@@ -48,7 +45,6 @@ public class AdapterManager {
     }
 
     public void updateDataSourceAll(String exclude) {
-        Log.d(TAG, "update data source: " + updateCounter.incrementAndGet());
         for(Adaptable a: adapters.values()) {
             if(a.getName().equals(exclude))
                 continue;

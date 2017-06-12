@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.widget.TimePicker;
 
 import com.gilshelef.feedme.donors.activities.DonorMainActivity;
@@ -30,8 +29,6 @@ public class NotifyDonationExpiredActivity extends AppCompatActivity implements 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "NotifyTimePassesActivity onCreate");
-
         Bundle extras = getIntent().getExtras();
         mDonationId = extras.getString(Donation.K_ID);
         int action = extras.getInt(ACTION, ACTION_PRESSED);
@@ -45,7 +42,6 @@ public class NotifyDonationExpiredActivity extends AppCompatActivity implements 
     }
 
     private void pressedEvent() {
-        Log.d(TAG, "pressedEvent");
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment dialog = AppCompatMaterialAlertDialog.getInstance();
         dialog.show(fm, "dialog");
@@ -53,7 +49,6 @@ public class NotifyDonationExpiredActivity extends AppCompatActivity implements 
 
 
     private void dismissEvent() {
-        Log.d(TAG,"dismissEvent");
         sendUpdate(DonorMainActivity.ACTION_REMOVE_DONATION);
     }
 

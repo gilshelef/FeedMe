@@ -9,7 +9,6 @@ import android.location.Location;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.launcher.RegistrationActivity;
@@ -69,6 +68,7 @@ public class NonProfit {
     }
 
     private static NonProfit build(final Context context) {
+        if(context == null) return null;
         SharedPreferences sharedPref = context.getSharedPreferences(RegistrationActivity.NON_PROFIT, Context.MODE_PRIVATE);
         String uuid = sharedPref.getString(KEY_ID, "0");
         String nonProfitName = sharedPref.getString(KEY_NAME, "עמותה");
@@ -92,9 +92,7 @@ public class NonProfit {
         final ValueEventListener listener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange, listenForAuthorizeEvent");
-                if(dataSnapshot.getValue() == null)
-                    return;
+                if(dataSnapshot.getValue() == null) return;
                 boolean authorized = dataSnapshot.getValue(Boolean.class);
                 if(authorized) {
                     setAuthorized(context);
@@ -135,7 +133,6 @@ public class NonProfit {
     }
 
     private void setAuthorized(Context context) {
-        Log.d(TAG, "non profit has been authorized!");
         getEditor(context).putBoolean(KEY_AUTHORIZED, true).apply();
         synchronized (this){
             this.authorized = true;

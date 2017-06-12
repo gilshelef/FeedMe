@@ -1,7 +1,5 @@
 package com.gilshelef.feedme.nonprofit.data.types;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -35,7 +33,6 @@ public class TypeManager {
 
     private TypeManager(){
         TypeRegistry.registerAll(this);
-        Log.d(TAG, "ALL REGISTERED");
     }
 
     public Type getType(String type) {
@@ -48,16 +45,6 @@ public class TypeManager {
         List<Type> types = new ArrayList<>();
         types.addAll(dataSources.values());
         return types;
-    }
-
-    public int getTypePosition(Type donationType) {
-        int i = 0;
-        for(Type t: dataSources.values()){
-            if(t.equals(donationType))
-                return i;
-            i++;
-        }
-        return i;
     }
 
     public static class TypeComparator implements Comparator<Type> {

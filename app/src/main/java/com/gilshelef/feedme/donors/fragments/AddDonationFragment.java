@@ -1,7 +1,6 @@
 package com.gilshelef.feedme.donors.fragments;
 
 import android.app.TimePickerDialog;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -10,7 +9,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,7 +26,6 @@ import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.nonprofit.data.Donation;
 import com.gilshelef.feedme.nonprofit.fragments.OnCounterChangeListener;
 import com.gilshelef.feedme.util.Constants;
-import com.gilshelef.feedme.util.ImagePicker;
 import com.gilshelef.feedme.util.Logger;
 import com.gilshelef.feedme.util.Util;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -44,16 +41,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import static android.app.Activity.RESULT_OK;
-
 /**
  * Created by gilshe on 3/27/17.
  */
 
 public class AddDonationFragment extends Fragment implements TimePickerDialog.OnTimeSetListener, OnImageResult {
     public static final String TAG = AddDonationFragment.class.getSimpleName();
-    public static final int REQUEST_IMAGE_CAPTURE = Constants.REQUEST_3;
-
 
     private EditText description;
     private Bitmap imageBitmap;
@@ -63,6 +56,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
     private DatabaseReference mDatabase;
     private StorageReference mStorageRef;
     private Logger mLogger;
+    private OnCounterChangeListener mListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -70,6 +64,7 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
         mDatabase = FirebaseDatabase.getInstance().getReference();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mLogger = Logger.get(getContext());
+        mListener = (OnCounterChangeListener) getActivity();
     }
 
 
@@ -121,13 +116,6 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
 
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK && data != null) {
-            imageBitmap = ImagePicker.getImageFromResult(getActivity(), resultCode, data);
-            imageView.setVisibility(View.VISIBLE);
-        }
-    }
 
     private void uploadImageToStorage(String donationId, OnSuccessListener<UploadTask.TaskSnapshot> onSuccessListener) {
 
@@ -149,7 +137,6 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
             @Override
             public void onFailure(@NonNull Exception exception) {
                 Toast.makeText(getContext(), "Error occurred while uploading image to storage, please try again later", Toast.LENGTH_LONG).show();
-                Log.e(TAG, exception.getMessage());
             }
         }).addOnSuccessListener(onSuccessListener);
 
@@ -192,25 +179,24 @@ public class AddDonationFragment extends Fragment implements TimePickerDialog.On
                 donation.calendar = calendar != null ? calendar : getDefaultCalendar();
 
                 donation.setImageUrl("");
+                DonationsManager.get(mListener).newDonationEvent(donation);
+
                 uploadImageToStorage(donationId, new OnSuccessListener<UploadTask.TaskSnapshot>() {
                     @Override
                     public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                         if(taskSnapshot != null && taskSnapshot.getDownloadUrl() != null) {
                             Uri imageUri = taskSnapshot.getDownloadUrl();
-                            DonationsManager.get().updateImageUrl(donation, imageUri.toString());
-                            Log.d(TAG, "upload new image");
+                            DonationsManager.get(mListener).updateImageUrl(donation, imageUri.toString());
                         }
                     }
                 });
 
-                DonationsManager.get().newDonationEvent(donation);
                 mLogger.newDonation(donationId);
                 Util.scheduleAlarm(getActivity(), donation);
                 return true;
             }
 
             catch (Exception e){
-                Log.e(TAG, e.getMessage());
                 return false;
             }
         }

@@ -2,7 +2,6 @@ package com.gilshelef.feedme.nonprofit.data;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 import com.gilshelef.feedme.nonprofit.data.types.Type;
 import com.gilshelef.feedme.util.Constants;
@@ -189,12 +188,12 @@ public class Donation implements Parcelable{
         if(other == null)
             return;
         if (!getId().equals(other.getId())) {
-            Log.e(TAG, "got update for different donations");
+//            Log.e(TAG, "got update for different donations");
             return;
         }
 
         if (!getDonorId().equals(other.getDonorId())) {
-            Log.e(TAG, "got update for different donors");
+//            Log.e(TAG, "got update for different donors");
             return;
         }
 

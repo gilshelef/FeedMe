@@ -3,7 +3,6 @@ package com.gilshelef.feedme.util;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -40,7 +39,6 @@ public class ParseListedNonProfitTask extends AsyncTask<Void, Void,Void> {
             CSVFile csvFile = new CSVFile(inputStream);
             List<String[]> nonProfits = csvFile.read();
             UploadToDatabase(nonProfits);
-            Log.d(TAG, "DONE PARSING LISTED NON PROFIT!!!");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -73,7 +71,6 @@ public class ParseListedNonProfitTask extends AsyncTask<Void, Void,Void> {
             try {
                 String csvLine;
                 while ((csvLine = reader.readLine()) != null) {
-                    Log.d(TAG, csvLine);
                     String[] row = csvLine.split(",");
                     resultList.add(row);
                 }
@@ -94,12 +91,4 @@ public class ParseListedNonProfitTask extends AsyncTask<Void, Void,Void> {
 
     }
 
-    private class ListedNonProfit {
-        private String id;
-        private String email;
-        ListedNonProfit(String[] nonProfit) {
-            this.id = nonProfit[0];
-            this.email = nonProfit[1];
-        }
-    }
 }

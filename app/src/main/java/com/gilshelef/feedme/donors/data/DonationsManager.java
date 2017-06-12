@@ -2,7 +2,6 @@ package com.gilshelef.feedme.donors.data;
 
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
 import com.gilshelef.feedme.nonprofit.data.Donation;
@@ -79,7 +78,6 @@ public class DonationsManager {
     public void newDonationEvent(final Donation donation) {
         final String donationId = donation.getId();
         final Donor donor = Donor.get();
-        Log.d(TAG, "add donation to donor: " + donor.getId());
 
         // upload to database
         donation.setState(Donation.State.AVAILABLE); // db state
@@ -198,6 +196,9 @@ public class DonationsManager {
 
     public void updateImageUrl(Donation donation, String imageUrl) {
         Donation d = mDonations.get(donation.getId());
+        if(d == null) // this should not happen! update image only after newDonationEvent!
+            return;
+
         d.setImageUrl(imageUrl);
 
         mDatabase
@@ -230,7 +231,6 @@ public class DonationsManager {
         private ValueEventListener getDonationsFromDataBase = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d(TAG, "onDataChange");
                 Map<String, Donation> myDonations = new HashMap<>();
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     try {
@@ -264,15 +264,12 @@ public class DonationsManager {
                     .addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                            Log.d(TAG, "new donation");
                         }
 
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String s) {
                             String donationId = dataSnapshot.getKey();
                             Donation.State state = Donation.State.valueOf(dataSnapshot.getValue().toString());
-
-                            Log.d(TAG, "donation : " + donationId + "changed to: " + state);
                             if(state.equals(Donation.State.TAKEN)) {
                                 returnDonation(donationId);
                                 mListener.updateViewCounters();

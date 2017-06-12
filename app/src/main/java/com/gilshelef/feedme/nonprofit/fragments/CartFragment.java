@@ -7,7 +7,6 @@ import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,8 +71,9 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
     public void updateItemsCount() {
         if (mItemCountUI == null) return;
         final int count = mDataSource.size();
-        if (count < 0)
-            Log.e(TAG, "ERROR!! number of items in bag is = " + count);
+//        if (count < 0) {
+//            Log.e(TAG, "ERROR!! number of items in bag is = " + count);
+//        }
         if (count <= 0) {
             mItemCountUI.setVisibility(View.INVISIBLE);
             mCheckoutBtn.setVisibility(View.GONE);
@@ -237,7 +237,6 @@ public class CartFragment extends BaseFragment implements View.OnClickListener, 
                         });
             }
 
-            //TODO notify service that manages time of donations
             return null;
         }
 

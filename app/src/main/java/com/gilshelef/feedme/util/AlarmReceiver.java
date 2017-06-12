@@ -9,7 +9,6 @@ import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
-import android.util.Log;
 
 import com.gilshelef.feedme.R;
 import com.gilshelef.feedme.nonprofit.data.Donation;
@@ -24,7 +23,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent i) {
-        Log.d(TAG, "onReceive, time passes for donation");
         if(i.getAction().equals(ACTION)) {
             Bundle extras = i.getExtras();
             String donationId = extras.getString(Donation.K_ID);

@@ -6,7 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -121,13 +120,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d(TAG, "onMapReady");
+//        Log.d(TAG, "onMapReady");
         mMap = googleMap;
         setUpMap();
     }
 
     private void setUpMap() {
-        Log.d(TAG, "setUpMap");
+//        Log.d(TAG, "setUpMap");
         mDataSource = DataManager.get(getActivity()).getAll();
 
         mMap.setOnMarkerClickListener(this);
@@ -146,7 +145,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             ActivityCompat.requestPermissions(getActivity(),
                     new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.ACCESS_COARSE_LOCATION},
                     Constants.PERMISSIONS_REQUEST_LOCATION);
-            Log.i(TAG, "no permission for my position enable");
+//            Log.i(TAG, "no permission for my position enable");
             return;
         }
         new DrawDonationTask().execute();
@@ -169,11 +168,11 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
             if (resultCode == RESULT_OK) {
                 Place place = PlaceAutocomplete.getPlace(getActivity(), data);
                 displayMark(place.getLatLng(), place.getName().toString());
-                Log.i(TAG, "Place: " + place.getName());
+//                Log.i(TAG, "Place: " + place.getName());
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(getActivity(), data);
                 // TODO: Handle the error.
-                Log.i(TAG, status.getStatusMessage());
+//                Log.i(TAG, status.getStatusMessage());
 
             } else if (resultCode == RESULT_CANCELED) {
                 // The user canceled the operation.
@@ -199,7 +198,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Log.d(TAG, "onMarkerClick");
+//        Log.d(TAG, "onMarkerClick");
         if(!(marker.getTag() instanceof Donation))
             marker.showInfoWindow();
 
@@ -212,7 +211,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback, GoogleM
 
     @Override
     public void updateDataSource() {
-        Log.d(TAG,"updateDataSource");
+//        Log.d(TAG,"updateDataSource");
         mDataSource.clear();
         mDataSource.addAll(DataManager.get(getActivity()).getAll());
     }
