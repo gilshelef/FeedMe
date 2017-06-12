@@ -1,7 +1,6 @@
 package com.gilshelef.feedme.nonprofit.data;
 
 import android.content.Context;
-import android.util.Log;
 
 import com.gilshelef.feedme.donors.data.Donor;
 import com.gilshelef.feedme.nonprofit.adapters.AdapterManager;
@@ -38,7 +37,7 @@ public class DataManager {
     private static DataManager instance;
     private final NonProfit mNonProfit;
     private final DatabaseHelper mDatabaseHelper;
-    private OnCounterChangeListener mListener;
+    private final OnCounterChangeListener mListener;
 
     private DataManager(Context context){
         mDonations = new ConcurrentHashMap<>();
@@ -183,6 +182,7 @@ public class DataManager {
     private void removeDonation(String id) {
         if (mDonations.containsKey(id)) {
             mDonations.remove(id);
+            mDatabaseHelper.donationRemoved(id);
             AdapterManager.get().updateDataSourceAll();
             mListener.updateViewCounters();
         }
@@ -213,12 +213,12 @@ public class DataManager {
         private DatabaseHelper() {
             mDatabaseRef = FirebaseDatabase.getInstance().getReference();
         }
-        public void fetchData() {
+
+        void fetchData() {
             mDatabaseRef.child(Constants.DB_DONATION)
                     .addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(final DataSnapshot dataSnapshot, String prevChildKey) {
-                            Log.d(TAG, "onChildAdded");
                             final Donation donation = dataSnapshot.getValue(Donation.class);
 
                             //fetch donor's profile info
@@ -228,7 +228,6 @@ public class DataManager {
                                     .addValueEventListener(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot1) {
-                                            Log.d(TAG, "onDataChange");
 
                                             Donor donor = dataSnapshot1.getValue(Donor.class);
 
@@ -260,8 +259,6 @@ public class DataManager {
 
                         @Override
                         public void onChildChanged(DataSnapshot dataSnapshot, String prevChildKey) {
-                            Log.d(TAG, "onChildChanged");
-
                             final Donation newDonation = dataSnapshot.getValue(Donation.class);
                             final Donation donation = mDonations.get(newDonation.getId());
 
@@ -282,7 +279,6 @@ public class DataManager {
 
                         @Override
                         public void onChildRemoved(DataSnapshot dataSnapshot) {
-                            Log.d(TAG, "onChildRemoved");
                             //mDonations has been removed
                             final String donationId = dataSnapshot.getKey();
                             removeDonation(donationId);
@@ -295,8 +291,10 @@ public class DataManager {
                         public void onCancelled(DatabaseError databaseError) {}
                     });
         }
-        public void takenEvent(String donationId) {
+
+        void takenEvent(String donationId) {
             Donation donation = mDonations.get(donationId);
+            if(donation == null) return;
             mDatabaseRef
                     .child(Constants.DB_DONATION)
                     .child(donationId)
@@ -308,7 +306,8 @@ public class DataManager {
                     .child(donationId)
                     .setValue(Donation.State.TAKEN);
         }
-        public void returnOwnedDonation(Donation donation) {
+
+        void returnOwnedDonation(Donation donation) {
             Map<String, Object> updates = new HashMap<>();
             updates.put(Donation.K_STATE, Donation.State.AVAILABLE);
             updates.put(Donation.K_NON_PROFIT_ID, null);
@@ -318,9 +317,14 @@ public class DataManager {
                     .updateChildren(updates);
 
         }
+
+        void donationRemoved(String donationId) {
+            mDatabaseRef
+                    .child(Constants.DB_NON_PROFIT)
+                    .child(mNonProfit.getId())
+                    .child(Constants.DB_DONATION)
+                    .child(donationId)
+                    .setValue(null);
+        }
     }
-
-
-
-
 }
