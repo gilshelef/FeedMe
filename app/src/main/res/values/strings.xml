@@ -30,7 +30,7 @@
 
     <string name="add_donation">New donation</string>
     <string name="business_address">כתובת בית העסק</string>
-    <string name="contact_phone">מספר טלפון</string>
+    <string name="contact_phone">מספר פלאפון</string>
     <string name="remove_registration">הסר רישום</string>
     <string name="address_hint">עיר רחוב ומספר</string>
     <string name="non_profit_name">שם העמותה</string>
@@ -89,9 +89,10 @@
     <string name="resend_email_authorization">לשלוח אימייל נוסף לאישורך?</string>
     <string name="authrization_confimed">קיבלנו אישור מאירגונך :)</string>
     <string name="authrization_confimed_msg">כעת האפליקציה פתוחה לכל השימושים</string>
-    <string name="non_profit_id_hint">מספר העמותה כפי שמופיע ברשם העמותות</string>
+    <string name="non_profit_id_hint"><font size="15">מספר עמותה, כפי שמופיע ברשם העמותות</font></string>
     <string name="donation_expired_title">שים לב, תוקף התרומה שלך עומד לפוג</string>
     <string name="donation_expired_msg">אתה יכול לעדכן את זמן האיסוף \nאו שהתרומה תרד מהאוויר.</string>
     <string name="pick_image_intent_text">בחר אפליקציה:</string>
+    <string name="apply_filter">הפעל</string>
 
 </resources>

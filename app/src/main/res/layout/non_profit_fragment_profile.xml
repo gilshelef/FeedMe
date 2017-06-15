@@ -24,7 +24,10 @@
                 android:id="@+id/name_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
                 android:layout_alignParentTop="true"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="16dp">
 
                 <!--name header-->
@@ -35,7 +38,6 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:clickable="true"
-                    android:paddingEnd="12dp"
                     android:text="@string/non_profit_name"
                     android:textSize="20sp" />
 
@@ -43,22 +45,24 @@
                     android:id="@+id/non_profit_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_below="@id/edit_name"
                     android:layout_marginTop="2dp"
-                    android:padding="8dp"
-                    android:gravity="start"
-                    android:paddingEnd="12dp"
                     android:drawablePadding="8dp"
-                    android:layout_alignParentEnd="true"
+                    android:gravity="start"
+                    android:padding="8dp"
+                    android:paddingEnd="12dp"
                     android:textColor="@android:color/black"
                     android:textSize="20sp" />
-        </RelativeLayout>
+            </RelativeLayout>
 
             <!--divider-->
             <View
                 android:id="@+id/divider_1"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
                 android:layout_below="@id/name_container"
                 android:background="@color/divider" />
 
@@ -68,6 +72,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/divider_1"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="16dp">
 
                 <TextView
@@ -77,7 +83,6 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:clickable="true"
-                    android:paddingEnd="12dp"
                     android:text="@string/address"
                     android:textSize="20sp" />
 
@@ -85,14 +90,13 @@
                     android:id="@+id/non_profit_address"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_below="@id/edit_address"
                     android:layout_marginTop="2dp"
-                    android:padding="8dp"
-                    android:gravity="start"
-                    android:paddingEnd="12dp"
-                    android:drawablePadding="8dp"
-                    android:layout_alignParentEnd="true"
                     android:drawableEnd="@drawable/ic_edit_black_24dp"
+                    android:drawablePadding="8dp"
+                    android:gravity="start"
+                    android:padding="8dp"
                     android:textColor="@android:color/black"
                     android:textSize="20sp" />
             </RelativeLayout>
@@ -100,17 +104,21 @@
             <!--divider-->
             <View
                 android:id="@+id/divider_2"
-                android:layout_below="@id/address_container"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_below="@id/address_container"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
                 android:background="@color/divider" />
 
             <!--contact-->
             <RelativeLayout
+                android:id="@+id/contact_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/divider_2"
-                android:id="@+id/contact_container"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="16dp">
 
                 <TextView
@@ -120,7 +128,6 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:clickable="true"
-                    android:paddingEnd="12dp"
                     android:text="@string/contact_name"
                     android:textSize="20sp" />
 
@@ -128,32 +135,35 @@
                     android:id="@+id/contact_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_below="@id/edit_contact"
                     android:layout_marginTop="2dp"
-                    android:padding="8dp"
-                    android:gravity="start"
-                    android:paddingEnd="12dp"
-                    android:drawablePadding="8dp"
-                    android:layout_alignParentEnd="true"
                     android:drawableEnd="@drawable/ic_edit_black_24dp"
+                    android:drawablePadding="8dp"
+                    android:gravity="start"
+                    android:padding="8dp"
                     android:textColor="@android:color/black"
                     android:textSize="20sp" />
             </RelativeLayout>
 
             <!--divider-->
             <View
-                android:layout_below="@id/contact_container"
                 android:id="@+id/divider_3"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_below="@id/contact_container"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
                 android:background="@color/divider" />
 
             <!--phone-->
             <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_below="@id/divider_3"
                 android:id="@+id/phone_container"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/divider_3"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
                 android:layout_marginTop="16dp">
 
                 <TextView
@@ -163,7 +173,6 @@
                     android:layout_alignParentEnd="true"
                     android:layout_alignParentTop="true"
                     android:clickable="true"
-                    android:paddingEnd="12dp"
                     android:text="@string/contact_phone"
                     android:textSize="20sp" />
 
@@ -171,24 +180,25 @@
                     android:id="@+id/contact_phone"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
                     android:layout_below="@id/edit_phone"
                     android:layout_marginTop="2dp"
-                    android:padding="8dp"
-                    android:gravity="end"
-                    android:paddingEnd="12dp"
-                    android:drawablePadding="8dp"
-                    android:layout_alignParentEnd="true"
                     android:drawableEnd="@drawable/ic_edit_black_24dp"
+                    android:drawablePadding="8dp"
+                    android:gravity="end"
+                    android:padding="8dp"
                     android:textColor="@android:color/black"
                     android:textSize="20sp" />
             </RelativeLayout>
 
             <!--divider-->
             <View
-                android:layout_below="@id/phone_container"
                 android:id="@+id/divider_4"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
+                android:layout_below="@id/phone_container"
+                android:layout_marginEnd="20dp"
+                android:layout_marginStart="20dp"
                 android:background="@color/divider" />
 
 
@@ -203,7 +213,7 @@
                 android:layout_marginBottom="30dp"
                 android:elevation="8dp"
                 android:layout_marginTop="24dp"
-                card_view:cardCornerRadius="10dp">
+                card_view:cardCornerRadius="@dimen/button_corner_radius">
 
                 <Button
                     android:id="@+id/remove_registration_btn"

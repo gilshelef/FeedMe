@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:card_view="http://schemas.android.com/tools"
     android:background="@android:color/white"
     android:orientation="vertical"
     android:id="@+id/details_container"
@@ -60,10 +60,12 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
-        android:layout_marginEnd="2dp"
-        android:layout_marginStart="2dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginStart="20dp"
         android:layout_marginTop="8dp"
-        android:layout_weight="0.50">
+        android:layout_weight="0.50"
+        android:paddingBottom="4dp"
+        android:paddingTop="4dp">
 
         <!--image-->
         <ImageView
@@ -124,6 +126,8 @@
             android:id="@+id/contact_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:clickable="true">
 
@@ -133,10 +137,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:layout_margin="4dp"
                 android:contentDescription="@string/call"
                 android:padding="4dp"
-                android:paddingEnd="10dp"
                 android:src="@drawable/ic_call_black_24dp" />
 
             <TextView
@@ -147,7 +149,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_toStartOf="@id/details_call_image"
                 android:gravity="center"
-                android:paddingEnd="4dp"
+                android:padding="4dp"
                 android:text="גיל שלף"
                 android:textColor="@color/lightTextColor"
                 android:textSize="16sp" />
@@ -158,6 +160,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:background="@color/divider" />
 
         <!--time-->
@@ -165,6 +169,8 @@
             android:id="@+id/time_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:clickable="true">
 
@@ -174,10 +180,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:layout_margin="4dp"
                 android:contentDescription="@string/call"
                 android:padding="4dp"
-                android:paddingEnd="10dp"
                 android:src="@drawable/ic_access_time_black_24dp" />
 
             <TextView
@@ -188,7 +192,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_toStartOf="@id/details_time_image"
                 android:gravity="center"
-                android:paddingEnd="4dp"
+                android:padding="4dp"
                 android:text="בשעה 16"
                 android:textColor="@color/lightTextColor"
                 android:textSize="16sp" />
@@ -198,6 +202,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:background="@color/divider" />
 
         <!--address-->
@@ -205,6 +211,8 @@
             android:id="@+id/address_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:layout_weight="1"
             android:clickable="true"
             android:paddingEnd="0dp"
@@ -217,10 +225,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:layout_margin="4dp"
                 android:contentDescription="@string/call"
                 android:padding="4dp"
-                android:paddingEnd="10dp"
                 android:src="@drawable/ic_room_black_24dp" />
 
             <TextView
@@ -231,7 +237,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_toStartOf="@id/details_address_image"
                 android:gravity="center"
-                android:paddingEnd="4dp"
+                android:padding="4dp"
                 android:text="אשור 32 כרמיאל"
                 android:textColor="@color/lightTextColor"
                 android:textSize="16sp" />
@@ -242,6 +248,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:background="@color/divider" />
 
         <!--taken-->
@@ -249,13 +257,15 @@
             android:id="@+id/taken_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
+            android:layout_weight="1"
             android:clickable="true"
             android:paddingEnd="0dp"
             android:paddingStart="0dp"
             android:paddingTop="0dp"
-            android:layout_weight="1"
-            android:visibility="gone"
-            android:layout_alignParentStart="true">
+            android:visibility="gone">
 
             <CheckBox
                 android:id="@+id/mark_taken_checkbox"
@@ -263,7 +273,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_centerInParent="true"
-                android:layout_margin="4dp"
                 android:padding="4dp" />
 
             <TextView
@@ -274,7 +283,7 @@
                 android:layout_marginEnd="4dp"
                 android:layout_toStartOf="@id/mark_taken_checkbox"
                 android:gravity="center"
-                android:paddingEnd="4dp"
+                android:padding="4dp"
                 android:text="@string/mark_taken"
                 android:textColor="@color/lightTextColor"
                 android:textSize="16sp" />
@@ -285,6 +294,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginStart="20dp"
             android:background="@color/divider" />
 
     </LinearLayout>
@@ -294,7 +305,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="16dp"
+        android:layout_margin="20dp"
         android:layout_weight="0.05"
         android:clickable="true"
         android:gravity="center"
