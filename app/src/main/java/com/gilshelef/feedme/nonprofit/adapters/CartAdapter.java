@@ -20,17 +20,13 @@ public class CartAdapter extends RecycledBaseAdapter {
         super(activity, dataSource, listener);
     }
 
-
     @Override
     public void updateDataSource() {
-//        List<Donation> newDonation = DataManager.get(mActivity).getInCart();
-//        synchronized (mDataSource) {
-//            mDataSource.clear();
-//            mDataSource.addAll(newDonation);
-//        }
-        mDataSource.clear();
-        mDataSource.addAll(DataManager.get(mActivity).getInCart());
-        ((OnUpdateCount)mListener).updateItemsCount();
+        synchronized (mLock) {
+            mDataSource.clear();
+            mDataSource.addAll(DataManager.get(mActivity).getInCart());
+        }
+        ((OnUpdateCount) mListener).updateItemsCount();
     }
 
     @Override
@@ -40,7 +36,6 @@ public class CartAdapter extends RecycledBaseAdapter {
 
     @Override
     protected void styleListItem(ItemViewHolder itemView, Donation donation) {
-
     }
 
     @Override

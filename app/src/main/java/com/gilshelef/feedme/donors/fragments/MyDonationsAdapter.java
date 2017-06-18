@@ -35,8 +35,10 @@ public class MyDonationsAdapter extends RecycledBaseAdapter {
 
     @Override
     public void updateDataSource() {
-        mDataSource.clear();
-        mDataSource.addAll(DonationsManager.get(onCounterListener).getAll());
+        synchronized (mLock) {
+            mDataSource.clear();
+            mDataSource.addAll(DonationsManager.get(onCounterListener).getAll());
+        }
     }
 
     @Override

@@ -73,7 +73,9 @@ public class OwnedAdapter extends RecycledBaseAdapter {
 
     @Override
     public void updateDataSource() {
-        mDataSource.clear();
-        mDataSource.addAll(DataManager.get(mActivity).getOwned());
+        synchronized (mLock) {
+            mDataSource.clear();
+            mDataSource.addAll(DataManager.get(mActivity).getOwned());
+        }
     }
 }

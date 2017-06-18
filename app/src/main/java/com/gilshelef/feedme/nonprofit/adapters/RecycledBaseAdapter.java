@@ -23,11 +23,13 @@ public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<ItemView
     protected final List<Donation> mDataSource;
     protected Activity mActivity;
     protected OnActionEvent mListener;
+    protected final Object mLock;
 
     public RecycledBaseAdapter(Activity activity, List<Donation> dataSource, OnActionEvent listener) {
         this.mDataSource = dataSource;
         this.mActivity = activity;
         this.mListener = listener;
+        this.mLock = new Object();
     }
 
     protected abstract boolean isDonorAdapter();
@@ -68,7 +70,9 @@ public abstract class RecycledBaseAdapter extends  RecyclerView.Adapter<ItemView
 
     @Override
     public int getItemCount() {
-        return (null != mDataSource ? mDataSource.size() : 0);
+        synchronized (mLock) {
+            return (null != mDataSource ? mDataSource.size() : 0);
+        }
     }
 
     @Override
