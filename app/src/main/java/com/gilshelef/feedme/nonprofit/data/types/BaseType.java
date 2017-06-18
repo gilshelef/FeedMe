@@ -56,7 +56,7 @@ public abstract class BaseType implements Type {
 
     @Override
     public int hashCode() {
-        return Integer.valueOf(name);
+        return name.hashCode();
     }
 
     protected abstract boolean onEqual(Object o);
