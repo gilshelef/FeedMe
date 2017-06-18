@@ -157,6 +157,11 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
         });
 
         medalCount = (TextView) view.findViewById(R.id.medal_counter);
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
         updateViewCounters();
     }
 
@@ -357,8 +362,12 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
         String donationType = parent.getItemAtPosition(position).toString();
         Donor donor = Donor.get(getActivity());
+        Type type = TypeManager.get().getType(donationType);
+        if(donor.getDonationType().equals(type))
+            return;
+
         donor.setTypeByString(getContext(), donationType);
-        mDonorRef.child(Donor.K_TYPE).setValue(donor.getDonationType());
+        mDonorRef.child(Donor.K_TYPE).setValue(donor.getDonationType().toMap());
         DonationsManager.get((OnCounterChangeListener) getActivity()).updateProfile(getContext());
         Toast.makeText(getActivity(), R.string.donation_type_changed_successfully, Toast.LENGTH_LONG).show();
     }
@@ -370,10 +379,10 @@ public class ProfileDonorFragment extends Fragment implements AdapterView.OnItem
 
     @Override
     public void updateViewCounters() {
-        final Donor donor = Donor.get(getActivity());
-//        Log.d(TAG, "donation Count: " + donor.getDonationCount());
-        if(medalCount != null)
-            medalCount.setText(String.valueOf(donor.getDonationCount()));
+        final Donor donor = Donor.get();
+        if(donor == null || medalCount == null)
+            return;
+        medalCount.setText(String.valueOf(donor.getDonationCount()));
     }
 
 

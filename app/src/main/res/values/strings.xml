@@ -94,5 +94,6 @@
     <string name="donation_expired_msg">אתה יכול לעדכן את זמן האיסוף \nאו שהתרומה תרד מהאוויר.</string>
     <string name="pick_image_intent_text">בחר אפליקציה:</string>
     <string name="apply_filter">הפעל</string>
+    <string name="remove_donation_checkbox">אני רוצה להסיר תרומה זו מהתרומות שלי</string>
 
 </resources>

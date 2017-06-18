@@ -29,6 +29,8 @@ public class Donation implements Parcelable{
     public static final String K_CART = "inCart";
     public static final String K_CALENDAR = "calendar";
     public static final String K_TAKEN = "taken";
+    public static final String K_REMOVE = "removeDonation";
+
 
     public enum State {SAVED, OWNED, AVAILABLE, TAKEN}
 
@@ -188,12 +190,10 @@ public class Donation implements Parcelable{
         if(other == null)
             return;
         if (!getId().equals(other.getId())) {
-//            Log.e(TAG, "got update for different donations");
             return;
         }
 
         if (!getDonorId().equals(other.getDonorId())) {
-//            Log.e(TAG, "got update for different donors");
             return;
         }
 

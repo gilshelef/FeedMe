@@ -127,8 +127,6 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
         if(!instance.hasDonation(donationId))
             return;
 
-//        Log.d("TIME", action);
-
         if(action.equals(ACTION_REMOVE_DONATION)) {
             Donor.get(this).updateDonationCount(this, -1);
             instance.returnDonation(donationId);
@@ -206,12 +204,22 @@ public class DonorMainActivity extends AppCompatActivity implements NavigationVi
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == DetailsActivity.DETAILS_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
+                DonationsManager manager = DonationsManager.get(this);
                 //get data from result
                 String donationId = data.getStringExtra(Donation.K_ID);
                 String description = data.getStringExtra(Donation.K_DESCRIPTION);
                 String calenderStr = data.getStringExtra(Donation.K_CALENDAR);
+                boolean removed = data.getBooleanExtra(Donation.K_REMOVE, false);
 
-                DonationsManager.get(this).updateDonationInformation(this, donationId, description, calenderStr);
+                if(removed) {
+                    Donor.get(this).updateDonationCount(this, -1);
+                    manager.returnDonation(donationId);
+                    Logger.get(this).returnDonation(donationId);
+                    Toast.makeText(this, R.string.remove_donation_successfully, Toast.LENGTH_LONG).show();
+                    Util.unScheduleAlarm(this, donationId);
+                    updateViewCounters();
+                }
+                else manager.updateDonationInformation(this, donationId, description, calenderStr);
                 AdapterManager.get().updateDataSourceAll();
             }
         }

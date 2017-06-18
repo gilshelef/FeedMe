@@ -85,6 +85,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
     private Button addToCartBtn;
     private ImageButton editDescription;
     private CheckBox takenCheckBox;
+    private CheckBox removeDonationBox;
 
 
     @Override
@@ -115,6 +116,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
 
 
         if(isDonor) {
+            findViewById(R.id.remove_container).setVisibility(View.VISIBLE);
             editDescription.setVisibility(View.VISIBLE);
             editDescription.setOnClickListener(descriptionListener);
             timeBtn.setOnClickListener(timeListener);
@@ -193,6 +195,7 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
         intent.putExtra(Donation.K_DESCRIPTION, donation.getDescription());
         intent.putExtra(Donation.K_CALENDAR, donation.calenderToString());
         intent.putExtra(Donation.K_TAKEN, takenCheckBox.isChecked());
+        intent.putExtra(Donation.K_REMOVE, removeDonationBox.isChecked());
         setResult(RESULT_OK, intent);
         finish();
     }
@@ -224,6 +227,9 @@ public class DetailsActivity extends AppCompatActivity implements TimePickerDial
 
         //taken
         takenCheckBox = (CheckBox) findViewById(R.id.mark_taken_checkbox);
+
+        //remove
+        removeDonationBox = (CheckBox) findViewById(R.id.remove_checkbox);
 
         addToCartBtn = (Button) findViewById(R.id.details_add_to_cart);
 
